@@ -139,6 +139,8 @@ table.bd tr.sum td{font-weight:700;border-top:2px solid var(--ink);font-size:19p
     <h1>오늘의 주식 분석</h1>
     <button class="btn" id="btnRefresh" type="button">새로고침</button>
     <div class="upd" id="upd" style="flex-basis:100%">데이터를 불러오는 중입니다…</div>
+    <div class="row" style="flex-basis:100%" role="group" aria-label="글씨 크기"><span class="small sub">글씨 크기</span>
+      <button class="chip" type="button" data-fs="1">보통</button><button class="chip" type="button" data-fs="1.15">크게</button><button class="chip" type="button" data-fs="1.3">아주 크게</button></div>
   </header>
   <div id="banners"></div>
   <div class="tabs two" role="tablist" aria-label="시장 선택">
@@ -184,6 +186,7 @@ const CONFIG = {
   MIN_COVERAGE: 70,      /* 가중치 기준 이만큼(%) 데이터가 없으면 순위에서 제외 */
   STALE_HOURS: 80,       /* 마지막 갱신 후 이 시간이 지나면 '최신 아님' 경고 */
   NEWS_MAX: 3,
+  TOP_N: 10,            /* 순위에 보여줄 종목 수 */
   PRICE_BANDS: {
     kr: [["all","전체",0,Infinity],["b1","1만원 이하",0,10000],["b2","1만~3만원",10000,30000],["b3","3만~5만원",30000,50000],["b4","5만~10만원",50000,100000],["b5","10만원 이상",100000,Infinity]],
     us: [["all","전체",0,Infinity],["b1","20달러 이하",0,20],["b2","20~50달러",20,50],["b3","50~100달러",50,100],["b4","100~300달러",100,300],["b5","300달러 이상",300,Infinity]]
@@ -284,12 +287,20 @@ const UNIVERSE = [
   ["012450","kr","한화에어로스페이스","defense"],["329180","kr","HD현대중공업","ship"],["010140","kr","삼성중공업","ship"],["034020","kr","두산에너빌리티","power"],
   ["015760","kr","한국전력","utility"],["032640","kr","LG유플러스","telecom"],["030200","kr","KT","telecom"],["003490","kr","대한항공","airline"],
   ["068270","kr","셀트리온","bio"],["005490","kr","POSCO홀딩스","steel"],["033780","kr","KT&G","consumer"],["028260","kr","삼성물산","holding"],
+  ["086790","kr","하나금융지주","bank"],["088350","kr","한화생명","bank"],["006800","kr","미래에셋증권","bank"],["005940","kr","NH투자증권","bank"],
+  ["138930","kr","BNK금융지주","bank"],["175330","kr","JB금융지주","bank"],["047040","kr","대우건설","build"],["000720","kr","현대건설","build"],
+  ["028670","kr","팬오션","shipping"],["011200","kr","HMM","shipping"],["036460","kr","한국가스공사","utility"],["035250","kr","강원랜드","consumer"],
+  ["034220","kr","LG디스플레이","device"],["017670","kr","SK텔레콤","telecom"],["066570","kr","LG전자","device"],["042660","kr","한화오션","ship"],
+  ["018880","kr","한온시스템","auto"],["030000","kr","제일기획","consumer"],
   ["NVDA","us","엔비디아","semi"],["AAPL","us","애플","device"],["MSFT","us","마이크로소프트","software"],["GOOGL","us","알파벳(구글)","internet"],
   ["AMZN","us","아마존","retail"],["META","us","메타","internet"],["AVGO","us","브로드컴","semi"],["TSLA","us","테슬라","auto"],
   ["BRK.B","us","버크셔 해서웨이","holding"],["JPM","us","JP모건","bank"],["V","us","비자","payments"],["LLY","us","일라이 릴리","bio"],
   ["XOM","us","엑슨모빌","energy"],["COST","us","코스트코","consumer"],["WMT","us","월마트","consumer"],["KO","us","코카콜라","consumer"],
   ["JNJ","us","존슨앤드존슨","bio"],["AMD","us","AMD","semi"],["PLTR","us","팔란티어","software"],["LMT","us","록히드마틴","defense"],
-  ["BAC","us","뱅크오브아메리카","bank"],["PFE","us","화이자","bio"],["T","us","AT&T","telecom"],["F","us","포드","auto"]
+  ["BAC","us","뱅크오브아메리카","bank"],["PFE","us","화이자","bio"],["T","us","AT&T","telecom"],["F","us","포드","auto"],
+  ["INTC","us","인텔","semi"],["CSCO","us","시스코","device"],["VZ","us","버라이즌","telecom"],["DIS","us","디즈니","consumer"],
+  ["NKE","us","나이키","consumer"],["UBER","us","우버","internet"],["PYPL","us","페이팔","payments"],["C","us","씨티그룹","bank"],
+  ["WFC","us","웰스파고","bank"],["SBUX","us","스타벅스","consumer"],["MRK","us","머크","bio"]
 ].map(a=>({id:a[0],market:a[1],name:a[2],sec:a[3]}));
 
 /* 업종별 정책 영향(일반 설명). 특정 인물의 투자 판단을 흉내 내지 않고, 정책이 미칠 수 있는 방향만 적습니다. */
@@ -313,6 +324,8 @@ const SECTOR = {
   software:{n:"소프트웨어",sens:"낮음",pos:"AI와 정부 IT 투자 확대의 수혜 가능성이 있습니다.",neg:"AI 규제나 정부 계약 예산 변화의 영향을 받을 수 있습니다."},
   retail:{n:"온라인 유통·클라우드",sens:"중간",pos:"AI·데이터센터 투자를 지원하는 정책의 수혜 가능성이 있습니다.",neg:"수입 상품 관세와 독점 규제의 영향을 받을 수 있습니다."},
   payments:{n:"결제",sens:"낮음",pos:"소비가 늘면 결제 금액도 함께 늘어납니다.",neg:"카드 수수료 규제의 영향을 받을 수 있습니다."},
+  build:{n:"건설",sens:"중간",pos:"주택 공급 확대나 사회기반시설 투자 정책의 수혜 가능성이 있습니다.",neg:"부동산 규제와 금리 변화에 따라 수주와 이익이 달라질 수 있습니다."},
+  shipping:{n:"해운",sens:"높음",pos:"무역 물동량이 늘면 운임과 이익이 좋아질 수 있습니다.",neg:"관세와 무역 갈등으로 물동량이 줄면 운임이 내려갈 수 있습니다."},
   energy:{n:"에너지",sens:"높음",pos:"석유·가스 생산 확대와 규제 완화 정책의 수혜 가능성이 있습니다.",neg:"유가를 낮추려는 정책이 나오면 이익이 줄어들 수 있습니다."}
 };
 
@@ -398,7 +411,7 @@ function cautions(s){
 function renderHeader(){
   const d=state.data, g=new Date(d.generatedAt);
   const p=n=>String(n).padStart(2,"0");
-  $("upd").innerHTML="마지막 업데이트 <b class=\"num\">"+g.getFullYear()+"-"+p(g.getMonth()+1)+"-"+p(g.getDate())+" "+p(g.getHours())+":"+p(g.getMinutes())+"</b> · 화~토요일 아침에 갱신";
+  $("upd").innerHTML="마지막 업데이트 <b class=\"num\">"+g.getFullYear()+"-"+p(g.getMonth()+1)+"-"+p(g.getDate())+" "+p(g.getHours())+":"+p(g.getMinutes())+"</b> · 장이 열린 날 약 3시간마다 갱신";
   const b=[]; const age=(Date.now()-g.getTime())/36e5;
   if(age>CONFIG.STALE_HOURS) b.push('<div class="banner">⚠ 일부 데이터가 최신 데이터가 아닙니다. 마지막 갱신 후 '+Math.floor(age/24)+"일 "+Math.floor(age%24)+"시간이 지났습니다.</div>");
   $("banners").innerHTML=b.join("");
@@ -430,18 +443,18 @@ function cardHtml(x, i){
   return '<article class="card stock"><div class="s-head"><div style="min-width:0"><div class="rank">'+(i+1)+'위</div><div class="s-name">'+esc(u.name)+' <span class="s-code">'+esc(s.id)+"</span></div></div>"+
     '<div class="score-box"><div class="n">'+x.r.total+'</div><div class="l">종합점수 / 100</div></div></div>'+
     '<div><div class="price">'+fmtPrice(s)+"</div>"+(state.krw&&s.market==="us"&&krwOf(s)?'<div class="sub small num">'+krwOf(s)+"</div>":"")+"</div>"+
-    '<div class="row">'+chgHtml(s)+'<span class="sub small">'+dateK(s.priceDate)+" 종가</span></div>"+
+    '<div class="row">'+chgHtml(s)+'<span class="sub small">'+dateK(s.priceDate)+" 기준</span></div>"+
     '<div class="row"><b>'+HZ_NAME[state.hz]+"</b> "+starsHtml(st)+" "+tagHtml(outlookOf(x.r.total))+"</div>"+
     '<button class="btn fill wide" type="button" data-open="'+esc(s.id)+'">분석 보기</button></article>';
 }
 function renderTop(){
   const mk=state.market, band=CONFIG.PRICE_BANDS[mk].find(b=>b[0]===state.band)||CONFIG.PRICE_BANDS[mk][0];
-  const all=stocksOf(mk), res=rank(all,state.hz,ctxOf(mk),band), top=res.ok.slice(0,5);
-  let h='<div><h2 class="sec-title">'+(mk==="kr"?"🇰🇷 한국주식":"🇺🇸 미국주식")+" "+HZ_NAME[state.hz]+" 관심 종목 TOP "+Math.min(5,top.length||5)+'</h2><p class="small sub">'+HZ_DESC[state.hz]+" 분석 알고리즘 기준이며, 대표 종목 "+UNIVERSE.filter(u=>u.market===mk).length+"개 안에서 고른 순위입니다.</p></div>";
+  const all=stocksOf(mk), res=rank(all,state.hz,ctxOf(mk),band), top=res.ok.slice(0,CONFIG.TOP_N);
+  let h='<div><h2 class="sec-title">'+(mk==="kr"?"🇰🇷 한국주식":"🇺🇸 미국주식")+" "+HZ_NAME[state.hz]+" 관심 종목 TOP "+Math.min(CONFIG.TOP_N,top.length||CONFIG.TOP_N)+'</h2><p class="small sub">'+HZ_DESC[state.hz]+" 분석 알고리즘 기준이며, 대표 종목 "+UNIVERSE.filter(u=>u.market===mk).length+"개 안에서 고른 순위입니다.</p></div>";
   if(!all.length) h+='<div class="card"><b>데이터 연결 필요</b><p>현재 최신 주가 데이터를 불러올 수 없습니다. 데이터가 연결되면 추천 기능을 사용할 수 있습니다.</p></div>';
   else if(!top.length) h+='<div class="card"><p>이 가격대에는 분석 대상 종목이 없습니다. 다른 가격대를 선택해 주세요.</p></div>';
   else h+=top.map(cardHtml).join("");
-  if(top.length && top.length<5) h+='<p class="small sub">이 가격대의 분석 대상 종목이 '+top.length+"개뿐이라 "+top.length+"개만 보여드립니다.</p>";
+  if(top.length && top.length<CONFIG.TOP_N) h+='<p class="small sub">이 가격대의 분석 대상 종목이 '+top.length+"개뿐이라 "+top.length+"개만 보여드립니다.</p>";
   const ex=res.excluded.map(x=>UNIVERSE.find(u=>u.id===x.s.id).name).concat(missingOf(mk).map(u=>u.name));
   if(ex.length && state.band==="all") h+='<div class="card"><b>분석 데이터 부족</b><p class="small">충분한 데이터를 확보하지 못해 추천 순위에서 제외했습니다: '+esc(ex.join(", "))+"</p></div>";
   $("top5").innerHTML=h;
@@ -489,7 +502,7 @@ function openDetail(id){
   const ctx=ctxOf(s.market), R3={short:scoreStock(s,"short",ctx),mid:scoreStock(s,"mid",ctx),long:scoreStock(s,"long",ctx)}, r=R3[state.hz], sec=SECTOR[u.sec];
   let body='<div><h2 class="s-name" style="font-size:28px">'+esc(u.name)+' <span class="s-code">'+esc(s.id)+" · "+sec.n+'</span></h2></div>'+
     '<div class="card"><div class="price" style="font-size:36px">'+fmtPrice(s)+"</div>"+(s.market==="us"&&krwOf(s)?'<div class="sub small num">'+krwOf(s)+" (환율 "+dateK(state.data.market.usdkrw.date)+" 기준)</div>":"")+
-    '<div class="row">'+chgHtml(s)+'<span class="sub small">'+dateK(s.priceDate)+" 종가 기준</span></div></div>";
+    '<div class="row">'+chgHtml(s)+'<span class="sub small">'+dateK(s.priceDate)+" 기준</span></div></div>";
   if(r.excluded){
     body+='<div class="card"><b>분석 데이터 부족</b><p>'+HZ_NAME[state.hz]+" 분석에 필요한 데이터를 충분히 확보하지 못해 점수를 내지 않았습니다. (없는 항목: "+r.missing.map(k=>FACTOR_NAME[k]).join(", ")+")</p></div>";
   } else {
@@ -543,7 +556,7 @@ async function load(isRefresh){
     const res=await fetch("data.json",{cache:"no-store"}); if(!res.ok) throw new Error("HTTP "+res.status);
     const d=await res.json(); if(!d||!Array.isArray(d.stocks)||!d.generatedAt||!d.market) throw new Error("형식 오류");
     const prev=state.data&&state.data.generatedAt; applyData(d); renderAll();
-    if(isRefresh) toast(prev===d.generatedAt? "이미 가장 최근 데이터입니다. 화~토요일 아침에 한 번 갱신됩니다." : "새 데이터로 바꿨습니다.");
+    if(isRefresh) toast(prev===d.generatedAt? "이미 가장 최근 데이터입니다. 장이 열린 날 약 3시간마다 새로 갱신됩니다." : "새 데이터로 바꿨습니다.");
   }catch(e){
     if(!state.data){ $("upd").textContent="데이터를 불러오지 못했습니다.";
       $("banners").innerHTML='<div class="banner err"><b>데이터 연결 필요</b><br>현재 최신 주가 데이터를 불러올 수 없습니다. 데이터 연결 후 추천 기능을 사용할 수 있습니다. 잠시 뒤 새로고침을 눌러 주세요.</div>';
@@ -563,8 +576,10 @@ document.addEventListener("click", e=>{
   else if(t.dataset.toggle){ tog(t,$(t.dataset.toggle),"점수 상세 보기","점수 상세 닫기"); }
   else if(t.id==="btnWhy"){ tog(t,$("whyBox"),"왜 이렇게 판단했나요?","설명 닫기"); }
   else if(t.id==="btnAlgo"){ tog(t,$("algoBox"),"계산 방법 보기","계산 방법 닫기"); }
+  else if(t.dataset.fs){ state.fs=parseFloat(t.dataset.fs); lsSet("sa_fs",state.fs); applyFs(); }
   else if(t.id==="btnRefresh"){ load(true); }
 });
+function applyFs(){ document.body.style.zoom=String(state.fs); document.querySelectorAll("[data-fs]").forEach(b=>b.setAttribute("aria-pressed", String(parseFloat(b.dataset.fs)===state.fs))); }
 function tog(btn,box,a,b){ box.hidden=!box.hidden; btn.setAttribute("aria-expanded",String(!box.hidden)); btn.textContent=box.hidden?a:b; }
 function openDetailKeepScroll(id){ const y=$("sheet").scrollTop; openDetail(id); $("sheet").scrollTop=y; }
 document.addEventListener("change", e=>{ if(e.target.id==="krw"){ state.krw=e.target.checked; lsSet("sa_krw",state.krw); renderTop(); } });
@@ -575,6 +590,7 @@ state.market=lsGet("sa_market","kr")==="us"?"us":"kr";
 state.hz=["short","mid","long"].includes(lsGet("sa_hz","long"))?lsGet("sa_hz","long"):"long";
 state.krw=lsGet("sa_krw",true)!==false;
 const w=lsGet("sa_watch",[]); state.watch=Array.isArray(w)?w.filter(x=>typeof x==="string"):[];
+state.fs=[1,1.15,1.3].includes(lsGet("sa_fs",1))?lsGet("sa_fs",1):1; applyFs();
 renderTabs(); load(false);
 </script>
 
