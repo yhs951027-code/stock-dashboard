@@ -412,6 +412,9 @@ function renderHeader(){
   const d=state.data, g=new Date(d.generatedAt);
   const p=n=>String(n).padStart(2,"0");
   $("upd").innerHTML="마지막 업데이트 <b class=\"num\">"+g.getFullYear()+"-"+p(g.getMonth()+1)+"-"+p(g.getDate())+" "+p(g.getHours())+":"+p(g.getMinutes())+"</b> · 장이 열린 날 약 3시간마다 갱신";
+  const mkLine=(mk,label)=>{ const a=d.stocks.filter(s=>s.market===mk&&s.priceDate); if(!a.length) return ""; const latest=a.map(s=>s.priceDate).sort().pop(); const n=a.filter(s=>s.priceDate===latest).length; const m=/^\d{4}-(\d{2})-(\d{2})/.exec(latest); const md=m? Number(m[1])+"월 "+Number(m[2])+"일" : latest; return label+" <b class=\"num\">"+md+"</b> 주가"+(n<a.length? " ("+a.length+"개 중 "+n+"개 반영, 나머지는 갱신 중)" : ""); };
+  const lines=[mkLine("kr","🇰🇷 한국"),mkLine("us","🇺🇸 미국")].filter(Boolean);
+  if(lines.length) $("upd").innerHTML+="<br>"+lines.join(" · ");
   const b=[]; const age=(Date.now()-g.getTime())/36e5;
   if(age>CONFIG.STALE_HOURS) b.push('<div class="banner">⚠ 일부 데이터가 최신 데이터가 아닙니다. 마지막 갱신 후 '+Math.floor(age/24)+"일 "+Math.floor(age%24)+"시간이 지났습니다.</div>");
   $("banners").innerHTML=b.join("");
