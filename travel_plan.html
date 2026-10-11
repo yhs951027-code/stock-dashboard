@@ -303,8 +303,14 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 볼거리 -->
 <section class="panel" id="spot">
   <h2>관광지 · 볼거리</h2>
-  <p class="lead">일정에 넣은 곳과, 조사했지만 반려견 때문에 뺀 곳을 같이 정리했어.</p>
-  <div class="grid" id="spotGrid"></div>
+  <p class="lead">여행 기간(10/30 금 – 11/1 일)에 갈 수 있는 곳만 남겼어. 오른쪽 금·토·일 표시가 그날 운영 여부야. 괴산 밖이라 거리가 있는 곳도 넣었으니 <b>숙소에서 길찾기</b>로 시간 먼저 확인해줘.</p>
+  <div class="filters" id="spotFilter">
+    <button aria-pressed="true" data-f="all">전체</button>
+    <button aria-pressed="false" data-f="near">괴산 안</button>
+    <button aria-pressed="false" data-f="far">괴산 밖 (문경·청주·충주)</button>
+    <button aria-pressed="false" data-f="dogok">반려견 동반 안내 있음</button>
+  </div>
+  <div id="spotGrid"></div>
 </section>
 
 <!-- 반려견 정보 -->
@@ -417,7 +423,6 @@ var SRC = {
   s15:{t:"괴산 올갱이국 거리 (주차장식당·서울식당·맛식당)", u:"https://www.ktriptips.com/kor/tourspot/704505"},
   s16:{t:"국립공원 반려견 동행 안내 (국립공원공단 예약시스템)", u:"https://reservation.knps.or.kr/contents/withPet.do"},
   s17:{t:"국립공원 반려견 시범사업 현황 (한국일보 2026-10-01)", u:"https://www.hankookilbo.com/news/article/A2026100114440002911"},
-  s18:{t:"2026 괴산김장축제 11/5~8 (국제뉴스)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3705317"},
   s19:{t:"반려동물 동반 가능 음식점 현황 (식품안전나라)", u:"https://www.foodsafetykorea.go.kr/portal/petKorea.do"},
   s20:{t:"쉼터청천 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=JTfNFW4qhyLq"},
   s21:{t:"산막이 세자매 애견동반 정보 (펫온, 2026-02 갱신)", u:"https://peton.me/bbs/board.php?bo_table=addPlace&wr_id=249306"},
@@ -452,7 +457,18 @@ var SRC = {
   s50:{t:"사나이짬뽕 (테이블링)", u:"https://www.tabling.co.kr/place/677cd7d866de5f069893781e"},
   s51:{t:"괴산 현지인 추천 맛집 TOP 5 (식신, 2026-04)", u:"https://www.siksinhot.com/theme/magazine/14033"},
   s52:{t:"털보왕돈까스 (식신 매장 정보)", u:"https://www.siksinhot.com/P/401288"},
-  s53:{t:"자연드림파크 공식 (2026-09-02 일부 식당 운영 중단 공지)", u:"https://naturaldreampark.co.kr/main.html"}
+  s53:{t:"자연드림파크 공식 (2026-09-02 일부 식당 운영 중단 공지)", u:"https://naturaldreampark.co.kr/main.html"},
+  s54:{t:"수옥폭포 (괴산군 문화관광)", u:"https://www.goesan.go.kr/tour/selectTourInfo.do?key=858&tourNo=425"},
+  s55:{t:"수옥폭포 안내 (여행을 말하다)", u:"https://www.telltrip.com/domestic-travel/goesan-suok-falls-history/"},
+  s56:{t:"연풍새재 옛길 (대한민국 구석구석)", u:"https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=92adf637-d05a-44fb-8654-a212584666b2"},
+  s57:{t:"연풍새재 (브라보마이라이프)", u:"https://bravo.etoday.co.kr/view/atc_view/16054"},
+  s58:{t:"2026 문경사과축제 10/17~11/1 (국제뉴스)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3663273"},
+  s59:{t:"문경사과축제 (문경시 관광)", u:"https://www.gbmg.go.kr/tour/contents.do?mId=0401030000"},
+  s60:{t:"문경새재 반려동물힐링센터 (문경시 관광)", u:"https://www.gbmg.go.kr/tour/contents.do?mId=0502130000"},
+  s61:{t:"청남대 축제/행사 공고 (2026 가을축제 10/31~11/8)", u:"https://www.chungbuk.go.kr/chnam/bbs/list.do?key=2004170453801"},
+  s62:{t:"청남대 가을축제 안내 (여행을 말하다)", u:"https://www.telltrip.com/festival/cheongnamdae-autumn-festival/"},
+  s63:{t:"청남대 영춘제 요금 (국제뉴스, 2026 봄)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3564924"},
+  s64:{t:"반려동물과 충주 여행 · 중앙탑사적공원 (대한민국 구석구석)", u:"https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=c967ab4f-9053-465b-ad66-77e3845b638e"}
 };
 
 /* ---------- 장소 ----------
@@ -474,12 +490,12 @@ var P = {
     dog:2, dogText:"정보 없음. 장보기는 1~2명만 다녀오는 걸 추천.", inout:"실내",
     reserve:"다이닝코드에 '우리한식' 위치 설명(우리할인마트 옆)으로만 확인된 상호. 영업 여부·시간은 지도 앱으로 확인.",
     price:"-", src:["s14"]},
-  mungwang:{name:"문광저수지 은행나무길", cat:"관광지", addr:"충북 괴산군 문광면 양곡리 16",
+  mungwang:{name:"문광저수지 은행나무길", cat:"관광지", area:"괴산 문광면", open:["o","o","o"], openNote:"상시 개방 산책로", addr:"충북 괴산군 문광면 양곡리 16",
     menu:"-", hours:"상시 개방 산책로 (별도 운영시간 정보 없음)", parking:"무료. 성수기 임시주차장 운영 사례 있음, 만차 시 둑방 옆 버스정류장 부근 주차 후기",
     dog:2, dogText:"반려견 출입 규정을 찾지 못함. 야외 산책로라 목줄 착용 전제로 방문 가능성이 높지만 공식 확인 아님.",
     inout:"야외 (약 2km 호숫가 길, 데크·흙길)", reserve:"예약 없음. 주말 오전에 붐빔 → 10시 전 도착 권장. 2026년 단풍 상태는 출발 직전 확인.",
     price:"입장 무료 · 주차 무료", src:["s7","s8"]},
-  sanmak:{name:"산막이옛길", cat:"관광지", addr:"충북 괴산군 칠성면 산막이옛길 (주차장: 칠성면 사은리 523)",
+  sanmak:{name:"산막이옛길", cat:"관광지", area:"괴산 칠성면", open:["o","o","o"], openNote:"09:00–17:00 연중무휴 안내 (유람선은 운항 여부 미확인)", addr:"충북 괴산군 칠성면 산막이옛길 (주차장: 칠성면 사은리 523)",
     menu:"-", hours:"09:00–17:00 연중무휴 안내 (트레킹 자체는 시간 제약 없다는 안내도 있음)", parking:"중소형 3,000원 · 대형 7,000원 (시간 제한 없음)",
     dog:2, dogText:"반려견 동반 규정을 찾지 못함. 유람선 반려견 탑승 여부도 미확인. 관리사무소(043-832-3527)에 확인 필요.",
     inout:"야외 (호숫가 숲길·데크길, 편도 약 2.3~4km)", reserve:"예약 없음. 주말 방문객 많음. 유람선(5,000~8,000원)은 2026년 8월 기사 기준 9/20까지 운항 중단이었고 재개 여부 미확인.",
@@ -613,13 +629,41 @@ var P = {
     addr:"충북 괴산군 청천면 화양로 317",
     menu:"옥수수라떼 등", hours:"모름", parking:N,
     dog:2, dogText:"반려견 동반 여부 확인 못 함.", inout:N, reserve:"화양계곡 방향 계곡 뷰 카페.", price:N, src:["s20"]},
-  hwayang:{name:"화양구곡 · 쌍곡계곡 (속리산국립공원)", cat:"제외", addr:"충북 괴산군 청천면 화양리 일대 / 칠성면 쌍곡리 일대",
-    menu:"-", hours:"-", parking:"-", dog:3,
-    dogText:"국립공원은 자연공원법에 따라 반려견 동반을 제한하고, 반려견 동반 시범 구간은 북한산·계룡산·가야산뿐(속리산 없음). 그래서 일정에서 뺐어.",
-    inout:"야외", reserve:"반려견 없이 일부 인원만 다녀오는 경우만 고려.", price:"-", src:["s16","s17"]},
-  gimjang:{name:"2026 괴산김장축제", cat:"제외", addr:"괴산 유기농엑스포 광장 일대",
-    menu:"-", hours:"2026. 11. 5(목) – 11. 8(일)", parking:"-", dog:2, dogText:"축제 기간이 여행 일정(~11/1) 이후라 해당 없음.",
-    inout:"야외", reserve:"일정이 겹치지 않아 제외. 참고용.", price:"-", src:["s18"]}
+  hwayang:{name:"화양구곡 (속리산국립공원)", cat:"반려견 없이", area:"괴산 청천면 (숙소 근처)", open:["o","o","o"], openNote:"국립공원 탐방로 상시 이용 (반려견은 출입 제한)",
+    addr:"충북 괴산군 청천면 화양리", mapq:"화양구곡",
+    menu:"-", hours:"상시", parking:N, dog:3,
+    dogText:"국립공원은 지정 구간 외 반려견 동반이 제한되고, 반려견 시범 허용 구간은 북한산·계룡산·가야산뿐(속리산 없음).",
+    inout:"야외 계곡길", reserve:"괴산 대표 계곡 단풍 명소. 6명이니 반려견 볼 사람과 나눠서 다녀올 때만 추천.", price:N, src:["s16","s17"]},
+  suok:{name:"수옥폭포", cat:"관광지", area:"괴산 연풍면 (숙소에서 남쪽, 거리 있음)", open:["o","o","o"], openNote:"상시 개방 · 연중무휴 (2026-07 갱신 안내)",
+    addr:"충북 괴산군 연풍면 수옥정1길 19", mapq:"수옥폭포",
+    menu:"-", hours:"상시 개방 · 연중무휴", parking:"무료 (주차장에서 폭포까지 걸어서 5~10분)",
+    dog:2, dogText:"반려견 규정을 찾지 못함. 야외 공간이라 목줄 착용 전제로 확인 필요.",
+    inout:"야외 (약 20m 높이 3단 폭포)", reserve:"단풍철 사진 명소. 주소가 출처마다 조금씩 달라(수옥정1길 19 / 127-1 등) 지도에서 '수옥폭포'로 검색 추천. 연풍새재 옛길과 묶어서 가기 좋음.", price:"입장 무료 · 주차 무료", src:["s54","s55"]},
+  yeonpung:{name:"연풍새재 옛길 (조령 3관문)", cat:"관광지", area:"괴산 연풍면 (수옥폭포 근처)", open:["o","o","o"], openNote:"숲길 산책로 (별도 운영시간 정보 없음)",
+    addr:"충북 괴산군 연풍면 조령산자연휴양림 입구 ~ 조령관", mapq:"조령산자연휴양림",
+    menu:"-", hours:"정보 없음 (숲길)", parking:N,
+    dog:2, dogText:"반려견 규정을 찾지 못함. 휴양림 구간은 반려견 제한이 있을 수 있어 조령산자연휴양림(043-833-7994)에 확인 필요.",
+    inout:"야외 (조령산자연휴양림 입구~조령관 약 1.5km 흙길)", reserve:"경사가 완만해 가볍게 걷기 좋다는 소개. 고개 넘어 경북 쪽이 문경새재.", price:"정보 없음", src:["s56","s57"]},
+  mgsaejae:{name:"문경새재 · 2026 문경사과축제", cat:"축제", area:"경북 문경 (괴산 연풍면 넘어, 거리 있음)", open:["o","o","o"], openNote:"사과축제 2026. 10. 17(토) – 11. 1(일) → 여행 3일 모두 축제 기간",
+    addr:"경북 문경시 문경읍 문경새재도립공원 일원", mapq:"문경새재도립공원",
+    menu:"-", hours:"축제 10/17–11/1 · 개막식 10/17 14시", parking:"주차 정보가 출처마다 다름 (무료 / 승용 2,000원)",
+    dog:2, dogText:"축제장·도립공원 반려견 규정을 찾지 못함 (054-571-7677 축제 문의).",
+    inout:"야외", reserve:"사과 판매·체험 위주. 사과따기 체험농장·오픈세트장 등은 별도 요금. 마지막 날(11/1) 오후는 철수 분위기일 수 있음.", price:"축제장 입장 무료 (일부 체험 별도)", src:["s58","s59"]},
+  mghealing:{name:"문경새재 반려동물힐링센터", cat:"반려견 시설", area:"경북 문경 (문경새재 근처)", open:["o","o","o"], openNote:"연중무휴 안내 (운영시간은 출처마다 다름)",
+    addr:"경북 문경시 문경새재 반려동물힐링센터", mapq:"문경새재 반려동물힐링센터",
+    menu:"-", hours:"10:00–20:00(입장 19:00) 또는 09:00–18:00 · 연중무휴", parking:"출처마다 다름 (무료 / 유료)",
+    dog:2, dogText:"반려견을 위한 전용 시설(운동장·카페). 마릿수 제한은 확인 못 함.",
+    inout:"실내·야외 운동장", reserve:"2026년부터 2030년까지 운영 업체 시설 사용 기간이 연장됐다는 보도. 문의 번호가 출처마다 달라(1577-3620 / 010-3152-3512) 방문 전 확인.", price:"입장 사람 7,000원 · 반려견 6,000원 (음료 포함)", src:["s60"]},
+  cnd:{name:"청남대 가을축제", cat:"축제", area:"청주 문의면 (거리 꽤 있음)", open:["x","o","o"], openNote:"2026. 10. 31(토) – 11. 8(일) → 금요일은 축제 전(청남대 자체는 개방 여부 확인 필요), 토·일은 축제 기간",
+    addr:"충북 청주시 상당구 문의면 청남대", mapq:"청남대",
+    menu:"-", hours:"축제 10/31–11/8 · 토요일은 야간 21시까지", parking:"승용차 3,000원 (2025년 기준) · 주말 무료 순환버스 운행",
+    dog:2, dogText:"반려견 동반 입장 가능하다는 안내(목줄·배변봉투 필수, 견종에 따라 입마개, 실내 출입 불가). 순환버스 반려견 탑승 여부는 모름.",
+    inout:"야외 정원·산책로 (실내 전시관은 반려견 불가)", reserve:"옛 대통령 별장. 국화·단풍 축제. 순환버스 이용 시 입장료 면제지만 반려견 동반이면 자가용이 현실적.", price:"입장료 성인 6,000원 (2026년 봄 기준, 가을 금액 미확인) · 주차 3,000원", src:["s61","s62","s63"]},
+  jungangtap:{name:"충주 중앙탑사적공원", cat:"관광지", area:"충주 중앙탑면 (거리 있음)", open:["o","o","o"], openNote:"상시 이용 · 연중무휴 안내",
+    addr:"충북 충주시 중앙탑면 탑정안길 6",
+    menu:"-", hours:"상시", parking:"무료",
+    dog:2, dogText:"관광공사 여행기사에 '반려동물 동반 가능'으로 소개, 탄금호 무지개길이 넓어 반려견 산책하기 좋다고 함. 목줄·인식표·배변 처리 필수.",
+    inout:"야외 호숫가 공원 (국보 탑평리 칠층석탑)", reserve:"반려견과 넓게 걷기 좋은 호숫가 공원. 근처에 충주 시내 맛집이 많음.", price:"입장·주차 무료", src:["s64"]}
 };
 
 /* ---------- 최근 2년 내 흔적 ---------- */
@@ -665,6 +709,15 @@ var RECS = [
   {title:"비 오거나 늘어지고 싶은 날", tag:"쉬기", g:["rest","dog"], p:"pizzatour",
     why:"무리해서 나가지 말고 피자 포장해서 숙소에서 쉬는 날로. 반려견도 편해.",
     cost:"피자 14,000~19,000원대", tip:"휴무일 정보 없음 → 전화 확인.", near:["teolbo","misoya"]},
+  {title:"문경새재 사과축제 + 반려견 놀이터", tag:"걷기·구경", g:["walk","dog"], p:"mgsaejae",
+    why:"2026 문경사과축제가 10/17–11/1이라 여행 3일 모두 축제 기간이야. 근처에 반려견 전용 '반려동물힐링센터'가 있어서 반려견도 마음껏 뛰게 할 수 있어.",
+    cost:"축제장 무료 · 힐링센터 사람 7,000원 / 반려견 6,000원", tip:"괴산 연풍면을 넘어가는 길이라 수옥폭포·연풍새재와 하루 코스로 묶기 좋아. 축제장 반려견 규정은 확인 못 함.", near:["mghealing","suok","yeonpung"]},
+  {title:"청남대 가을축제 (토·일)", tag:"걷기·구경", g:["walk","dog"], p:"cnd",
+    why:"옛 대통령 별장에서 열리는 국화·단풍 축제(10/31–11/8). 반려견 동반 입장이 된다는 안내가 있고, 토요일은 밤 9시까지 야간 개장이야.",
+    cost:"입장 성인 6,000원(봄 기준) · 주차 3,000원", tip:"숙소에서 거리가 꽤 있어 반나절 이상 잡아야 해. 실내 전시관은 반려견 불가, 견종에 따라 입마개 필요.", near:[]},
+  {title:"충주 탄금호 따라 반려견 산책", tag:"걷기·구경", g:["walk","dog"], p:"jungangtap",
+    why:"관광공사 기사에 반려동물 동반 가능으로 소개된 넓은 호숫가 공원. 입장·주차 무료라 부담 없어.",
+    cost:"무료", tip:"목줄·인식표·배변 처리 필수. 괴산에서 거리가 있으니 귀가 방향이 맞는 사람(천안·인천 쪽)은 돌아가는 길에 들르기 좋아.", near:[]},
   {title:"반려견 없이 갈 사람만: 화양구곡 단풍", tag:"걷기·구경", g:["walk"], p:"hwayang",
     why:"괴산 대표 계곡 단풍 명소지만 국립공원이라 반려견은 못 들어가. 6명이니 반려견 볼 사람과 구경 갈 사람을 나눠 다녀오는 방법이 있어.",
     cost:"모름", tip:"반려견 시범 허용 구간은 북한산·계룡산·가야산뿐이라 속리산(화양구곡)은 해당 없음.", near:["shimteo"]}
@@ -734,7 +787,7 @@ function armed(btn,label){
 function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show")},1800)}
 
 // 지도 검색어: 주소의 괄호 설명은 빼고 사용
-function q(p){ return p.addr.replace(/\s*\(.*?\)\s*/g," ").replace(/ 일대$/,"").trim() }
+function q(p){ if(p.mapq) return p.mapq; return p.addr.replace(/\s*\(.*?\)\s*/g," ").replace(/ 일대$/,"").trim() }
 function naverUrl(s){return "https://map.naver.com/p/search/"+enc(s)}
 function kakaoUrl(s){return "https://map.kakao.com/?q="+enc(s)}
 function kakaoRoute(a,b){return "https://map.kakao.com/?sName="+enc(a)+"&eName="+enc(b)}
@@ -872,16 +925,37 @@ function renderFood(f){
   $("#foodList").innerHTML=keys.map(shopItem).join("") || '<p class="muted">이 분류에서 최근 2년 내 흔적이 확인된 곳은 없어.'+(hidden?' 위 버튼으로 확인 못 한 곳까지 볼 수 있어.':'')+'</p>';
 }
 $("#foodAll").addEventListener("click",function(){ showAll=!showAll; renderFood(); });
-function renderSpot(){
-  $("#spotGrid").innerHTML=["mungwang","sanmak","hwayang","gimjang"].map(function(k){
+var SPOT_KEYS=["mungwang","sanmak","suok","yeonpung","jungangtap","cnd","mgsaejae","mghealing","hwayang"];
+function renderSpot(f){
+  f=f||"all";
+  var keys=SPOT_KEYS.filter(function(k){
     var p=P[k];
-    var html=placeCard(p);
-    if(p.cat==="제외") html=html.replace('<span class="badge b-tag">제외</span>','<span class="badge b-no">일정 제외</span>');
-    return html;
+    if(f==="near") return /^괴산/.test(p.area);
+    if(f==="far") return !/^괴산/.test(p.area);
+    if(f==="dogok") return p.dog!==3 && /동반 (입장 )?가능|전용 시설/.test(p.dogText);
+    return true;
+  });
+  $("#spotGrid").innerHTML=keys.map(function(k){
+    var p=P[k], base=P.somong;
+    return '<details class="shop" data-k="'+k+'"><summary>'+
+      '<span class="nm">'+esc(p.name)+'<small>'+esc(p.cat)+' · '+esc(p.area||"")+'</small></span>'+openChips(p)+'<span class="chev" aria-hidden="true">▼</span></summary>'+
+      '<div class="body">'+
+        '<div class="pricebox"><b>비용</b>'+p.price+'</div>'+
+        '<dl class="kv">'+
+          '<dt>운영</dt><dd>'+p.hours+'<div class="muted">여행 날짜 판단 근거: '+esc(p.openNote||"")+'</div></dd>'+
+          '<dt>숙소에서 차로</dt><dd><span class="need">미측정</span> · 아래 버튼으로 확인</dd>'+
+          '<dt>주소</dt><dd>'+esc(p.addr)+'</dd>'+
+          '<dt>주차</dt><dd>'+p.parking+'</dd>'+
+          '<dt>반려견</dt><dd>'+dogBadge(p.dog)+'<div class="muted" style="margin-top:4px">'+esc(p.dogText)+'</div></dd>'+
+          '<dt>공간</dt><dd>'+p.inout+'</dd>'+
+          '<dt>참고</dt><dd>'+esc(p.reserve)+'</dd>'+
+        '</dl>'+
+        '<div class="btns"><a class="btn primary" href="'+kakaoRoute(q(base),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기 (카카오맵)</a>'+mapBtns(p)+'</div>'+srcHtml(p.src)+
+      '</div></details>';
   }).join("");
 }
 function renderDog(f){
-  var keys=Object.keys(P).filter(function(k){return k!=="gimjang"});
+  var keys=Object.keys(P);
   $("#dogGrid").innerHTML=keys.map(function(k){return P[k]}).filter(function(p){return f==="all"||String(p.dog)===f}).map(function(p){
     return '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><h3>'+esc(p.name)+'</h3><span class="badge b-tag">'+esc(p.cat)+'</span></div>'+
       dogBadge(p.dog)+'<p style="margin:8px 0 0">'+esc(p.dogText)+'</p><p class="muted" style="margin:6px 0 0">실내·야외: '+p.inout+'</p>'+srcHtml(p.src)+'</div>';
@@ -897,10 +971,11 @@ function bindFilter(id,fn){
 bindFilter("#foodFilter",renderFood);
 bindFilter("#dogFilter",renderDog);
 bindFilter("#recFilter",renderRecs);
+bindFilter("#spotFilter",renderSpot);
 
 /* ---------- 지도 ---------- */
 function renderMapDays(){
-  var keys=["somong"]; RECS.forEach(function(r){ if(keys.indexOf(r.p)<0) keys.push(r.p); });
+  var keys=["somong"]; RECS.forEach(function(r){ if(keys.indexOf(r.p)<0) keys.push(r.p); }); SPOT_KEYS.forEach(function(k){ if(keys.indexOf(k)<0) keys.push(k); });
   $("#mapDays").innerHTML='<div class="card"><ol style="margin:0;padding-left:20px">'+keys.map(function(k){
     var p=P[k];
     return '<li style="margin-bottom:10px"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.addr)+'</div><div class="btns" style="margin-top:4px">'+
@@ -1050,7 +1125,7 @@ $("#themeBtn").addEventListener("click",function(){
 });
 
 /* ---------- 시작 ---------- */
-renderRecs("all"); renderFood("all"); renderSpot(); renderDog("all"); renderMapDays();
+renderRecs("all"); renderFood("all"); renderSpot("all"); renderDog("all"); renderMapDays();
 renderBudgetRows(); calcBudget(); renderCheck();
 showPanel(location.hash.slice(1)||"home",false);
 })();
