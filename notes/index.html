@@ -108,6 +108,20 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 #blocks{display:flex;flex-direction:column}
 .b-text{display:block;width:100%;resize:none;overflow:hidden;border:0;background:transparent;color:var(--pink);font:inherit;font-size:19px;line-height:32px;padding:0;margin:0;min-height:32px}
 .b-todo{display:flex;align-items:flex-start;gap:4px;border-bottom:1px dashed var(--pline)}
+/* 목록(번호·글머리표): 줄이 넘어가도 글자가 기호 뒤에 맞춰지게 */
+.b-li{display:flex;align-items:flex-start;padding-left:calc(var(--lv,0) * 28px)}
+.b-li .mk{flex:none;min-width:30px;padding-right:7px;text-align:right;font-size:19px;line-height:32px;color:var(--pink);font-family:var(--f-num);font-variant-numeric:tabular-nums;user-select:none;white-space:nowrap}
+.b-li .mk.sym{min-width:22px;text-align:center;padding-right:8px}
+.b-li .mk.small{font-size:13px}
+.b-li-t{flex:1;min-width:0;display:block;resize:none;overflow:hidden;border:0;background:transparent;color:var(--pink);font:inherit;font-size:19px;line-height:32px;padding:0;margin:0;min-height:32px}
+.paper-lined .b-li-t{background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--pline) 31px 32px)}
+.litools{flex:none;display:flex;gap:6px;padding:6px 12px 0;background:var(--bg);border-top:1px solid var(--line);overflow-x:auto}
+.litools button{flex:1 0 auto;min-height:46px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-size:15.5px;font-weight:700;white-space:nowrap;padding:4px 10px}
+.lsts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lst{border-radius:12px;border:2.5px solid var(--line);background:var(--card);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:120px}
+.lst[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
+.lst b{font-size:16px}
+.lst pre{margin:0;font:inherit;font-size:15px;line-height:1.55;color:var(--sub);white-space:pre}
 .ck{flex:none;width:44px;height:44px;margin-left:-8px;border:0;background:transparent;display:grid;place-items:center;padding:0}
 .ck i{width:26px;height:26px;border-radius:7px;border:2.5px solid var(--psub);display:grid;place-items:center;font-style:normal;font-size:18px;font-weight:700;line-height:1;color:#fff}
 .ck[aria-checked="true"] i{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
@@ -126,8 +140,9 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .atime{flex:none;font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:15px;color:var(--psub);min-width:84px;text-align:right}
 .tail{flex:1;min-height:120px;cursor:text}
 .ed-meta{font-size:14.5px;color:var(--psub);font-family:var(--f-num);padding:10px 0 14px;text-align:right}
-.tools{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg)}
-.tool{min-height:58px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:15px;font-weight:700;line-height:1.2;padding:4px}
+.tools{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg)}
+.tool{min-height:58px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:14.5px;font-weight:700;line-height:1.2;padding:4px 2px;white-space:nowrap;letter-spacing:-.02em;min-width:0}
+@media (max-width:380px){ .tool{font-size:13px} }
 .tool b{font-size:22px;line-height:1.1}
 .blank-msg{display:none}
 
@@ -334,8 +349,15 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
         <div class="ed-meta" id="meta"></div>
       </div>
     </div>
+    <div class="litools" id="liTools" hidden role="toolbar" aria-label="목록 편집">
+      <button type="button" data-li="out">⇤ 내어쓰기</button>
+      <button type="button" data-li="in">들여쓰기 ⇥</button>
+      <button type="button" data-li="style">모양</button>
+      <button type="button" data-li="end">목록 끝</button>
+    </div>
     <div class="tools" role="toolbar" aria-label="추가하기">
       <button class="tool" id="tCheck" type="button"><b>☑</b>체크리스트</button>
+      <button class="tool" id="tList" type="button"><b>≡</b>목록</button>
       <button class="tool" id="tDraw" type="button"><b>✏️</b>그림</button>
       <button class="tool" id="tRec" type="button"><b>🎤</b>음성 녹음</button>
       <button class="tool" id="tPaper" type="button"><b>📄</b>메모지</button>
@@ -414,6 +436,16 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
     <button class="btn ghost" id="shImport" type="button">📥 받은 달력 파일 불러오기</button>
     <p class="hint">보내는 순간의 내용이 전달돼요. 서로 실시간으로 같이 고치는 기능은 아니에요.</p>
     <input type="file" id="calFileIn" accept=".json,.txt,.ics,text/calendar,application/json,text/plain" hidden>
+    <button class="btn ghost" type="button" data-close>닫기</button>
+  </div>
+</div>
+
+<!-- 목록 모양 -->
+<div class="dim" id="listDlg" hidden>
+  <div class="bsheet" role="dialog" aria-modal="true" aria-labelledby="listH">
+    <h2 id="listH">목록 모양</h2>
+    <div class="lsts" id="lsts"></div>
+    <p class="hint">“1. 내용”이나 “- 내용”을 치고 엔터를 눌러도 목록이 시작돼요. 들여쓰기하면 아래 단계 모양으로 바뀌어요.</p>
     <button class="btn ghost" type="button" data-close>닫기</button>
   </div>
 </div>
@@ -529,7 +561,8 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 function find(id){ return notes.find(n=>n.id===id); }
 function cur(){ return find(curId); }
 function blk(n,id){ return n.blocks.find(b=>b.id===id); }
-function isEmpty(n){ return !n.title.trim() && n.blocks.every(b=>(b.type==='text'||b.type==='todo') && !b.text.trim()); }
+function isWriting(b){ return b.type==='text'||b.type==='todo'||b.type==='li'; } // 글자를 적는 칸
+function isEmpty(n){ return !n.title.trim() && n.blocks.every(b=>isWriting(b) && !b.text.trim()); }
 function touch(n){
   n.updated=Date.now(); dirty.add(n.id);
   setSaveState('dirty');
@@ -559,7 +592,7 @@ async function saveNow(){
 // 편집을 마칠 때 비어 있는 줄·체크 항목 정리
 function tidy(n){
   const before=n.blocks.length;
-  n.blocks=n.blocks.filter(b=>!((b.type==='text'||b.type==='todo') && !b.text.trim()));
+  n.blocks=n.blocks.filter(b=>!(isWriting(b) && !b.text.trim()));
   if(n.blocks.length!==before) dirty.add(n.id);
 }
 function normalize(m){
@@ -577,14 +610,14 @@ function hl(text,q){
   if(i<0) return esc(text);
   return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+q.length))+'</mark>'+esc(text.slice(i+q.length));
 }
-function textOf(n){ return n.blocks.filter(b=>b.type==='text'||b.type==='todo').map(b=>b.text).join('\n'); }
+function textOf(n){ return n.blocks.filter(isWriting).map(b=>b.text).join('\n'); }
 function titleOf(n){
   if(n.title.trim()) return n.title.trim();
   const l=textOf(n).split('\n').find(s=>s.trim());
   return l? l.trim() : (n.blocks.some(b=>b.type==='draw')? '그림 메모' : n.blocks.some(b=>b.type==='audio')? '음성 메모' : '제목 없음');
 }
 function previewOf(n){
-  const lines=n.blocks.filter(b=>b.type==='text').flatMap(b=>b.text.split('\n')).map(s=>s.trim()).filter(Boolean);
+  const lines=n.blocks.flatMap((b,i)=>b.type==='text'? b.text.split('\n') : b.type==='li'? [markerFor(n,i)+' '+b.text] : []).map(s=>s.trim()).filter(Boolean);
   if(!n.title.trim()) lines.shift();
   if(lines.length) return lines.join(' ');
   return n.blocks.filter(b=>b.type==='todo' && b.text.trim()).map(b=>(b.done?'☑ ':'☐ ')+b.text.trim()).join('  ');
@@ -703,11 +736,39 @@ function renderEditor(){
   box.querySelectorAll('textarea').forEach(autosize);
   updateMeta();
 }
+/* ---------- 목록 (번호·글머리표) ---------- */
+// 목록 항목 블록: {type:'li', style, level(0~2), text}. 번호는 저장하지 않고 위치로 매번 계산 → 끼워 넣거나 지워도 자동으로 다시 매겨짐.
+const LIST_STYLES={
+  outline:{name:'단계식', marks:['1.','-','•'], sample:'1. 첫째\n    - 세부 내용\n        • 더 자세히'},
+  num:{name:'번호 (한글 개요식)', marks:['1.','가.','1)'], sample:'1. 첫째\n    가. 세부 내용\n        1) 더 자세히'},
+  dash:{name:'대시', marks:['-','-','-'], sample:'- 첫째\n- 둘째\n- 셋째'},
+  dot:{name:'점', marks:['●','○','▪'], sample:'● 첫째\n● 둘째\n● 셋째'},
+};
+const KO_SEQ='가나다라마바사아자차카타파하';
+function markerFor(n,i){
+  const b=n.blocks[i], st=LIST_STYLES[b.style]||LIST_STYLES.outline, lv=Math.min(2,b.level||0), mk=st.marks[lv];
+  if(!/^(1\.|1\)|가\.)$/.test(mk)) return mk;
+  let k=1; // 같은 단계에서 몇 번째인지 (위 단계 항목을 만나면 새로 셈)
+  for(let j=i-1;j>=0;j--){ const x=n.blocks[j]; if(x.type!=='li') break; const xl=x.level||0; if(xl<lv) break; if(xl===lv) k++; }
+  if(mk==='1.') return k+'.';
+  if(mk==='1)') return k+')';
+  return KO_SEQ[(k-1)%KO_SEQ.length]+'.';
+}
 function blockEl(b,n){
   if(b.type==='text'){
     const ta=el('textarea',{className:'b-text',rows:1,value:b.text,placeholder:n.blocks.length===1?'내용을 입력하세요':''});
     ta.dataset.id=b.id; ta.setAttribute('aria-label','내용');
     return ta;
+  }
+  if(b.type==='li'){
+    const mkText=markerFor(n,n.blocks.indexOf(b));
+    const row=el('div',{className:'b-li'}); row.dataset.id=b.id; row.style.setProperty('--lv',Math.min(2,b.level||0));
+    const sym=!/\d|[가-힣]/.test(mkText);
+    const mk=el('span',{className:'mk'+(sym?' sym':'')+(/[●○▪]/.test(mkText)?' small':''),textContent:mkText}); mk.setAttribute('aria-hidden','true');
+    const ta=el('textarea',{className:'b-li-t',rows:1,value:b.text}); ta.dataset.id=b.id;
+    ta.setAttribute('aria-label',mkText+' 목록 항목'); ta.setAttribute('enterkeyhint','next');
+    row.append(mk,ta);
+    return row;
   }
   if(b.type==='todo'){
     const row=el('div',{className:'b-todo'+(b.done?' done':'')});
@@ -764,14 +825,14 @@ function insertBlock(b){
   let i=n.blocks.findIndex(x=>x.id===lastFocus);
   if(i<0) i=n.blocks.length-1;
   // 체크리스트 중간에 그림·녹음이 끼지 않도록 목록 끝으로 보낸다
-  if(b.type!=='todo') while(n.blocks[i]?.type==='todo' && n.blocks[i+1]?.type==='todo') i++;
+  for(const run of ['todo','li']) if(b.type!==run) while(n.blocks[i]?.type===run && n.blocks[i+1]?.type===run) i++;
   const at=n.blocks[i];
   if(at && at.type==='text' && !at.text.trim()) n.blocks.splice(i,1,b);
   else n.blocks.splice(i+1,0,b);
   lastFocus=b.id;
   touch(n); renderEditor();
   requestAnimationFrame(()=>{
-    if(b.type==='todo') focusBlock(b.id);
+    if(isWriting(b)) focusBlock(b.id);
     else document.querySelector(`#blocks [data-id="${b.id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'});
   });
 }
@@ -787,12 +848,58 @@ async function removeMediaBlock(id,label){
 $('#title').addEventListener('input',e=>{ const n=cur(); if(!n) return; n.title=e.target.value; touch(n); });
 $('#title').addEventListener('focus',()=>{ lastFocus=null; });
 $('#title').addEventListener('keydown',e=>{
-  if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); const n=cur(); const f=n.blocks.find(b=>b.type==='text'||b.type==='todo'); if(f) focusBlock(f.id,true); }
+  if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); const n=cur(); const f=n.blocks.find(isWriting); if(f) focusBlock(f.id,true); }
 });
 $('#blocks').addEventListener('focusin',e=>{ if(e.target.tagName==='TEXTAREA') lastFocus=e.target.dataset.id; });
+// 글 칸에서 "1. 내용", "- 내용", "● 내용"을 치고 엔터 → 목록으로 바꿔준다 (한글 문단 번호처럼)
+const LIST_START=/^(\s*)(\d{1,3}[.)]|[가-하]\.|[-*•●○▪·])\s+(\S.*)$/;
+function styleFromMark(m){
+  if(/^\d/.test(m)) return 'outline';
+  if(/^[가-하]/.test(m)) return 'num';
+  if(m==='-'||m==='*') return 'dash';
+  return 'dot';
+}
+function autoList(n,b,ta,e){
+  if(e.inputType==='insertFromPaste') return false;
+  const c=ta.selectionStart, v=ta.value;
+  if(c<1 || v[c-1]!=='\n') return false;
+  const ls=v.lastIndexOf('\n',c-2)+1, line=v.slice(ls,c-1), m=line.match(LIST_START);
+  if(!m) return false;
+  const style=styleFromMark(m[2]), level=Math.min(2,Math.floor(m[1].replace(/\t/g,'    ').length/2));
+  const before=v.slice(0,ls).replace(/\n$/,''), after=v.slice(c);
+  const item={id:uid(),type:'li',style,level,text:m[3]}, next={id:uid(),type:'li',style,level,text:after};
+  const rep=[]; if(before.trim()) rep.push({id:uid(),type:'text',text:before});
+  rep.push(item,next);
+  n.blocks.splice(n.blocks.indexOf(b),1,...rep);
+  touch(n); renderEditor(); focusBlock(next.id,true);
+  return true;
+}
+function caretTo(id,pos){
+  const ta=document.querySelector(`#blocks textarea[data-id="${id}"]`); if(!ta) return;
+  ta.focus({preventScroll:true}); const p=Math.min(pos??ta.value.length,ta.value.length); ta.setSelectionRange(p,p);
+  ta.scrollIntoView({block:'nearest'});
+}
+// 목록 항목 단계 바꾸기 / 목록에서 빠져나오기
+function liIndent(b,d){ b.level=Math.max(0,Math.min(2,(b.level||0)+d)); }
+function liToText(n,b){ b.type='text'; delete b.style; delete b.level; }
 $('#blocks').addEventListener('input',e=>{
   const ta=e.target; if(ta.tagName!=='TEXTAREA') return;
   const n=cur(), b=blk(n,ta.dataset.id); if(!b) return;
+  if(b.type==='text' && autoList(n,b,ta,e)) return;
+  if(b.type==='li' && ta.value.includes('\n')){
+    const parts=ta.value.split('\n');
+    if(parts.length===2 && !b.text && !parts[0] && !parts[1]){ // 빈 항목에서 엔터 → 한 단계 위로, 맨 위면 목록 끝
+      if((b.level||0)>0) liIndent(b,-1); else liToText(n,b);
+      b.text=''; touch(n); renderEditor(); caretTo(b.id,0); return;
+    }
+    b.text=parts[0];
+    const idx=n.blocks.indexOf(b);
+    const added=parts.slice(1).map(t=>({id:uid(),type:'li',style:b.style,level:b.level||0,text:t}));
+    n.blocks.splice(idx+1,0,...added);
+    touch(n); renderEditor();
+    focusBlock(added[added.length-1].id,added.length===1);
+    return;
+  }
   if(b.type==='todo' && ta.value.includes('\n')){
     // 엔터 = 다음 항목. 붙여넣은 여러 줄은 줄마다 항목으로.
     const parts=ta.value.split('\n');
@@ -808,14 +915,25 @@ $('#blocks').addEventListener('input',e=>{
   b.text=ta.value; autosize(ta); touch(n);
 });
 $('#blocks').addEventListener('keydown',e=>{
-  const ta=e.target; if(!ta.classList?.contains('b-todo-t')) return;
+  const ta=e.target;
+  if(ta.classList?.contains('b-li-t')){
+    const n=cur(), b=blk(n,ta.dataset.id); if(!b) return;
+    if(e.key==='Tab'){ e.preventDefault(); const p=ta.selectionStart; liIndent(b,e.shiftKey?-1:1); touch(n); renderEditor(); caretTo(b.id,p); return; }
+    if(e.key==='Backspace' && ta.selectionStart===0 && ta.selectionEnd===0){ // 맨 앞에서 지우기 → 단계 올리기, 맨 위면 기호 없애기
+      e.preventDefault();
+      if((b.level||0)>0) liIndent(b,-1); else liToText(n,b);
+      touch(n); renderEditor(); caretTo(b.id,0); return;
+    }
+    return;
+  }
+  if(!ta.classList?.contains('b-todo-t')) return;
   if(e.key==='Backspace' && ta.value==='' ){
     e.preventDefault();
     const n=cur(), b=blk(n,ta.dataset.id), i=n.blocks.indexOf(b);
     n.blocks.splice(i,1);
     const prev=n.blocks[i-1];
     touch(n); renderEditor();
-    if(prev && (prev.type==='todo'||prev.type==='text')) focusBlock(prev.id);
+    if(prev && isWriting(prev)) focusBlock(prev.id);
   }
 });
 $('#blocks').addEventListener('click',e=>{
@@ -865,6 +983,74 @@ $('#tCheck').onclick=()=>{
   }
   insertBlock({id:uid(),type:'todo',text:'',done:false});
 };
+let listTarget=null; // 모양 고르기 창을 열 때 대상 (현재 목록 / 글 칸의 선택 줄 / 새로 넣기)
+function listRun(n,b){ // b가 속한 이어진 목록 항목들
+  let i=n.blocks.indexOf(b), s=i, e=i;
+  while(n.blocks[s-1]?.type==='li') s--; while(n.blocks[e+1]?.type==='li') e++;
+  return n.blocks.slice(s,e+1);
+}
+function openListStyles(target){
+  listTarget=target;
+  document.activeElement?.blur?.(); // 키보드를 내려서 고르는 창이 가려지지 않게
+  const n=cur(); const curStyle= target?.kind==='list'? blk(n,target.id)?.style : null;
+  $('#lsts').innerHTML=Object.entries(LIST_STYLES).map(([k,v])=>`<button class="lst" type="button" data-st="${k}" aria-pressed="${k===curStyle}"><b>${v.name}</b><pre>${esc(v.sample)}</pre></button>`).join('');
+  openOverlay('list');
+}
+$('#tList').addEventListener('pointerdown',e=>e.preventDefault()); // 누를 때 커서·선택 유지
+$('#tList').onclick=()=>{
+  const n=cur(); if(!n) return;
+  const at=blk(n,lastFocus);
+  if(at?.type==='li') return openListStyles({kind:'list',id:at.id});
+  if(at?.type==='text' && at.text.trim()){
+    const ta=document.querySelector(`#blocks textarea[data-id="${at.id}"]`);
+    return openListStyles({kind:'text',id:at.id,s:ta?.selectionStart??0,e:ta?.selectionEnd??0});
+  }
+  openListStyles({kind:'new'});
+};
+$('#lsts').addEventListener('click',e=>{
+  const btn=e.target.closest('.lst'); const n=cur(); if(!btn||!n) return;
+  const style=btn.dataset.st, t=listTarget||{kind:'new'};
+  let focusId=null, focusAtEnd=true;
+  if(t.kind==='list'){
+    const b=blk(n,t.id); if(b) listRun(n,b).forEach(x=>x.style=style); focusId=t.id;
+  }else if(t.kind==='text'){
+    // 커서가 있는 줄(또는 선택한 여러 줄)을 목록으로
+    const b=blk(n,t.id), v=b.text;
+    const ls=v.lastIndexOf('\n',Math.max(0,t.s-1))+1; let le=v.indexOf('\n',Math.max(t.e,t.s)); if(le<0) le=v.length;
+    if(t.s>0 && v[t.s-1]==='\n') {} // 줄 맨 앞
+    const lines=v.slice(ls,le).split('\n');
+    const before=v.slice(0,ls).replace(/\n$/,''), after=v.slice(le+1);
+    const items=lines.map(l=>{ const m=l.match(LIST_START); return {id:uid(),type:'li',style,level:m? Math.min(2,Math.floor(m[1].length/2)) : 0,text:(m? m[3] : l).trim()}; });
+    const rep=[]; if(before.trim()) rep.push({id:uid(),type:'text',text:before});
+    rep.push(...items); if(after.trim()) rep.push({id:uid(),type:'text',text:after});
+    n.blocks.splice(n.blocks.indexOf(b),1,...rep);
+    focusId=items[items.length-1].id;
+  }else{
+    const b={id:uid(),type:'li',style,level:0,text:''};
+    closeOverlay(); insertBlock(b); return;
+  }
+  touch(n); renderEditor(); closeOverlay();
+  if(focusId) setTimeout(()=>caretTo(focusId),50);
+});
+$('#listDlg').addEventListener('click',e=>{ if(e.target===e.currentTarget || e.target.matches('[data-close]')) closeOverlay(); });
+// 목록 칸에 있을 때만 보이는 편집 줄 (누를 때 키보드가 내려가지 않게 포커스 유지)
+const liTools=$('#liTools');
+$('#blocks').addEventListener('focusin',e=>{ liTools.hidden=!e.target.classList?.contains('b-li-t'); });
+$('#blocks').addEventListener('focusout',()=>{ setTimeout(()=>{ if(!document.activeElement?.classList?.contains('b-li-t')) liTools.hidden=true; },120); });
+liTools.addEventListener('pointerdown',e=>e.preventDefault());
+liTools.addEventListener('click',e=>{
+  const act=e.target.closest('[data-li]')?.dataset.li; const ta=document.activeElement;
+  const n=cur(); const b=n && ta?.classList?.contains('b-li-t') && blk(n,ta.dataset.id); if(!act||!b) return;
+  const p=ta.selectionStart;
+  if(act==='in'||act==='out'){ liIndent(b,act==='in'?1:-1); touch(n); renderEditor(); caretTo(b.id,p); }
+  else if(act==='style'){ openListStyles({kind:'list',id:b.id}); }
+  else if(act==='end'){
+    if(!b.text.trim()){ liToText(n,b); touch(n); renderEditor(); caretTo(b.id,0); return; }
+    const run=listRun(n,b), last=run[run.length-1];
+    const t={id:uid(),type:'text',text:''}; n.blocks.splice(n.blocks.indexOf(last)+1,0,t);
+    touch(n); renderEditor(); caretTo(t.id,0);
+  }
+});
 $('#tDraw').onclick=()=>openDraw(null);
 $('#tRec').onclick=startRec;
 $('#tPaper').onclick=openPaper;
@@ -1106,7 +1292,7 @@ function wirePlayer(b,play,track,bar,time){
 /* ================= 겹쳐 뜨는 화면 + 뒤로가기 ================= */
 // 그림판·녹음·메모지 창도 휴대폰 뒤로가기로 닫히게 history에 한 칸씩 쌓는다
 let overlay=null;
-const OV={paper:'#paperDlg',draw:'#drawDlg',rec:'#recDlg',cals:'#calsDlg',share:'#shareDlg'};
+const OV={paper:'#paperDlg',draw:'#drawDlg',rec:'#recDlg',cals:'#calsDlg',share:'#shareDlg',list:'#listDlg'};
 function openOverlay(name){
   overlay=name; $(OV[name]).hidden=false;
   D.discard=false;
@@ -1128,12 +1314,13 @@ addEventListener('popstate',()=>{
 /* ================= 공유 ================= */
 function noteAsText(n){
   const out=[]; if(n.title.trim()) out.push(n.title.trim(),'');
-  for(const b of n.blocks){
+  n.blocks.forEach((b,i)=>{
+    if(b.type==='li' && b.text.trim()) out.push('    '.repeat(Math.min(2,b.level||0))+markerFor(n,i)+' '+b.text);
     if(b.type==='text' && b.text.trim()) out.push(b.text);
     if(b.type==='todo' && b.text.trim()) out.push((b.done?'☑ ':'☐ ')+b.text);
     if(b.type==='draw') out.push('[그림]');
     if(b.type==='audio') out.push('[음성 '+mmss(b.dur||0)+']');
-  }
+  });
   return out.join('\n');
 }
 async function drawingPng(mediaId,paper){
