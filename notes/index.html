@@ -223,6 +223,18 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .tg{display:block;font-size:12.5px;line-height:1.35;padding:1px 2px 1px 3px;border-radius:4px;background:color-mix(in srgb,var(--c) 20%,transparent);border-left:3px solid var(--c);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:clip;letter-spacing:-.03em;font-weight:500}
 @media (min-width:600px){ .tg{text-overflow:ellipsis;letter-spacing:0} }
 .more{font-size:12px;color:var(--sub);text-align:center;font-weight:700}
+.cell.hol .dn{color:var(--sun)}
+.cell.today.hol .dn{color:var(--brand-ink)}
+.hn{display:block;font-size:11.5px;line-height:1.25;color:var(--sun);text-align:center;white-space:nowrap;overflow:hidden;font-weight:700;letter-spacing:-.04em}
+.tg.span{border-left:0;border-radius:0;margin-inline:-2px;background:color-mix(in srgb,var(--c) 32%,transparent)}
+.tg.span.s{border-left:3px solid var(--c);border-radius:4px 0 0 4px;margin-left:0}
+.tg.span.e{border-radius:0 4px 4px 0;margin-right:0}
+.tg.span.s.e{border-radius:4px}
+.hol-badge{font-size:14.5px;font-weight:700;padding:2px 10px;border-radius:999px;background:color-mix(in srgb,var(--sun) 14%,transparent);color:var(--sun)}
+.rng{display:flex;gap:6px;align-items:center;width:100%}
+.rng input{flex:1;min-width:0}
+.ev-form input[type=date]{min-height:54px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:17px;padding:8px 8px}
+.ev-form .tip{font-size:14px;color:var(--sub)}
 .cal-tip{font-size:14.5px;color:var(--sub);text-align:center}
 
 .day-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -352,7 +364,7 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
     <p class="cal-tip">날짜를 누르면 일정이 보이고, 한 번 더 누르면 바로 적을 수 있어요 · 좌우로 밀면 달이 바뀌어요</p>
   </section>
   <section class="cal-day" id="calDay" aria-label="선택한 날의 일정">
-    <div class="day-h"><h2 id="dayTitle"></h2><span class="badge" id="dayBadge" hidden>오늘</span></div>
+    <div class="day-h"><h2 id="dayTitle"></h2><span class="badge" id="dayBadge" hidden>오늘</span><span class="hol-badge" id="dayHol" hidden></span></div>
     <ul class="evs" id="dayList"></ul>
     <form class="ev-form" id="evForm" autocomplete="off">
       <h3 id="evFormH">일정 적기</h3>
@@ -362,6 +374,13 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
         <input type="time" id="evTime" aria-label="시간 (선택)">
         <button class="btn ghost" id="evNoTime" type="button">시간 없음</button>
       </div>
+      <div class="row">
+        <button class="btn ghost" id="evRangeBtn" type="button" aria-pressed="false">📆 여러 날 (기간)</button>
+        <div class="rng" id="evRange" hidden>
+          <input type="date" id="evStart" aria-label="시작 날짜"><span aria-hidden="true">~</span><input type="date" id="evEnd" aria-label="끝 날짜">
+        </div>
+      </div>
+      <p class="tip">“12~13 휴가”처럼 적으면 기간으로 들어가요.</p>
       <div class="acts">
         <button class="btn danger" id="evDel" type="button" hidden>삭제</button>
         <button class="btn ghost" id="evCancel" type="button" hidden>취소</button>
@@ -1337,7 +1356,70 @@ function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0
 function parseYmd(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
 function calOf(id){ return cals.find(c=>c.id===id); }
 function visibleCals(){ return cals.filter(c=>c.visible!==false); }
-function sortEv(a,b){ return (a.time?1:0)-(b.time?1:0) || (a.time||'').localeCompare(b.time||'') || a.created-b.created; }
+function endOf(e){ return e.end && e.end>e.date? e.end : e.date; }
+function onDay(e,k){ return e.date<=k && k<=endOf(e); }
+function isMulti(e){ return endOf(e)!==e.date; }
+function addDays(k,n){ const d=parseYmd(k); d.setDate(d.getDate()+n); return ymd(d); }
+function spanDays(e){ return Math.round((parseYmd(endOf(e))-parseYmd(e.date))/864e5)+1; }
+// 기간 일정이 먼저(오래 걸리는 것 먼저) → 시간 없는 일정 → 시간 순
+function sortEv(a,b){
+  return (isMulti(b)-isMulti(a)) || (isMulti(a)&&isMulti(b)? a.date.localeCompare(b.date)||spanDays(b)-spanDays(a) : 0)
+    || (a.time?1:0)-(b.time?1:0) || (a.time||'').localeCompare(b.time||'') || a.created-b.created;
+}
+function shortDay(k){ const d=parseYmd(k); return `${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})`; }
+
+/* ---------- 공휴일 ---------- */
+// 2025~2027년: 우주항공청 월력요항·관공서 공휴일 규정 기준으로 확인한 날짜.
+// 그 밖의 해: 음력(단기력) 계산 + 대체공휴일 규칙으로 계산 → 선거일·임시공휴일은 빠짐.
+const HOLI_KNOWN={
+  2025:{'01-01':'신정','01-27':'임시공휴일','01-28':'설날 연휴','01-29':'설날','01-30':'설날 연휴','03-01':'삼일절','03-03':'대체공휴일','05-05':'어린이날·부처님오신날','05-06':'대체공휴일','06-03':'대통령 선거일','06-06':'현충일','08-15':'광복절','10-03':'개천절','10-05':'추석 연휴','10-06':'추석','10-07':'추석 연휴','10-08':'대체공휴일','10-09':'한글날','12-25':'성탄절'},
+  2026:{'01-01':'신정','02-16':'설날 연휴','02-17':'설날','02-18':'설날 연휴','03-01':'삼일절','03-02':'대체공휴일','05-01':'노동절','05-05':'어린이날','05-24':'부처님오신날','05-25':'대체공휴일','06-03':'지방선거일','06-06':'현충일','07-17':'제헌절','08-15':'광복절','08-17':'대체공휴일','09-24':'추석 연휴','09-25':'추석','09-26':'추석 연휴','10-03':'개천절','10-05':'대체공휴일','10-09':'한글날','12-25':'성탄절'},
+  2027:{'01-01':'신정','02-06':'설날 연휴','02-07':'설날','02-08':'설날 연휴','02-09':'대체공휴일','03-01':'삼일절','05-01':'노동절','05-03':'대체공휴일','05-05':'어린이날','05-13':'부처님오신날','06-06':'현충일','07-17':'제헌절','07-19':'대체공휴일','08-15':'광복절','08-16':'대체공휴일','09-14':'추석 연휴','09-15':'추석','09-16':'추석 연휴','10-03':'개천절','10-04':'대체공휴일','10-09':'한글날','10-11':'대체공휴일','12-25':'성탄절','12-27':'대체공휴일'},
+};
+const holiCache={};
+let lunarFmt=null;
+function lunarDate(y,lm,ld){ // y년 안의 음력 lm월 ld일 (윤달 제외)
+  try{ lunarFmt||=new Intl.DateTimeFormat('en-u-ca-dangi',{month:'numeric',day:'numeric'}); }catch(e){ return null; }
+  for(let d=new Date(y,0,1);d.getFullYear()===y;d.setDate(d.getDate()+1)){
+    const p=lunarFmt.formatToParts(d);
+    if(p.find(x=>x.type==='month')?.value===String(lm) && p.find(x=>x.type==='day')?.value===String(ld)) return new Date(d);
+  }
+  return null;
+}
+function calcHolidays(y){
+  const H={}, add=(d,n)=>{ const k=ymd(d); H[k]=H[k]? H[k]+'·'+n : n; };
+  const D=(m,d)=>new Date(y,m-1,d), off=(d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+  add(D(1,1),'신정');
+  const seol=lunarDate(y,1,1), bud=lunarDate(y,4,8), chu=lunarDate(y,8,15);
+  const seolDays=seol? [off(seol,-1),seol,off(seol,1)] : [], chuDays=chu? [off(chu,-1),chu,off(chu,1)] : [];
+  seolDays.forEach((d,i)=>add(d,i===1?'설날':'설날 연휴'));
+  add(D(3,1),'삼일절');
+  if(y>=2026) add(D(5,1),'노동절');
+  add(D(5,5),'어린이날');
+  if(bud) add(bud,'부처님오신날');
+  add(D(6,6),'현충일');
+  if(y>=2026) add(D(7,17),'제헌절');
+  add(D(8,15),'광복절');
+  chuDays.forEach((d,i)=>add(d,i===1?'추석':'추석 연휴'));
+  add(D(10,3),'개천절'); add(D(10,9),'한글날'); add(D(12,25),'성탄절');
+  // 대체공휴일: 그 다음의 첫 번째 비공휴일(일요일·공휴일이 아닌 날)
+  const base={...H}, count=k=>(base[k]||'').split('·').filter(Boolean).length;
+  const next=d=>{ let x=off(d,1); while(x.getDay()===0 || H[ymd(x)]) x=off(x,1); return x; };
+  const sub=d=>{ H[ymd(next(d))]='대체공휴일'; };
+  for(const days of [seolDays,chuDays]) if(days.some(d=>d.getDay()===0 || count(ymd(d))>1)) sub(days[2]);
+  const kid=D(5,5); if(kid.getDay()===0 || kid.getDay()===6 || count(ymd(kid))>1) sub(kid);
+  const wk=[D(3,1),D(8,15),D(10,3),D(10,9),D(12,25)]; if(bud) wk.push(bud); if(y>=2026) wk.push(D(5,1),D(7,17));
+  for(const d of wk) if(d.getDay()===0 || d.getDay()===6) sub(d);
+  return H;
+}
+function holidaysOf(y){
+  if(holiCache[y]) return holiCache[y];
+  let H;
+  if(HOLI_KNOWN[y]){ H={}; for(const [md,n] of Object.entries(HOLI_KNOWN[y])) H[`${y}-${md}`]=n; }
+  else H=calcHolidays(y);
+  return holiCache[y]=H;
+}
+function holidayName(k){ return holidaysOf(+k.slice(0,4))[k]||''; }
 function dayLabel(s,withYear){
   const d=parseYmd(s);
   return (withYear? d.getFullYear()+'년 ' : '')+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+WD[d.getDay()]+'요일';
@@ -1389,20 +1471,29 @@ function renderGrid(){
   const first=new Date(y,m,1), start=new Date(y,m,1-first.getDay());
   const last=new Date(y,m+1,0), weeks=Math.ceil((first.getDay()+last.getDate())/7);
   const vis=new Set(visibleCals().map(c=>c.id));
-  const byDay={};
-  for(const e of evts) if(vis.has(e.cal)) (byDay[e.date]||=[]).push(e);
+  const gridStart=ymd(start), gridEnd=addDays(gridStart,weeks*7-1);
+  const inGrid=evts.filter(e=>vis.has(e.cal) && e.date<=gridEnd && endOf(e)>=gridStart);
   const today=ymd(new Date());
   const maxTags= innerWidth>=1000? 4 : wide.matches? 3 : 2;
   let h=WD.map((w,i)=>`<div class="wd-h${i===0?' sun':i===6?' sat':''}">${w}</div>`).join('');
   for(let i=0;i<weeks*7;i++){
     const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i), k=ymd(d);
-    const list=(byDay[k]||[]).sort(sortEv);
-    const cls=['cell']; if(d.getMonth()!==m) cls.push('out'); if(d.getDay()===0) cls.push('sun'); if(d.getDay()===6) cls.push('sat'); if(k===today) cls.push('today');
-    const shown=list.length>maxTags? list.slice(0,maxTags-1) : list;
-    const tags=shown.map(e=>`<span class="tg" style="--c:${calOf(e.cal)?.color||'#888'}">${esc(e.text)}</span>`).join('');
+    const list=inGrid.filter(e=>onDay(e,k)).sort(sortEv);
+    const hol=holidayName(k);
+    const cls=['cell']; if(d.getMonth()!==m) cls.push('out'); if(d.getDay()===0) cls.push('sun'); if(d.getDay()===6) cls.push('sat'); if(k===today) cls.push('today'); if(hol) cls.push('hol');
+    const room=hol? maxTags-1 : maxTags;
+    const shown=list.length>room? list.slice(0,Math.max(0,room-1)) : list;
+    // 기간 일정: 이어지는 칸은 띠로, 글자는 시작하는 날과 매주 일요일에만
+    const tags=shown.map(e=>{
+      const c=calOf(e.cal)?.color||'#888';
+      if(!isMulti(e)) return `<span class="tg" style="--c:${c}">${esc(e.text)}</span>`;
+      const cl='tg span'+(k===e.date?' s':'')+(k===endOf(e)?' e':'');
+      const show=k===e.date || d.getDay()===0 || i===0;
+      return `<span class="${cl}" style="--c:${c}">${show? esc(e.text) : '&nbsp;'}</span>`;
+    }).join('');
     const more=list.length>shown.length? `<span class="more">+${list.length-shown.length}</span>` : '';
-    const label=`${d.getMonth()+1}월 ${d.getDate()}일${list.length?`, 일정 ${list.length}개`:''}`;
-    h+=`<button class="${cls.join(' ')}" type="button" data-d="${k}" aria-selected="${k===selDay}" aria-label="${label}"><span class="dn">${d.getDate()}</span>${tags}${more}</button>`;
+    const label=`${d.getMonth()+1}월 ${d.getDate()}일${hol?`, ${hol}`:''}${list.length?`, 일정 ${list.length}개`:''}`;
+    h+=`<button class="${cls.join(' ')}" type="button" data-d="${k}" aria-selected="${k===selDay}" aria-label="${label}"><span class="dn">${d.getDate()}</span>${hol?`<span class="hn">${esc(hol)}</span>`:''}${tags}${more}</button>`;
   }
   $('#calGrid').innerHTML=h;
 }
@@ -1436,12 +1527,13 @@ $('#calGrid').addEventListener('click',e=>{
 function renderDay(){
   $('#dayTitle').textContent=dayLabel(selDay);
   $('#dayBadge').hidden= selDay!==ymd(new Date());
+  const hol=holidayName(selDay); $('#dayHol').hidden=!hol; $('#dayHol').textContent='🎌 '+hol;
   $('#evText').placeholder=`${parseYmd(selDay).getMonth()+1}월 ${parseYmd(selDay).getDate()}일에 적을 내용`;
   const vis=new Set(visibleCals().map(c=>c.id));
-  const list=evts.filter(e=>e.date===selDay && vis.has(e.cal)).sort(sortEv);
-  const hidden=evts.filter(e=>e.date===selDay && !vis.has(e.cal)).length;
+  const list=evts.filter(e=>onDay(e,selDay) && vis.has(e.cal)).sort(sortEv);
+  const hidden=evts.filter(e=>onDay(e,selDay) && !vis.has(e.cal)).length;
   $('#dayList').innerHTML= list.length
-    ? list.map(e=>{ const c=calOf(e.cal); return `<li><button class="ev" type="button" data-ev="${e.id}" style="--c:${c?.color||'#888'}" aria-current="${editEv===e.id}"><span class="bar"></span><span class="bd"><span class="tx">${esc(e.text)}</span><span class="mt">${[timeLabel(e.time),c?.name].filter(Boolean).join(' · ')}</span></span></button></li>`; }).join('')
+    ? list.map(e=>{ const c=calOf(e.cal); return `<li><button class="ev" type="button" data-ev="${e.id}" style="--c:${c?.color||'#888'}" aria-current="${editEv===e.id}"><span class="bar"></span><span class="bd"><span class="tx">${esc(e.text)}</span><span class="mt">${[isMulti(e)?`${shortDay(e.date)} ~ ${shortDay(endOf(e))} · ${spanDays(e)}일`:'',timeLabel(e.time),c?.name].filter(Boolean).join(' · ')}</span></span></button></li>`; }).join('')
       +(hidden?`<li class="cal-tip">숨긴 달력에 일정 ${hidden}개가 더 있어요</li>`:'')
     : `<li class="day-empty">${hidden?`숨긴 달력에만 일정 ${hidden}개가 있어요.`:'이 날 일정이 없어요. 아래에 적어보세요.'}</li>`;
 }
@@ -1450,6 +1542,7 @@ $('#dayList').addEventListener('click',e=>{
   const ev=evts.find(x=>x.id===b.dataset.ev); if(!ev) return;
   editEv=ev.id; formCal=ev.cal;
   $('#evText').value=ev.text; $('#evTime').value=ev.time||'';
+  setRange(isMulti(ev), ev.date, endOf(ev));
   $('#evFormH').textContent='일정 고치기'; $('#evSave').textContent='고친 내용 저장';
   $('#evDel').hidden=false; $('#evCancel').hidden=false;
   renderEvCals(); renderDay();
@@ -1463,7 +1556,35 @@ function renderEvCals(){
   $('#evCals').innerHTML=cals.map(c=>`<button class="cchip" type="button" role="radio" data-cal="${c.id}" style="--c:${c.color}" aria-checked="${c.id===formCal}"><i></i>${esc(c.name)}</button>`).join('');
 }
 $('#evCals').addEventListener('click',e=>{ const b=e.target.closest('[data-cal]'); if(!b) return; formCal=b.dataset.cal; renderEvCals(); });
+function setRange(on,start,end){
+  $('#evRangeBtn').setAttribute('aria-pressed',String(on));
+  $('#evRange').hidden=!on;
+  $('#evStart').value=start||selDay; $('#evEnd').value=end||addDays(start||selDay,1);
+}
+$('#evRangeBtn').onclick=()=>{ const on=$('#evRangeBtn').getAttribute('aria-pressed')!=='true'; setRange(on,selDay,addDays(selDay,1)); if(on) $('#evEnd').focus(); };
+$('#evStart').addEventListener('change',()=>{ if($('#evEnd').value<$('#evStart').value) $('#evEnd').value=$('#evStart').value; });
+// "12~13 휴가", "12일~13일 휴가", "10/12~10/14 출장", "10월 30일~11월 2일 여행" → 기간 + 내용
+// 숫자 바로 뒤에 단위가 붙으면 기간이 아님: "1~2시 회의", "3~4명", "1~2주 휴가"
+const UNIT_STRICT=/^(시간|시|분|초|명|개월|개|번|층|살|세|원|박|%)/;
+const UNIT_SOFT=/^(만|천|회|차|주|년|월|등|위|점|인|장|권|병|잔|대)(?![가-힣])/;
+function parseRange(text){
+  const m=text.match(/^\s*(?:(\d{1,2})\s*(?:\/|\.|월)\s*)?(\d{1,2})\s*일?\s*[~～]\s*(?:(\d{1,2})\s*(?:\/|\.|월)\s*)?(\d{1,2})(\s*일)?(\s*까지)?(\s*)([\s\S]+)$/);
+  if(!m) return null;
+  const rest=m[8].trim(); if(!rest) return null;
+  if(!m[5] && !m[6] && !m[7] && (UNIT_STRICT.test(rest) || UNIT_SOFT.test(rest))) return null;
+  const base=parseYmd(selDay);
+  const sm=m[1]? +m[1] : base.getMonth()+1, sd=+m[2];
+  let em=m[3]? +m[3] : sm; const ed=+m[4];
+  let ey=base.getFullYear(), sy=ey;
+  if(!m[3] && ed<sd) em=sm+1;              // 30~2 → 다음 달 2일
+  const s=new Date(sy,sm-1,sd), e=new Date(ey,em-1,ed);
+  if(m[3] && e<s) e.setFullYear(e.getFullYear()+1); // 12/30~1/2 → 다음 해
+  if(s.getDate()!==sd || e.getDate()!==ed || sm<1||sm>12 || em<1||em>13) return null; // 없는 날짜
+  if(e<s || (e-s)/864e5>366) return null;
+  return {date:ymd(s),end:ymd(e),text:rest};
+}
 function resetForm(){
+  setRange(false,selDay,addDays(selDay,1));
   editEv=null; $('#evText').value=''; $('#evTime').value='';
   $('#evFormH').textContent='일정 적기'; $('#evSave').textContent='추가';
   $('#evDel').hidden=true; $('#evCancel').hidden=true;
@@ -1472,18 +1593,28 @@ $('#evNoTime').onclick=()=>{ $('#evTime').value=''; };
 $('#evCancel').onclick=()=>{ resetForm(); renderDay(); };
 $('#evForm').addEventListener('submit',e=>{
   e.preventDefault();
-  const text=$('#evText').value.trim();
+  let text=$('#evText').value.trim();
   if(!text){ $('#evText').focus(); toast('내용을 적어주세요.'); return; }
   const now=Date.now(), time=$('#evTime').value||'';
+  // 날짜 범위: '여러 날'을 켰으면 그 날짜, 아니면 글에서 "12~13 휴가" 같은 표현을 찾아본다
+  let date=editEv? (evts.find(x=>x.id===editEv)?.date||selDay) : selDay, end='', parsed=null;
+  if($('#evRangeBtn').getAttribute('aria-pressed')==='true'){
+    date=$('#evStart').value||selDay; end=$('#evEnd').value||date;
+    if(end<date){ toast('끝 날짜가 시작 날짜보다 빨라요.'); $('#evEnd').focus(); return; }
+  }else if((parsed=parseRange(text))){ ({date,end,text}=parsed); }
+  else if(editEv) end='';
+  if(end===date) end='';
   const c=calOf(formCal);
   if(c && c.visible===false){ c.visible=true; saveCal(c); renderCalChips(); }
   if(editEv){
     const ev=evts.find(x=>x.id===editEv);
-    if(ev){ Object.assign(ev,{text,time,cal:formCal,updated:now}); saveEv(ev); }
+    if(ev){ Object.assign(ev,{text,time,cal:formCal,date,updated:now}); if(end) ev.end=end; else delete ev.end; saveEv(ev); }
     toast('일정을 고쳤습니다.');
   }else{
-    const ev={id:uid(),cal:formCal,date:selDay,time,text,created:now,updated:now};
+    const ev={id:uid(),cal:formCal,date,time,text,created:now,updated:now};
+    if(end) ev.end=end;
     evts.push(ev); saveEv(ev);
+    if(end) toast(`${shortDay(date)} ~ ${shortDay(end)} '${text}' 넣었어요.`);
   }
   resetForm(); renderGrid(); renderDay();
   $('#evText').focus({preventScroll:true}); // 이어서 하나 더 적을 수 있게
@@ -1573,21 +1704,22 @@ async function sendFile(name,type,content,shareType){
 $('#shText').onclick=async()=>{
   const c=calOf(shareCal); if(!c) return;
   const y=calMonth.getFullYear(), m=calMonth.getMonth();
-  const prefix=`${y}-${String(m+1).padStart(2,'0')}-`;
-  const list=evts.filter(e=>e.cal===c.id && e.date.startsWith(prefix)).sort((a,b)=>a.date.localeCompare(b.date)||sortEv(a,b));
+  const ms=ymd(new Date(y,m,1)), me=ymd(new Date(y,m+1,0));
+  const list=evts.filter(e=>e.cal===c.id && e.date<=me && endOf(e)>=ms).sort((a,b)=>a.date.localeCompare(b.date)||sortEv(a,b));
   if(!list.length){ toast(`${m+1}월 '${c.name}' 달력에 일정이 없어요.`); return; }
   const lines=[`📅 ${c.name} · ${y}년 ${m+1}월`,''];
   let prev='';
   for(const e of list){
     const d=parseYmd(e.date);
     const head=e.date!==prev? `${d.getMonth()+1}/${d.getDate()} (${WD[d.getDay()]})` : '      ';
-    lines.push(`${head} ${e.time?timeLabel(e.time)+' ':''}${e.text}`); prev=e.date;
+    const range=isMulti(e)? `~ ${parseYmd(endOf(e)).getMonth()+1}/${parseYmd(endOf(e)).getDate()} (${WD[parseYmd(endOf(e)).getDay()]}) ` : '';
+    lines.push(`${head} ${range}${e.time?timeLabel(e.time)+' ':''}${e.text}`); prev=e.date;
   }
   const text=lines.join('\n');
   if(navigator.share){ try{ await navigator.share({text}); return; }catch(e){ if(e.name==='AbortError') return; } }
   try{ await navigator.clipboard.writeText(text); toast('일정 글을 복사했어요. 카톡에 붙여넣기 하세요.'); }catch(e){ toast('공유와 복사가 모두 막혀 있어요.'); }
 };
-function icsEsc(s){ return s.replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
+function icsEsc(s){ return s.replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
 function icsFold(line){ // 한 줄 75바이트 제한
   const enc=new TextEncoder(); let out='', cur='', n=0;
   for(const ch of line){ const b=enc.encode(ch).length; if(n+b>(out?74:75)){ out+=(out?'\r\n ':'')+cur; cur=''; n=0; } cur+=ch; n+=b; }
@@ -1600,11 +1732,11 @@ function buildIcs(c){
     const d=e.date.replace(/-/g,'');
     L.push('BEGIN:VEVENT','UID:'+e.id+'@memo-app','DTSTAMP:'+now);
     if(e.time){
-      const [h,mi]=e.time.split(':').map(Number), end=new Date(...e.date.split('-').map((v,i)=>i===1?v-1:+v),h+1,mi);
+      const [h,mi]=e.time.split(':').map(Number), end=new Date(...endOf(e).split('-').map((v,i)=>i===1?v-1:+v),h+1,mi);
       const t=e.time.replace(':','')+'00';
       L.push('DTSTART:'+d+'T'+t,'DTEND:'+ymd(end).replace(/-/g,'')+'T'+String(end.getHours()).padStart(2,'0')+String(end.getMinutes()).padStart(2,'0')+'00');
     }else{
-      const nx=parseYmd(e.date); nx.setDate(nx.getDate()+1);
+      const nx=parseYmd(endOf(e)); nx.setDate(nx.getDate()+1);
       L.push('DTSTART;VALUE=DATE:'+d,'DTEND;VALUE=DATE:'+ymd(nx).replace(/-/g,''));
     }
     L.push('SUMMARY:'+icsEsc(e.text),'END:VEVENT');
@@ -1636,7 +1768,7 @@ async function importCalFile(file){
 }
 async function importShared(j){
   const src=j.calendar; let c=calOf(src.id);
-  const incoming=(j.events||[]).filter(e=>e && e.id && /^\d{4}-\d{2}-\d{2}$/.test(e.date)).map(e=>({...e,cal:src.id,text:String(e.text||''),time:e.time||''}));
+  const incoming=(j.events||[]).filter(e=>e && e.id && /^\d{4}-\d{2}-\d{2}$/.test(e.date)).map(e=>{ const x={...e,cal:src.id,text:String(e.text||''),time:e.time||''}; if(!(typeof x.end==='string' && /^\d{4}-\d{2}-\d{2}$/.test(x.end) && x.end>x.date)) delete x.end; return x; });
   let msg;
   if(c && !c.shared){ // 내가 만든 달력 → 합치기 (최근에 고친 쪽)
     let n=0;
@@ -1672,6 +1804,10 @@ function importIcs(text,fname){
           if(m[6]) d=new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5]));
           cur.date=ymd(d); cur.time=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
         }else{ cur.date=`${m[1]}-${m[2]}-${m[3]}`; cur.time=''; }
+      }else if(key.startsWith('DTEND')){
+        const m=val.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})\d{0,2}(Z)?)?/); if(!m) continue;
+        let d=m[4]? (m[6]? new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5])) : new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5])) : new Date(+m[1],m[2]-1,+m[3]-1); // 종일 일정의 DTEND는 다음 날
+        cur.endDate=ymd(d);
       }else if(key.startsWith('SUMMARY')) cur.text=unesc(val);
       else if(key==='UID') cur.uid=val;
     }
@@ -1680,7 +1816,7 @@ function importIcs(text,fname){
   const c={id:uid(),name:unesc(name).slice(0,20)||'가져온 달력',color:CAL_COLORS[cals.length%CAL_COLORS.length],visible:true,shared:false,order:Math.max(0,...cals.map(x=>x.order||0))+1,created:Date.now()};
   cals.push(c); saveCal(c);
   const now=Date.now();
-  for(const e of out){ const ev={id:uid(),cal:c.id,date:e.date,time:e.time,text:e.text,created:now,updated:now}; evts.push(ev); saveEv(ev); }
+  for(const e of out){ const ev={id:uid(),cal:c.id,date:e.date,time:e.time,text:e.text,created:now,updated:now}; if(e.endDate>e.date) ev.end=e.endDate; evts.push(ev); saveEv(ev); }
   if(overlay) closeOverlay();
   setView('cal'); renderCalAll();
   toast(`'${c.name}' 달력으로 일정 ${out.length}개를 가져왔어요. (반복 일정은 첫 날만 들어가요)`);
