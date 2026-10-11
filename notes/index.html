@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F4C5C">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<title>메모장</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 레이아웃: 목록 화면 ↔ 편집 화면 1열. 넓은 화면에서는 좌우 2단. 저장은 이 기기(localStorage)에만. */
+:root{
+  --bg:#EDF0F3; --card:#FFFFFF; --ink:#152033; --sub:#4E5B6E; --line:#D3DAE2;
+  --brand:#0F4C5C; --brand-ink:#FFFFFF; --soft:#E1ECEE;
+  --star:#C98A00; --warn:#B3261E; --warn-bg:#FBE6E4; --mid:#8A5A00; --mid-bg:#FBF0D6;
+  --shadow:0 1px 2px rgba(21,32,51,.08),0 6px 18px rgba(21,32,51,.06);
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#10161F; --card:#1A2330; --ink:#EEF2F6; --sub:#A9B4C2; --line:#33404F;
+  --brand:#7FD1DE; --brand-ink:#0B1A20; --soft:#22323A;
+  --star:#F2C562; --warn:#FF9A91; --warn-bg:#3F1E1C; --mid:#F2C562; --mid-bg:#3A2F14;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#10161F; --card:#1A2330; --ink:#EEF2F6; --sub:#A9B4C2; --line:#33404F;
+  --brand:#7FD1DE; --brand-ink:#0B1A20; --soft:#22323A;
+  --star:#F2C562; --warn:#FF9A91; --warn-bg:#3F1E1C; --mid:#F2C562; --mid-bg:#3A2F14;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+a{color:var(--brand)}
+h1,h2,p{margin:0}
+.sub{color:var(--sub)}
+
+.layout{max-width:1100px;margin:0 auto;min-height:100dvh}
+.pane{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:calc(14px + env(safe-area-inset-top,0px)) calc(110px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{font-family:var(--f-num);font-size:26px;font-weight:700}
+.btn{min-height:52px;padding:10px 18px;border-radius:12px;border:2px solid var(--brand);background:var(--card);color:var(--brand);font-weight:700;font-size:18px}
+.btn.fill{background:var(--brand);color:var(--brand-ink)}
+.btn.ghost{border-color:var(--line);color:var(--ink);font-weight:500}
+.btn.danger{border-color:var(--warn);color:var(--warn)}
+.btn.icon{min-width:52px;padding-inline:12px}
+
+.search{width:100%;min-height:56px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:19px;padding:10px 14px}
+.count{font-size:16px;color:var(--sub)}
+.group{font-family:var(--f-num);font-size:17px;font-weight:700;color:var(--sub);margin-top:4px}
+
+.list{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.item{display:flex;flex-direction:column;gap:2px;width:100%;padding:14px 16px;border-radius:14px;border:2px solid transparent;background:var(--card);box-shadow:var(--shadow);text-align:left}
+.item[aria-current="true"]{border-color:var(--brand)}
+.item .t{font-size:20px;font-weight:700;line-height:1.35;display:flex;gap:6px;align-items:baseline}
+.item .t span{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.item .p{color:var(--sub);font-size:16.5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.item .d{color:var(--sub);font-size:15px;font-family:var(--f-num)}
+.pin{color:var(--star);flex:none}
+mark{background:var(--mid-bg);color:inherit;border-radius:3px}
+
+.empty{background:var(--card);border-radius:16px;padding:28px 16px;text-align:center;color:var(--sub);display:flex;flex-direction:column;gap:12px;align-items:center}
+
+.fab{position:fixed;right:max(16px,calc(50% - 304px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:10;min-height:60px;padding:12px 22px;border-radius:999px;border:0;background:var(--brand);color:var(--brand-ink);font-size:20px;font-weight:700;box-shadow:0 6px 20px rgba(15,76,92,.35)}
+
+.menu{display:flex;flex-direction:column;gap:8px;background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.menu .row{display:flex;flex-wrap:wrap;gap:8px}
+.menu .btn{flex:1 1 140px}
+.menu p{font-size:15.5px;color:var(--sub)}
+
+/* 편집 화면 */
+.editor{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column}
+.ed-bar{flex:none;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;border-bottom:1px solid var(--line);max-width:640px;width:100%;margin:0 auto}
+.ed-bar .gap{display:flex;gap:8px}
+.ed-meta{max-width:640px;width:100%;margin:0 auto;padding:8px 16px 0;font-size:15px;color:var(--sub);font-family:var(--f-num)}
+.ed-body{flex:1;display:flex;max-width:640px;width:100%;margin:0 auto;padding:6px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+textarea{flex:1;width:100%;resize:none;border:0;background:var(--card);color:var(--ink);font:inherit;font-size:19px;line-height:1.7;padding:16px;border-radius:14px;box-shadow:var(--shadow)}
+textarea::placeholder{color:var(--sub)}
+.btn[aria-pressed="true"]{background:var(--soft);color:var(--star);border-color:var(--star)}
+
+.banner{border-radius:12px;padding:12px 14px;background:var(--warn-bg);color:var(--warn);font-weight:500;border:1px solid var(--warn)}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:40;max-width:608px;margin:0 auto;background:var(--ink);color:var(--bg);padding:10px 10px 10px 16px;border-radius:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.toast button{min-height:44px;padding:6px 14px;border-radius:10px;border:0;background:var(--brand);color:var(--brand-ink);font-weight:700;flex:none}
+.editor ~ .toast{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+
+/* 넓은 화면: 왼쪽 목록, 오른쪽 편집 */
+@media (min-width:900px){
+  .layout{display:grid;grid-template-columns:400px 1fr;gap:0}
+  .pane{max-width:none;margin:0;border-right:1px solid var(--line);height:100dvh;overflow-y:auto}
+  .fab{right:auto;left:calc(max(0px,50% - 550px) + 400px - 16px);transform:translateX(-100%)}
+  .editor{position:sticky;top:0;height:100dvh;inset:auto;z-index:auto}
+  .editor[hidden]{display:flex!important}
+  .editor.blank .ed-bar,.editor.blank .ed-meta,.editor.blank .ed-body{visibility:hidden}
+  #btnBack{display:none}
+  .toast{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <main class="pane" id="listPane">
+    <header class="top">
+      <h1>📝 메모장</h1>
+      <button class="btn ghost icon" id="btnMenu" type="button" aria-expanded="false" aria-controls="menu" aria-label="설정 열기">⋯</button>
+    </header>
+    <div id="banners"></div>
+    <section class="menu" id="menu" hidden>
+      <p>메모는 이 기기·이 브라우저에만 저장됩니다. 기기를 바꾸거나 브라우저 데이터를 지우기 전에 백업해 두세요.</p>
+      <div class="row">
+        <button class="btn" id="btnExport" type="button">백업 파일 저장</button>
+        <button class="btn" id="btnImport" type="button">백업 불러오기</button>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="btnTheme" type="button">화면: 자동</button>
+        <button class="btn ghost" id="btnHome" type="button" onclick="location.href='../'">주식 분석으로</button>
+      </div>
+      <input type="file" id="fileIn" accept="application/json,.json" hidden>
+    </section>
+    <input class="search" id="q" type="search" inputmode="search" autocomplete="off" placeholder="메모 검색" aria-label="메모 검색">
+    <div class="count" id="count" aria-live="polite"></div>
+    <div id="list"></div>
+  </main>
+
+  <section class="editor blank" id="editor" hidden aria-label="메모 편집">
+    <div class="ed-bar">
+      <button class="btn ghost" id="btnBack" type="button">← 목록</button>
+      <span></span>
+      <div class="gap">
+        <button class="btn ghost icon" id="btnPin" type="button" aria-pressed="false" aria-label="상단 고정">📌</button>
+        <button class="btn ghost icon" id="btnShare" type="button" aria-label="공유 또는 복사">📤</button>
+        <button class="btn danger icon" id="btnDel" type="button" aria-label="삭제">🗑</button>
+      </div>
+    </div>
+    <div class="ed-meta" id="meta" aria-live="polite"></div>
+    <div class="ed-body">
+      <textarea id="ta" placeholder="첫 줄이 제목이 됩니다." aria-label="메모 내용" spellcheck="false"></textarea>
+    </div>
+  </section>
+</div>
+
+<button class="fab" id="btnNew" type="button">＋ 새 메모</button>
+<div class="toast" id="toast" hidden role="status"><span id="toastMsg"></span><button id="toastAct" type="button" hidden></button></div>
+
+<script>
+const KEY='notes.v1', THEME_KEY='notes.theme';
+const $=s=>document.querySelector(s);
+const wide=matchMedia('(min-width:900px)');
+
+let notes=[], curId=null, saveTimer=null, storageOk=true;
+
+/* ---------- 저장소 ---------- */
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    const arr=raw? JSON.parse(raw) : [];
+    notes=Array.isArray(arr)? arr.filter(validNote) : [];
+  }catch(e){ notes=[]; storageOk=false; }
+}
+function persist(){
+  try{ localStorage.setItem(KEY,JSON.stringify(notes)); storageOk=true; }
+  catch(e){ storageOk=false; }
+  renderBanners();
+}
+function validNote(n){ return n && typeof n.id==='string' && typeof n.body==='string'; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function find(id){ return notes.find(n=>n.id===id); }
+
+/* ---------- 표시 도우미 ---------- */
+function titleOf(n){ const l=n.body.split('\n').find(s=>s.trim()); return l? l.trim() : '제목 없음'; }
+function previewOf(n){
+  const lines=n.body.split('\n').map(s=>s.trim()).filter(Boolean);
+  return lines.slice(1).join(' ');
+}
+function esc(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function hl(text,q){
+  if(!q) return esc(text);
+  const i=text.toLowerCase().indexOf(q.toLowerCase());
+  if(i<0) return esc(text);
+  return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+q.length))+'</mark>'+esc(text.slice(i+q.length));
+}
+function snippet(text,q){
+  // 검색어가 미리보기 뒤쪽에 있으면 그 근처를 보여준다
+  if(!q) return text;
+  const i=text.toLowerCase().indexOf(q.toLowerCase());
+  return i>40? '…'+text.slice(i-20) : text;
+}
+function when(ts){
+  const d=new Date(ts), now=new Date();
+  const sameDay=d.toDateString()===now.toDateString();
+  const y=new Date(now); y.setDate(now.getDate()-1);
+  const hm=d.toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'});
+  if(sameDay) return '오늘 '+hm;
+  if(d.toDateString()===y.toDateString()) return '어제 '+hm;
+  if(d.getFullYear()===now.getFullYear()) return (d.getMonth()+1)+'월 '+d.getDate()+'일';
+  return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.';
+}
+function full(ts){ return new Date(ts).toLocaleString('ko-KR',{year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+
+/* ---------- 목록 ---------- */
+function renderList(){
+  const q=$('#q').value.trim();
+  const ql=q.toLowerCase();
+  const shown=notes
+    .filter(n=>n.body.trim() || n.id===curId)
+    .filter(n=>!ql || n.body.toLowerCase().includes(ql))
+    .sort((a,b)=>(b.pinned-a.pinned)||(b.updated-a.updated));
+
+  const total=notes.filter(n=>n.body.trim()).length;
+  $('#count').textContent= q? `“${q}” 검색 결과 ${shown.length}개` : (total? `메모 ${total}개` : '');
+
+  const box=$('#list');
+  if(!shown.length){
+    box.innerHTML= q
+      ? `<div class="empty"><p>“${esc(q)}”이(가) 들어간 메모가 없습니다.</p></div>`
+      : `<div class="empty"><p style="font-size:20px;color:var(--ink);font-weight:700">아직 메모가 없어요</p><p>아래 <b>＋ 새 메모</b>를 눌러 바로 적어보세요.<br>쓰는 동안 자동으로 저장됩니다.</p></div>`;
+    return;
+  }
+  const pinned=shown.filter(n=>n.pinned), rest=shown.filter(n=>!n.pinned);
+  const item=n=>{
+    const pv=previewOf(n);
+    return `<li><button class="item" type="button" data-id="${n.id}" aria-current="${n.id===curId}">
+      <span class="t">${n.pinned?'<b class="pin" aria-label="고정됨">📌</b>':''}<span>${hl(titleOf(n),q)}</span></span>
+      ${pv?`<span class="p">${hl(snippet(pv,q),q)}</span>`:''}
+      <span class="d">${when(n.updated)}</span></button></li>`;
+  };
+  let html='';
+  if(pinned.length && rest.length) html+=`<p class="group">고정됨</p>`;
+  if(pinned.length) html+=`<ul class="list">${pinned.map(item).join('')}</ul>`;
+  if(pinned.length && rest.length) html+=`<p class="group">메모</p>`;
+  if(rest.length) html+=`<ul class="list">${rest.map(item).join('')}</ul>`;
+  box.innerHTML=html;
+}
+
+function renderBanners(){
+  $('#banners').innerHTML= storageOk? '' :
+    `<div class="banner">이 브라우저에서는 메모를 저장할 수 없습니다(사생활 보호 모드이거나 저장 공간이 꽉 찼을 수 있어요). 창을 닫으면 내용이 사라지니 📤 버튼으로 복사해 두세요.</div>`;
+}
+
+/* ---------- 편집 ---------- */
+function open(id,{focus=true,push=true}={}){
+  flush();
+  const n=find(id); if(!n) return;
+  dropIfEmpty(curId, id);
+  curId=id;
+  const ed=$('#editor');
+  ed.hidden=false; ed.classList.remove('blank');
+  $('#ta').value=n.body;
+  updateEditorMeta();
+  if(push && location.hash!=='#'+id){
+    // 모바일에서 뒤로가기가 목록으로 돌아가도록 기록을 남긴다
+    if(location.hash.length>1) history.replaceState(null,'','#'+id);
+    else history.pushState(null,'','#'+id);
+  }
+  renderList();
+  if(focus){
+    const ta=$('#ta');
+    ta.focus({preventScroll:true});
+    if(!n.body) ta.setSelectionRange(0,0);
+  }
+}
+function close({push=true}={}){
+  flush();
+  dropIfEmpty(curId);
+  curId=null;
+  const ed=$('#editor');
+  ed.hidden=true; ed.classList.add('blank');
+  $('#ta').value='';
+  if(push && location.hash) history.back();
+  renderList();
+}
+function dropIfEmpty(id,keep){
+  if(!id || id===keep) return;
+  const n=find(id);
+  if(n && !n.body.trim()){ notes=notes.filter(x=>x.id!==id); persist(); }
+}
+function updateEditorMeta(){
+  const n=find(curId); if(!n) return;
+  $('#btnPin').setAttribute('aria-pressed',String(!!n.pinned));
+  $('#btnPin').setAttribute('aria-label',n.pinned?'고정 해제':'상단 고정');
+  $('#meta').textContent= n.body.trim()? `${full(n.updated)} 저장됨 · ${n.body.length.toLocaleString()}자` : '새 메모';
+}
+function newNote(){
+  const now=Date.now();
+  const n={id:uid(),body:'',pinned:false,created:now,updated:now};
+  notes.push(n);
+  open(n.id);
+}
+function onInput(){
+  const n=find(curId); if(!n) return;
+  n.body=$('#ta').value;
+  n.updated=Date.now();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ saveTimer=null; persist(); updateEditorMeta(); renderList(); },400);
+}
+function flush(){
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; persist(); }
+}
+
+/* ---------- 삭제 + 되돌리기 ---------- */
+let lastDeleted=null;
+function del(){
+  const n=find(curId); if(!n) return;
+  if(!n.body.trim()){ close(); return; }
+  lastDeleted={...n};
+  notes=notes.filter(x=>x.id!==n.id);
+  persist();
+  curId=null;
+  close();
+  toast('메모를 삭제했습니다.','되돌리기',()=>{
+    if(!lastDeleted) return;
+    notes.push(lastDeleted); persist();
+    const id=lastDeleted.id; lastDeleted=null;
+    open(id,{focus:false});
+  });
+}
+
+/* ---------- 공유 ---------- */
+async function share(){
+  const n=find(curId); if(!n || !n.body.trim()) return;
+  flush();
+  if(navigator.share){
+    try{ await navigator.share({title:titleOf(n),text:n.body}); return; }
+    catch(e){ if(e.name==='AbortError') return; }
+  }
+  try{ await navigator.clipboard.writeText(n.body); toast('메모 내용을 복사했습니다.'); }
+  catch(e){ $('#ta').select(); toast('복사가 막혀 있어요. 선택된 글을 길게 눌러 복사하세요.'); }
+}
+
+/* ---------- 백업 ---------- */
+function exportAll(){
+  flush();
+  const data={app:'notes',version:1,exported:Date.now(),notes:notes.filter(n=>n.body.trim())};
+  if(!data.notes.length){ toast('백업할 메모가 없습니다.'); return; }
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  const d=new Date();
+  a.href=URL.createObjectURL(blob);
+  a.download=`메모백업_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast(`메모 ${data.notes.length}개를 백업 파일로 저장했습니다.`);
+}
+function importFile(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    let incoming;
+    try{
+      const j=JSON.parse(r.result);
+      incoming=(Array.isArray(j)? j : j.notes||[]).filter(validNote);
+    }catch(e){ toast('백업 파일을 읽을 수 없습니다.'); return; }
+    if(!incoming.length){ toast('불러올 메모가 없습니다.'); return; }
+    // 같은 메모(id)는 더 최근에 고친 쪽을 남긴다
+    let added=0, updated=0;
+    for(const m of incoming){
+      const n={id:m.id,body:m.body,pinned:!!m.pinned,created:+m.created||Date.now(),updated:+m.updated||Date.now()};
+      const cur=find(n.id);
+      if(!cur){ notes.push(n); added++; }
+      else if(n.updated>cur.updated){ Object.assign(cur,n); updated++; }
+    }
+    persist(); renderList();
+    if(curId){ $('#ta').value=find(curId).body; updateEditorMeta(); }
+    toast(`새 메모 ${added}개, 갱신 ${updated}개를 불러왔습니다.`);
+  };
+  r.readAsText(file);
+}
+
+/* ---------- 화면 테마 ---------- */
+const THEMES=['auto','light','dark'], THEME_LABEL={auto:'자동',light:'밝게',dark:'어둡게'};
+function applyTheme(t){
+  if(t==='auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme',t);
+  $('#btnTheme').textContent='화면: '+THEME_LABEL[t];
+}
+function getTheme(){ try{ return localStorage.getItem(THEME_KEY)||'auto'; }catch(e){ return 'auto'; } }
+
+/* ---------- 토스트 ---------- */
+let toastTimer=null;
+function toast(msg,actLabel,act){
+  const t=$('#toast'), b=$('#toastAct');
+  $('#toastMsg').textContent=msg;
+  b.hidden=!actLabel;
+  b.textContent=actLabel||'';
+  b.onclick= act? ()=>{ t.hidden=true; act(); } : null;
+  t.hidden=false;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ t.hidden=true; if(act) lastDeleted=null; }, act? 6000 : 3000);
+}
+
+/* ---------- 이벤트 ---------- */
+$('#list').addEventListener('click',e=>{
+  const b=e.target.closest('.item'); if(b) open(b.dataset.id,{focus:wide.matches});
+});
+$('#btnNew').onclick=newNote;
+$('#btnBack').onclick=()=>close();
+$('#btnDel').onclick=del;
+$('#btnShare').onclick=share;
+$('#btnPin').onclick=()=>{
+  const n=find(curId); if(!n) return;
+  n.pinned=!n.pinned;
+  if(!n.body.trim()) return updateEditorMeta();
+  persist(); updateEditorMeta(); renderList();
+  toast(n.pinned?'목록 맨 위에 고정했습니다.':'고정을 해제했습니다.');
+};
+$('#ta').addEventListener('input',onInput);
+$('#q').addEventListener('input',renderList);
+$('#btnMenu').onclick=()=>{
+  const m=$('#menu'); m.hidden=!m.hidden;
+  $('#btnMenu').setAttribute('aria-expanded',String(!m.hidden));
+};
+$('#btnExport').onclick=exportAll;
+$('#btnImport').onclick=()=>$('#fileIn').click();
+$('#fileIn').onchange=e=>{ const f=e.target.files[0]; if(f) importFile(f); e.target.value=''; };
+$('#btnTheme').onclick=()=>{
+  const t=THEMES[(THEMES.indexOf(getTheme())+1)%THEMES.length];
+  try{ localStorage.setItem(THEME_KEY,t); }catch(e){}
+  applyTheme(t);
+};
+
+// 뒤로가기/주소 변경으로 화면 전환
+addEventListener('popstate',()=>{
+  const id=location.hash.slice(1);
+  if(id && find(id)) open(id,{push:false,focus:false});
+  else if(curId) close({push:false});
+});
+
+// 다른 탭에서 고친 내용 반영 (지금 편집 중인 메모는 덮어쓰지 않음)
+addEventListener('storage',e=>{
+  if(e.key!==KEY) return;
+  const editing=curId && find(curId);
+  load();
+  if(editing && !find(curId)) notes.push(editing);
+  else if(editing){ const n=find(curId); if(n.updated<editing.updated) Object.assign(n,editing); else if(n.body!==$('#ta').value) $('#ta').value=n.body; }
+  renderList(); if(curId) updateEditorMeta();
+});
+
+// 앱을 내리거나 닫을 때 입력 중인 내용 즉시 저장
+addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') flush(); });
+addEventListener('pagehide',flush);
+
+// 단축키: Ctrl/Cmd+Alt+N 새 메모, Esc 목록으로
+addEventListener('keydown',e=>{
+  if(e.key==='Escape' && curId && !wide.matches){ close(); }
+  if((e.ctrlKey||e.metaKey) && e.altKey && e.key.toLowerCase()==='n'){ e.preventDefault(); newNote(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); flush(); updateEditorMeta(); toast('저장했습니다.'); }
+});
+
+/* ---------- 시작 ---------- */
+applyTheme(getTheme());
+load();
+renderBanners();
+{
+  const id=location.hash.slice(1);
+  if(id && find(id)) open(id,{push:false,focus:false});
+  else { if(id) history.replaceState(null,'',location.pathname); renderList(); }
+}
+</script>
+</body>
+</html>
