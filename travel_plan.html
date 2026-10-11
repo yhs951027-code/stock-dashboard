@@ -17,14 +17,14 @@
     --bg:#151a17; --card:#1f2622; --ink:#e8ece9; --sub:#a3ada6; --line:#323b36;
     --brand:#7cc29f; --brand-soft:#23342b; --accent:#e8bd4a; --accent-soft:#3a3220;
     --ok:#7fd3a0; --ok-soft:#1f3a2a; --warn:#f0c060; --warn-soft:#3d321c; --no:#f08c8c; --no-soft:#402424;
-    --shadow:none;
+    --shadow:none; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#151a17; --card:#1f2622; --ink:#e8ece9; --sub:#a3ada6; --line:#323b36;
   --brand:#7cc29f; --brand-soft:#23342b; --accent:#e8bd4a; --accent-soft:#3a3220;
   --ok:#7fd3a0; --ok-soft:#1f3a2a; --warn:#f0c060; --warn-soft:#3d321c; --no:#f08c8c; --no-soft:#402424;
-  --shadow:none;
+  --shadow:none; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -42,7 +42,7 @@ button,input,select{font:inherit;color:inherit}
 .illu-tag{position:absolute;top:10px;right:12px;font-size:12px;background:rgba(0,0,0,.45);color:#fff;padding:3px 8px;border-radius:20px}
 
 /* nav */
-nav.menu{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+nav.menu{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
 nav.menu .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:8px;padding-bottom:8px}
 nav.menu .wrap::-webkit-scrollbar{display:none}
 nav.menu button{flex:0 0 auto;border:0;background:none;padding:8px 12px;border-radius:20px;cursor:pointer;font-size:15px;color:var(--sub);white-space:nowrap}
@@ -297,7 +297,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
     <div class="dir">
       <div><label for="dFrom">출발지</label><input id="dFrom" placeholder="예: 천안역, 집 주소"></div>
       <div><label for="dTo">목적지</label><input id="dTo" placeholder="예: 스테이소몽" value="충북 괴산군 청천면 괴산로상신2길 52-9"></div>
-      <div class="btns" style="margin:0"><button class="btn primary" id="dGo" type="button">카카오맵 길찾기</button><button class="btn" id="dSwap" type="button">⇅ 바꾸기</button></div>
+      <div class="btns" style="margin:0"><a class="btn primary" id="dGo" href="#" target="_blank" rel="noopener">카카오맵 길찾기</a><button class="btn" id="dSwap" type="button">⇅ 바꾸기</button></div>
     </div>
     <p class="muted" style="margin:8px 0 0">카카오맵 길찾기 URL은 출발지·목적지를 이름으로 넘기는 방식이라, 열린 뒤 후보 중 정확한 장소를 한 번 골라야 할 수 있어.</p>
   </div>
@@ -527,6 +527,13 @@ function won(n){return Math.round(n).toLocaleString("ko-KR")+"원"}
 function store(k,v){try{ if(v===undefined){return localStorage.getItem(k)} localStorage.setItem(k,v) }catch(e){return null}}
 function storeDel(k){try{localStorage.removeItem(k)}catch(e){}}
 var toastT;
+// confirm() 대신 두 번 눌러 확인 (임베드 환경에서도 동작)
+function armed(btn,label){
+  if(btn.dataset.armed==="1"){ btn.dataset.armed=""; btn.textContent=btn.dataset.label; clearTimeout(btn._t); return true; }
+  btn.dataset.label=btn.dataset.label||btn.textContent; btn.dataset.armed="1"; btn.textContent=label;
+  clearTimeout(btn._t); btn._t=setTimeout(function(){btn.dataset.armed="";btn.textContent=btn.dataset.label},4000);
+  return false;
+}
 function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show")},1800)}
 
 // 지도 검색어: 주소의 괄호 설명은 빼고 사용
@@ -671,12 +678,11 @@ function renderMapDays(){
       }).join("")+'</ol></div>';
   }).join("");
 }
-$("#dGo").addEventListener("click",function(){
-  var a=$("#dFrom").value.trim(), b=$("#dTo").value.trim();
-  if(!a||!b){toast("출발지와 목적지를 모두 입력해줘");return}
-  window.open(kakaoRoute(a,b),"_blank","noopener");
-});
-$("#dSwap").addEventListener("click",function(){var a=$("#dFrom"),b=$("#dTo"),t=a.value;a.value=b.value;b.value=t});
+function syncRoute(){var a=$("#dFrom").value.trim(), b=$("#dTo").value.trim(); $("#dGo").href = (a&&b) ? kakaoRoute(a,b) : "#";}
+$("#dFrom").addEventListener("input",syncRoute); $("#dTo").addEventListener("input",syncRoute);
+$("#dGo").addEventListener("click",function(e){ if($("#dGo").getAttribute("href")==="#"){ e.preventDefault(); toast("출발지와 목적지를 모두 입력해줘"); } });
+$("#dSwap").addEventListener("click",function(){var a=$("#dFrom"),b=$("#dTo"),t=a.value;a.value=b.value;b.value=t;syncRoute()});
+syncRoute();
 
 /* ---------- 주소 복사 ---------- */
 document.addEventListener("click",function(e){
@@ -750,7 +756,7 @@ $("#bBody").addEventListener("change",function(e){
 $("#bPeople").addEventListener("input",function(){calcBudget();saveBudget()});
 $("#bLimit").addEventListener("input",function(){calcBudget();saveBudget()});
 $("#bReset").addEventListener("click",function(){
-  if(!confirm("비용 항목을 처음 값으로 되돌릴까?")) return;
+  if(!armed($("#bReset"),"한 번 더 누르면 초기화")) return;
   storeDel(BKEY); bRows=BUDGET.map(function(r){return {id:r.id,name:r.name,note:r.note,amt:r.amt,st:r.st}});
   $("#bPeople").value=6; $("#bLimit").value=""; renderBudgetRows(); calcBudget(); toast("초기화했어");
 });
@@ -779,7 +785,7 @@ $("#chkWrap").addEventListener("change",function(e){
   store(CKEY,JSON.stringify(cState)); updateProgress();
 });
 $("#chkReset").addEventListener("click",function(){
-  if(!confirm("체크를 전부 해제할까?")) return;
+  if(!armed($("#chkReset"),"한 번 더 누르면 전부 해제")) return;
   cState={}; storeDel(CKEY); renderCheck(); toast("전부 해제했어");
 });
 
