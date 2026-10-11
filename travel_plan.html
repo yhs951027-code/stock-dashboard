@@ -316,7 +316,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 장보기·빵 -->
 <section class="panel" id="shop">
   <h2>장보기 · 빵</h2>
-  <p class="lead">트레이더스 여행용 추천과 성심당 베이커리·케익부띠끄 TOP 10이야. 숙소 규정에 안 맞는 상품(숯·가스)과 여행 기간에 안 파는 시즌 케이크는 자동으로 뺐어. 살 것에 체크하면 아래에 합계가 나와(가격이 범위·미상인 건 합계에서 빠져).</p>
+  <p class="lead">트레이더스 먹거리 TOP 20과 성심당 베이커리·케익부띠끄 TOP 10이야(2026-10-11 검색 기준). 숙소 규정에 안 맞는 상품(숯·장작·가스)과 지금 안 파는 시즌 케이크는 자동으로 뺐어. <b>사진 보기</b>를 누르면 네이버 이미지 검색으로 열려(이 페이지에 사진을 직접 넣을 수는 없었어). 살 것에 체크하면 아래에 합계가 나와(가격이 범위·미상인 건 합계에서 빠져).</p>
   <div class="filters" id="shopFilter">
     <button aria-pressed="true" data-f="traders">트레이더스</button>
     <button aria-pressed="false" data-f="bakery">성심당 베이커리</button>
@@ -514,7 +514,14 @@ var SRC = {
   s82:{t:"안성집 설농탕 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=23fdB6H70qIK"},
   s83:{t:"안성집 설농탕 (당근 로컬 프로필)", u:"https://www.daangn.com/kr/local-profile/%EC%95%88%EC%84%B1%EC%A7%91%EC%84%A4%EB%86%8D%ED%83%95-544q9zs3ozu2/"},
   s84:{t:"옛날병천순대 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=2kGB4YuOT8GU"},
-  s85:{t:"괴산산막이매운탕 (로컬즈)", u:"https://localz.kr/c/maeuntang"}
+  s85:{t:"괴산산막이매운탕 (로컬즈)", u:"https://localz.kr/c/maeuntang"},
+  s86:{t:"성심당 가을 한정 알밤시루 출시 (국제뉴스, 2026-09)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3703754"},
+  s87:{t:"성심당 알밤시루·알밤롤 판매 (이투데이)", u:"https://www.etoday.co.kr/news/view/2628978"},
+  s88:{t:"트레이더스 행사 전단 (이마트 앱, 10/12~10/18 포함)", u:"https://eapp.emart.com/tradersclub/flyerImgView.do"},
+  s89:{t:"트레이더스 26년 7월 3주차 신상 (스레드)", u:"https://www.threads.com/@martdiary/post/DauYT7dkefY"},
+  s90:{t:"트레이더스 괴물용량 인기 메뉴 (다음)", u:"https://v.daum.net/v/z6ARt2meKB"},
+  s91:{t:"트레이더스 쇼핑 가이드 (신세계 뉴스룸)", u:"https://www.shinsegaegroupnewsroom.com/120430/"},
+  s92:{t:"트레이더스 양념 소불고기 후기 (블로그)", u:"https://www.biroso.kr/956"}
 };
 
 /* ---------- 장소 ----------
@@ -748,23 +755,37 @@ Object.keys(P).forEach(function(k){ P[k].ver=VER[k]||""; P[k].vnote=VNOTE[k]||""
 /* ---------- 장보기·빵 TOP 10 ---------- */
 // won: 확정 숫자 가격(장바구니 합계용, 범위·미상은 null) · ban: 숙소 규정 위반 · months: 판매 월(여행 10·11월과 겹쳐야 표시)
 var SHOP = {
-  traders:{title:"트레이더스 여행용 추천 TOP 10", lead:"숙소 바비큐(전기그릴 전용)와 6명 2박 기준으로 골랐어. 가격은 쇼핑몰 입점가·후기 기준이라 매장가와 다를 수 있어. 출발 전 각자 동네 트레이더스에서 사서 아이스박스로 가져오는 걸 추천해.",
+  traders:{title:"트레이더스 글램핑·캠핑·펜션 먹거리 TOP 20", limit:20, img:"트레이더스 ",
+    lead:"2026-10-11에 검색한 가격이야. 이번 주 전단(10/12~18), 최근 신상 소식, 쇼핑몰 입점가, 후기 순으로 최신 자료를 썼고 상품마다 언제 기준인지 적었어. 매장가와 다를 수 있으니 계산 전에 확인해줘. 숙소는 전기그릴 전용이라 숯·장작·가스 상품은 자동으로 뺐어.",
     store:{name:"이마트 트레이더스", nq:"트레이더스"},
     items:[
-      {name:"미국산 냉동 꽃갈비(LA갈비) 2.3kg", price:"79,800원 (호주산 77,800원)", won:79800, note:"전기그릴에 굽기 좋은 두께. 2026-09 블로그 기준(광고 포함). 2.5kg 입점가는 115,500~122,700원.", src:["s73","s71"]},
-      {name:"돼지 양념 LA식 갈비구이 2.1kg", price:"27,980원", won:27980, note:"가성비 메인. 양념이라 전기그릴 바닥이 탈 수 있으니 호일 깔기.", src:["s73"]},
-      {name:"수입 냉동 대패 삼겹살 4kg", price:"54,400~60,900원", won:null, note:"얇아서 전기그릴에서도 빨리 익음. 6명 2끼 넉넉.", src:["s72"]},
-      {name:"뼈삼겹", price:"100g당 1,980원", won:null, note:"2026-04 후기 기준 행사가. 상시 판매인지는 모름.", src:["s74"]},
-      {name:"티스탠다드 통그릴 비엔나 1kg", price:"10,480원", won:10480, note:"고기 굽기 전 애피타이저·아침용.", src:["s75"]},
-      {name:"티스탠다드 통그릴 프랑크 1.2kg", price:"12,980원", won:12980, note:"반려견 간식으로는 주지 말기(염분).", src:["s75"]},
-      {name:"후라이드 치킨 2마리", price:"약 18,000원", won:18000, note:"도착 첫날 저녁 전 허기 달래기용. 2026 질문답변 기준.", src:["s78"]},
-      {name:"칼바사 부대찌개 밀키트", price:"17,980원", won:17980, note:"바비큐 마무리 국물. 가격은 2024년 무렵 기준이라 바뀌었을 수 있음.", src:["s77"]},
-      {name:"밀푀유나베 밀키트", price:"24,980원", won:24980, note:"전기그릴 말고 숙소 주방에서 끓이기. 가격 2024년 무렵 기준.", src:["s77"]},
-      {name:"오뚜기 진라면 볶음밥 1kg (5인분)", price:"11,980원", won:11980, note:"체크아웃 날 아침 간단히. 2026 질문답변 기준.", src:["s79"]},
+      {name:"국내산 냉장 돼지갈비 · 앞다리 (리테일팩)", price:"이번 주 행사: 3,500원 할인 (정가 모름)", won:null, note:"10/12~10/18 트레이더스 제휴 삼성카드·SFC카드 결제 시. 바비큐 메인으로 가장 최신 행사 정보.", src:["s88"]},
+      {name:"미국산 냉동 꽃갈비(LA갈비) 2.3kg", price:"79,800원 (호주산 77,800원)", won:79800, note:"2026-09 블로그 기준(광고 포함). 전기그릴에 굽기 좋은 두께.", src:["s73","s71"]},
+      {name:"돼지 양념 LA식 갈비구이 2.1kg", price:"27,980원", won:27980, note:"2026-09 블로그 기준. 양념이라 호일 깔고 굽기.", src:["s73"]},
+      {name:"양념 소불고기 2.5~2.7kg", price:"약 32,000~40,000원", won:null, note:"용량·가격이 자료마다 다름(2024년 자료). 전기그릴 팬이나 숙소 주방에서.", src:["s92","s91"]},
+      {name:"수입 냉동 대패 삼겹살 4kg", price:"54,400~60,900원", won:null, note:"쇼핑몰 입점가. 얇아서 전기그릴에서도 빨리 익음.", src:["s72"]},
+      {name:"티스탠다드 통그릴 비엔나 1kg", price:"10,480원", won:10480, note:"이마트몰 트레이더스 배송가. 고기 전 애피타이저·아침용.", src:["s75"]},
+      {name:"티스탠다드 통그릴 프랑크 1.2kg", price:"12,980원", won:12980, note:"이마트몰 트레이더스 배송가. 반려견에게는 주지 말기(염분).", src:["s75"]},
+      {name:"비비고 미니떡갈비 1.1kg", price:"14,980원", won:14980, note:"약 2달 전 전단 기준(당시 1,500원 할인). 굽기만 하면 끝.", src:["s88"]},
+      {name:"낙지볶음 900g", price:"20,980원", won:20980, note:"2026-07 신상. 고기 사이 매운 메뉴로.", src:["s89"]},
+      {name:"제육두부김치", price:"14,980원", won:14980, note:"2026-07 신상. 술안주용.", src:["s89"]},
+      {name:"부대찌개 밀키트 (사골육수·사리 포함)", price:"17,980원 (칼바사 부대찌개 기준)", won:17980, note:"바비큐 마무리 국물. 가격은 2024년 무렵 기준.", src:["s90","s77"]},
+      {name:"밀푀유나베 밀키트", price:"24,980원", won:24980, note:"숙소 주방에서 끓이기. 가격 2024년 무렵 기준.", src:["s77"]},
+      {name:"초밥 (3~4인분)", price:"2만원대", won:null, note:"도착한 첫날 간단 저녁. 2024 트레이더스 보도자료 기준.", src:["s91"]},
+      {name:"후라이드 치킨 2마리", price:"약 18,000원", won:18000, note:"2026 질문답변 기준. 체크인 직후 허기 달래기.", src:["s78"]},
+      {name:"곤드레나물밥 300g × 5팩", price:"10,980원", won:10980, note:"전자레인지 데우면 끝. 다음날 아침 식사용.", src:["s90"]},
+      {name:"오뚜기 진라면 볶음밥 1kg (5인분)", price:"11,980원", won:11980, note:"2026 질문답변 기준. 체크아웃 날 아침.", src:["s79"]},
+      {name:"오뚜기 컵누들 매콤한맛 15개입", price:"15,480원", won:15480, note:"약 2달 전 전단 기준. 밤 야식·해장.", src:["s88"]},
+      {name:"T STANDARD 소고기 육포 280g", price:"17,980원", won:17980, note:"약 2달 전 전단 기준. 산책·이동 중 간식.", src:["s88"]},
+      {name:"클라우드 500ml × 12캔 + 쿨러백", price:"22,480원", won:22480, note:"2026-07 신상 기획 상품. 쿨러백 포함이라 여행용으로 좋음.", src:["s89"]},
+      {name:"쿠키슈", price:"1만원 미만", won:null, note:"대용량 디저트. 성심당 빵 못 사는 사람용 간식.", src:["s90"]},
+      {name:"맥콜 4.73L", price:"18,980원", won:18980, note:"대용량 음료. 운전자·비음주자용.", src:["s90"]},
       {name:"큐맥 팜볼 야자 숯 10kg", price:"24,680원", won:24680, ban:"숙소 규정상 개인 숯 사용 불가 (전기그릴만 가능)", src:["s76"]},
+      {name:"큐맥 참나무 장작 12kg", price:"13,980원", won:13980, ban:"숙소 규정상 장작 사용 불가", src:["s76"]},
       {name:"맥스 구공탄 가스레인지", price:"27,980원", won:27980, ban:"숙소 규정상 가스버너 사용 불가", src:["s76"]}
     ]},
-  bakery:{title:"성심당 베이커리 TOP 10", lead:"여러 추천글에 자주 오른 순서로 정리했어(성심당 공식 순위 아님). 대전에 들를 수 있는 사람이 사 오면 좋아. 가격은 2026년 정리글 기준이 우선이고, 없으면 다른 출처 가격을 적었어.",
+  bakery:{title:"성심당 베이커리 TOP 10", limit:10, img:"성심당 ",
+    lead:"여러 추천글에 자주 오른 순서야(성심당 공식 순위 아님). 가격은 2026년 정리글 기준이 우선이고, 없으면 다른 출처 가격을 적었어. 10월에 새로 나온 빵 메뉴는 검색으로 찾지 못했어.",
     store:{name:"성심당 본점", nq:"성심당 본점"},
     items:[
       {name:"튀김소보로", price:"1,700원대", won:null, note:"가장 많이 꼽히는 1위. 6개 세트 약 10,000원.", src:["s65","s66"]},
@@ -778,19 +799,21 @@ var SHOP = {
       {name:"순수롤", price:"약 14,000원 (DCC점 기준)", won:null, note:"본점 가격은 확인 못 함.", src:["s65"]},
       {name:"말차순크림빵", price:"3,000원", won:3000, note:"순크림빵 시리즈(시즌성일 수 있음).", src:["s65"]}
     ]},
-  cake:{title:"성심당 케익부띠끄 TOP 10", lead:"여행 기간(10월 말~11월 초)에 파는 케이크만 자동으로 남겼어. 시루 케이크는 오전에 품절되기 쉽고 일부는 1인 구매 수량 제한이 있을 수 있어.",
+  cake:{title:"성심당 케익부띠끄 TOP 10", limit:10, img:"성심당 ",
+    lead:"2026년 10월 기준으로 지금 파는 케이크만 자동으로 남겼어. 시루는 오전에 품절되기 쉽고 1인 구매 수량 제한이 있을 수 있어.",
     store:{name:"성심당 케익부띠끄 본점", nq:"성심당 케익부띠끄 본점"},
     items:[
-      {name:"무화과시루", price:"45,000원", won:45000, months:[8,9,10,11,12], note:"8~12월 판매(8/20부터 전 지점).", src:["s68","s70"]},
-      {name:"알밤시루", price:"45,000원", won:45000, months:[10,11,12], note:"10~11월 한정이라는 글과 12월 중순 DCC점이라는 글이 섞여 있음 → 판매 여부 전화 확인.", src:["s69","s70"]},
-      {name:"생귤시루", price:"모름", won:null, months:[7,8,9,10], note:"7~10월 판매 → 10월 말엔 끝났을 수 있음.", src:["s70"]},
+      {name:"알밤시루", price:"45,000원", won:45000, siru:"판매 중 · 본점 9/23부터, 롯데점 9/28 또는 10/1부터, DCC점 9/28 또는 10/13부터 (기사마다 다름)", months:[9,10,11], note:"2026 가을 한정 신상. 지금 사기 가장 확실한 시루.", src:["s86","s87"]},
+      {name:"알밤롤", price:"19,000원", won:19000, months:[9,10,11], note:"알밤시루와 함께 출시. 케익부띠끄 본점 판매.", src:["s87"]},
+      {name:"무화과시루", price:"45,000원", won:45000, siru:"판매 중일 가능성 높음 · 8~12월 판매로 소개", months:[8,9,10,11,12], note:"8/20부터 전 지점 판매로 소개된 가을 시루.", src:["s68","s70"]},
+      {name:"생귤시루", price:"모름", won:null, siru:"10월 말엔 판매 종료됐을 수 있음 · 7~10월 판매로 소개", months:[7,8,9,10], note:"요거트크림 + 하우스귤.", src:["s70"]},
       {name:"키리쉬 모짜르트 3호", price:"36,000원", won:36000, note:"연중 판매.", src:["s69"]},
       {name:"부띠끄 생케이크 2호", price:"35,000원", won:35000, note:"연중 판매.", src:["s69"]},
+      {name:"발레리나 4호", price:"45,000원", won:45000, note:"2026 메뉴표.", src:["s65"]},
+      {name:"생망고타르트", price:"46,000원", won:46000, note:"2026 메뉴표.", src:["s65"]},
+      {name:"무화과타르트", price:"42,000원", won:42000, note:"2026 메뉴표.", src:["s65"]},
       {name:"딸기모짜르트 2호", price:"31,000원", won:31000, note:"상시 케이크.", src:["s70"]},
       {name:"메리무스 1호", price:"29,000원", won:29000, note:"상시 케이크.", src:["s70"]},
-      {name:"샤인이랑멜론", price:"37,000원", won:37000, note:"2026 메뉴표 생크림 케이크.", src:["s65"]},
-      {name:"망고망고", price:"39,000원", won:39000, note:"2026 메뉴표 생크림 케이크.", src:["s65"]},
-      {name:"무화과타르트", price:"42,000원", won:42000, note:"2026 메뉴표.", src:["s65"]},
       {name:"딸기시루", price:"43,000~52,000원 (출처마다 다름)", won:null, months:[12,1,2,3], note:"겨울 한정.", src:["s69","s70"]},
       {name:"망고시루", price:"모름", won:null, months:[4,5,6,7], note:"봄~여름 한정.", src:["s70"]},
       {name:"샤인멜론시루", price:"43,000원", won:43000, months:[6,7,8], note:"여름 한정.", src:["s70"]}
@@ -798,7 +821,7 @@ var SHOP = {
 };
 function shopOut(it){
   if(it.ban) return it.ban;
-  if(it.months && it.months.indexOf(10)<0 && it.months.indexOf(11)<0) return "여행 기간(10~11월)에 안 파는 시즌 상품";
+  if(it.months && it.months.indexOf(10)<0 && it.months.indexOf(11)<0) return "지금(10~11월) 안 파는 시즌 상품";
   return "";
 }
 
@@ -1271,14 +1294,16 @@ var SKEY="goesan_shop_v1", shopSel={}; try{shopSel=JSON.parse(store(SKEY)||"{}")
 var curShop="traders";
 function renderShop(g){
   if(g) curShop=g; var S=SHOP[curShop];
-  var keepI=S.items.filter(function(it){return !shopOut(it)}).slice(0,10), outI=S.items.filter(function(it){return shopOut(it)});
+  var keepI=S.items.filter(function(it){return !shopOut(it)}).slice(0,S.limit||10), outI=S.items.filter(function(it){return shopOut(it)});
+  var siru=S.items.filter(function(it){return it.siru && !shopOut(it)});
   $("#shopList").innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">'+esc(S.title)+'</h3>'+
     '<a class="btn primary" href="'+naverUrl(S.store.nq)+'" target="_blank" rel="noopener">네이버 지도: '+esc(S.store.name)+'</a></div>'+
     '<p class="muted" style="margin:6px 0 8px">'+esc(S.lead)+'</p>'+
+    (siru.length?'<div class="today"><b>지금 파는 시루</b><ul style="margin:4px 0 0;padding-left:20px">'+siru.map(function(it){return '<li><b>'+esc(it.name)+'</b> '+esc(it.price)+' — '+esc(it.siru)+'</li>'}).join("")+'</ul></div>':'')+
     keepI.map(function(it,i){
       var id=curShop+":"+it.name;
       return '<div class="rank"><span class="no">'+(i+1)+'</span><label><input type="checkbox" data-shop="'+esc(id)+'"'+(shopSel[id]?' checked':'')+'> '+esc(it.name)+'</label><span class="pr">'+esc(it.price)+'</span>'+
-        '<span class="nt">'+esc(it.note)+(it.src?' · <span class="muted">출처: '+it.src.map(function(k){return '<a href="'+SRC[k].u+'" target="_blank" rel="noopener">'+esc(SRC[k].t)+'</a>'}).join(", ")+'</span>':'')+'</span></div>';
+        '<span class="nt"><a class="btn" style="padding:3px 9px;font-size:13px;margin-right:6px" href="https://search.naver.com/search.naver?where=image&query='+enc(S.img+it.name.replace(/\s*\(.*?\)\s*/g," ").trim())+'" target="_blank" rel="noopener">사진 보기</a>'+esc(it.note)+(it.src?' · <span class="muted">출처: '+it.src.map(function(k){return '<a href="'+SRC[k].u+'" target="_blank" rel="noopener">'+esc(SRC[k].t)+'</a>'}).join(", ")+'</span>':'')+'</span></div>';
     }).join("")+
     (outI.length?'<details class="outlist"><summary>자동으로 뺀 상품 '+outI.length+'개 (이유 보기)</summary><ul>'+outI.map(function(it){return '<li><b>'+esc(it.name)+'</b> ('+esc(it.price)+') — '+esc(shopOut(it))+'</li>'}).join("")+'</ul></details>':'')+
   '</div>';
