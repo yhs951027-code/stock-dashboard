@@ -94,6 +94,13 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .editor{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column}
 .ed-bar{flex:none;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;border-bottom:1px solid var(--line)}
 .ed-bar .gap{display:flex;gap:8px}
+.ed-bar .btn{padding-inline:12px;white-space:nowrap}
+.save{min-width:104px;white-space:nowrap}
+.save[data-st="dirty"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.save[data-st="saving"]{opacity:.7}
+.save[data-st="saved"]{border-color:var(--line);color:var(--sub);font-weight:500}
+.save[data-st="error"]{border-color:var(--warn);color:var(--warn)}
+@media (max-width:380px){ .ed-bar{gap:6px;padding-inline:8px} .ed-bar .btn{font-size:16.5px;padding-inline:9px} .ed-bar .gap{gap:6px} .ed-bar .btn.icon{min-width:46px;padding-inline:8px} .save{min-width:92px} }
 .ed-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px}
 .sheet{max-width:760px;margin:0 auto;min-height:100%;border-radius:16px;box-shadow:var(--shadow);padding:14px 16px 0;display:flex;flex-direction:column}
 .title{width:100%;border:0;border-bottom:1px solid var(--pline);background:transparent;color:var(--pink);font:inherit;font-family:var(--f-num);font-size:24px;font-weight:700;line-height:1.4;padding:4px 0 10px;margin-bottom:8px}
@@ -212,7 +219,7 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
     <div class="blank-msg">왼쪽에서 메모를 고르거나<br><b>＋ 새 메모</b>를 눌러주세요.</div>
     <div class="ed-bar">
       <button class="btn ghost" id="btnBack" type="button">← 목록</button>
-      <span></span>
+      <button class="btn save" id="btnSave" type="button" data-st="saved" aria-live="polite">✓ 저장됨</button>
       <div class="gap">
         <button class="btn ghost icon" id="btnPin" type="button" aria-pressed="false" aria-label="상단 고정">📌</button>
         <button class="btn ghost icon" id="btnShare" type="button" aria-label="공유">📤</button>
@@ -346,14 +353,29 @@ function blk(n,id){ return n.blocks.find(b=>b.id===id); }
 function isEmpty(n){ return !n.title.trim() && n.blocks.every(b=>(b.type==='text'||b.type==='todo') && !b.text.trim()); }
 function touch(n){
   n.updated=Date.now(); dirty.add(n.id);
+  setSaveState('dirty');
   clearTimeout(saveTimer);
   saveTimer=setTimeout(flush,400);
 }
+// 쓰는 동안 0.4초마다 자동 저장. 저장 버튼은 상태를 보여주고, 누르면 즉시 저장.
 function flush(){
   clearTimeout(saveTimer); saveTimer=null;
-  for(const id of dirty){ const n=find(id); if(n && !isEmpty(n)) saveNote(n); }
+  const jobs=[];
+  for(const id of dirty){ const n=find(id); if(n && !isEmpty(n)) jobs.push(saveNote(n)); }
   dirty.clear();
   updateMeta(); renderList();
+  if(!jobs.length){ if(!storageErr) setSaveState('saved'); return Promise.resolve(!storageErr); }
+  setSaveState('saving');
+  return Promise.all(jobs).then(()=>{ setSaveState(storageErr? 'error' : (dirty.size? 'dirty' : 'saved')); return !storageErr; });
+}
+const SAVE_LABEL={dirty:'💾 저장',saving:'저장 중…',saved:'✓ 저장됨',error:'⚠ 다시 저장'};
+function setSaveState(st){ const b=$('#btnSave'); if(!b || b.dataset.st===st) return; b.dataset.st=st; b.textContent=SAVE_LABEL[st]; }
+async function saveNow(){
+  const n=cur(); if(!n) return;
+  if(isEmpty(n)){ toast('저장할 내용이 없어요.'); return; }
+  dirty.add(n.id);
+  const ok=await flush();
+  toast(ok? new Date().toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'})+'에 저장했습니다.' : '저장하지 못했습니다. 저장 공간을 확인해 주세요.');
 }
 // 편집을 마칠 때 비어 있는 줄·체크 항목 정리
 function tidy(n){
@@ -456,6 +478,7 @@ function openNote(id,{focus=true,push=true}={}){
     else history.pushState(null,'','#'+id);
   }
   renderEditor();
+  setSaveState(dirty.has(id)? 'dirty' : 'saved');
   $('#edScroll').scrollTop=0;
   renderList();
   if(focus){
@@ -668,6 +691,7 @@ $('#tRec').onclick=startRec;
 $('#tPaper').onclick=openPaper;
 
 $('#btnBack').onclick=()=>closeNote();
+$('#btnSave').onclick=saveNow;
 $('#btnPin').onclick=()=>{
   const n=cur(); if(!n) return;
   n.pinned=!n.pinned; touch(n); flush();
@@ -1069,7 +1093,7 @@ addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'
 addEventListener('pagehide',flush);
 addEventListener('keydown',e=>{
   if(e.key==='Escape'){ if(overlay) closeOverlay(); else if(curId && !wide.matches) closeNote(); }
-  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); flush(); toast('저장했습니다.'); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); saveNow(); }
 });
 // 폴더블을 접었다 펼 때: 넓은 화면으로 바뀌면 목록+편집 2단, 좁아지면 편집 화면만
 wide.addEventListener('change',()=>{
