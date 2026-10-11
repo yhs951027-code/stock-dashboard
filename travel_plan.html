@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>괴산 스테이소몽 여행</title>
+<meta name="description" content="10/30(금)~11/2(월) 괴산 스테이소몽 3박 4일 · 성인 6명 + 반려견 2마리 여행 계획">
+<style>
+:root{
+  --bg:#f6f4ee; --card:#ffffff; --ink:#1f2a24; --sub:#5c665f; --line:#e3e0d6;
+  --brand:#2f6b4f; --brand-soft:#e4efe8; --accent:#d9a521; --accent-soft:#fbf1d6;
+  --ok:#2f7d4f; --ok-soft:#e1f2e7; --warn:#a86a00; --warn-soft:#fdf0d5; --no:#b23b3b; --no-soft:#f9e1e1;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151a17; --card:#1f2622; --ink:#e8ece9; --sub:#a3ada6; --line:#323b36;
+    --brand:#7cc29f; --brand-soft:#23342b; --accent:#e8bd4a; --accent-soft:#3a3220;
+    --ok:#7fd3a0; --ok-soft:#1f3a2a; --warn:#f0c060; --warn-soft:#3d321c; --no:#f08c8c; --no-soft:#402424;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151a17; --card:#1f2622; --ink:#e8ece9; --sub:#a3ada6; --line:#323b36;
+  --brand:#7cc29f; --brand-soft:#23342b; --accent:#e8bd4a; --accent-soft:#3a3220;
+  --ok:#7fd3a0; --ok-soft:#1f3a2a; --warn:#f0c060; --warn-soft:#3d321c; --no:#f08c8c; --no-soft:#402424;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;font-size:16px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+a{color:var(--brand)}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:#cfe3d6}
+.hero svg{display:block;width:100%;height:300px}
+.hero-txt{position:absolute;left:0;right:0;bottom:0;padding:24px 0 22px;background:linear-gradient(transparent,rgba(10,25,18,.72));color:#fff}
+.hero-txt h1{margin:0;font-size:clamp(24px,5vw,38px);line-height:1.25;letter-spacing:-.5px}
+.hero-txt p{margin:6px 0 0;font-size:15px;opacity:.95}
+.illu-tag{position:absolute;top:10px;right:12px;font-size:12px;background:rgba(0,0,0,.45);color:#fff;padding:3px 8px;border-radius:20px}
+
+/* nav */
+nav.menu{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+nav.menu .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:8px;padding-bottom:8px}
+nav.menu .wrap::-webkit-scrollbar{display:none}
+nav.menu button{flex:0 0 auto;border:0;background:none;padding:8px 12px;border-radius:20px;cursor:pointer;font-size:15px;color:var(--sub);white-space:nowrap}
+nav.menu button[aria-selected="true"]{background:var(--brand);color:#fff;font-weight:600}
+:root[data-theme="dark"] nav.menu button[aria-selected="true"]{color:#10231a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) nav.menu button[aria-selected="true"]{color:#10231a}}
+
+main{padding:20px 0 60px}
+section.panel{display:none}
+section.panel.active{display:block}
+h2{font-size:22px;margin:4px 0 12px;letter-spacing:-.3px}
+h3{font-size:18px;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 16px}
+
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.notice{background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;margin:0 0 16px}
+.muted{color:var(--sub);font-size:14px}
+
+/* summary */
+.sum-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.stat .k{font-size:13px;color:var(--sub)}
+.stat .v{font-size:20px;font-weight:700;margin-top:2px}
+.stat .s{font-size:13px;color:var(--sub)}
+
+/* badges */
+.badge{display:inline-block;font-size:13px;font-weight:600;padding:2px 9px;border-radius:20px;line-height:1.6}
+.b-ok{background:var(--ok-soft);color:var(--ok)}
+.b-warn{background:var(--warn-soft);color:var(--warn)}
+.b-no{background:var(--no-soft);color:var(--no)}
+.b-tag{background:var(--brand-soft);color:var(--brand)}
+.need{color:var(--warn);font-weight:600}
+
+/* day tabs & timeline */
+.daytabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.daytabs button{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 6px;cursor:pointer;text-align:center;line-height:1.3}
+.daytabs button b{display:block;font-size:16px}
+.daytabs button span{font-size:13px;color:var(--sub)}
+.daytabs button[aria-selected="true"]{border-color:var(--brand);background:var(--brand-soft);box-shadow:inset 0 0 0 1px var(--brand)}
+.route{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:16px}
+.route ol{margin:6px 0 0;padding-left:22px}
+.route li{margin:2px 0}
+.timeline{position:relative;padding-left:22px}
+.timeline:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.stop{position:relative;margin-bottom:12px}
+.stop:before{content:"";position:absolute;left:-20px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--brand);border:2px solid var(--bg)}
+.stop .time{font-weight:700;color:var(--brand);font-size:15px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;font-size:15px;margin:10px 0}
+.kv dt{color:var(--sub)}
+.kv dd{margin:0}
+.move{font-size:14px;color:var(--sub);margin:-4px 0 12px;padding-left:2px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:7px 11px;font-size:14px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#10231a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#10231a}}
+.src{font-size:13px;color:var(--sub);margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.src a{word-break:break-all}
+
+/* filter */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.filters button{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:14px}
+.filters button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* directions */
+.dir{display:grid;gap:8px;grid-template-columns:1fr 1fr auto;align-items:end}
+.dir label{font-size:14px;color:var(--sub);display:block}
+.dir input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+
+/* budget */
+.btable{width:100%;border-collapse:collapse}
+.btable th,.btable td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:15px}
+.btable th{font-size:13px;color:var(--sub);font-weight:600}
+.btable input[type=number]{width:120px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);text-align:right}
+.btable select{padding:7px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.bnote{font-size:13px;color:var(--sub);margin-top:3px}
+.bres{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin:16px 0}
+.bres .stat .v{font-size:19px}
+.over{color:var(--no)} .under{color:var(--ok)}
+.inline-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0}
+.inline-in input{width:140px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);text-align:right}
+
+/* checklist */
+.chk-group{margin-bottom:16px}
+.chk-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:6px;cursor:pointer}
+.chk-item input{width:20px;height:20px;margin-top:2px;flex:0 0 auto;accent-color:var(--brand)}
+.chk-item.done span{text-decoration:line-through;color:var(--sub)}
+.progress{height:10px;border-radius:10px;background:var(--line);overflow:hidden;margin:6px 0 14px}
+.progress div{height:100%;background:var(--brand);width:0;transition:width .2s}
+
+.srctable{width:100%;border-collapse:collapse;font-size:14px}
+.srctable th,.srctable td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+.srctable a{word-break:break-all}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f2a24;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.toast.show{opacity:1}
+footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid var(--line)}
+.theme-btn{position:absolute;top:10px;left:12px;font-size:12px;background:rgba(0,0,0,.45);color:#fff;border:0;padding:3px 10px;border-radius:20px;cursor:pointer}
+
+@media (max-width:640px){
+  .hero svg{height:230px}
+  .daytabs{grid-template-columns:repeat(2,1fr)}
+  .kv{grid-template-columns:84px 1fr;font-size:14.5px}
+  .dir{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .btable thead{display:none}
+  .btable tr{display:block;border-bottom:1px solid var(--line);padding:8px 0}
+  .btable td{display:block;border:0;padding:3px 0}
+  .btable input[type=number]{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <!-- 일러스트: 실제 장소 사진이 아님 -->
+  <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="산과 호수, 은행나무를 표현한 일러스트">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7d9a8"/><stop offset="1" stop-color="#cfe3d6"/></linearGradient>
+      <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb0a8"/><stop offset="1" stop-color="#4f8b80"/></linearGradient>
+    </defs>
+    <rect width="1200" height="300" fill="url(#sky)"/>
+    <circle cx="930" cy="80" r="34" fill="#fbe7b8"/>
+    <path d="M0 190 L140 90 L260 170 L380 70 L520 175 L660 95 L800 170 L950 85 L1080 160 L1200 110 L1200 300 L0 300Z" fill="#7a9c7f"/>
+    <path d="M0 215 L170 140 L320 205 L470 130 L640 210 L820 140 L990 205 L1200 150 L1200 300 L0 300Z" fill="#5b8264"/>
+    <path d="M0 230 L1200 230 L1200 300 L0 300Z" fill="url(#lake)"/>
+    <g fill="#e2b13c">
+      <circle cx="90" cy="200" r="22"/><circle cx="140" cy="194" r="26"/><circle cx="195" cy="202" r="21"/>
+      <circle cx="980" cy="198" r="24"/><circle cx="1035" cy="192" r="28"/><circle cx="1090" cy="200" r="22"/><circle cx="1140" cy="196" r="25"/>
+    </g>
+    <g fill="#6b4b2a"><rect x="137" y="214" width="6" height="18"/><rect x="1032" y="214" width="6" height="18"/><rect x="1137" y="214" width="6" height="18"/></g>
+    <g fill="#ffffff" opacity=".35"><rect x="300" y="250" width="160" height="3" rx="2"/><rect x="620" y="262" width="220" height="3" rx="2"/><rect x="180" y="276" width="120" height="3" rx="2"/></g>
+  </svg>
+  <span class="illu-tag">일러스트 · 실제 장소 사진 아님</span>
+  <button class="theme-btn" id="themeBtn" type="button">화면 테마</button>
+  <div class="hero-txt"><div class="wrap">
+    <h1>괴산 스테이소몽 3박 4일</h1>
+    <p>2026. 10. 30(금) – 11. 2(월) · 성인 6명 · 반려견 2마리</p>
+  </div></div>
+</header>
+
+<nav class="menu" aria-label="메뉴"><div class="wrap" role="tablist" id="menu">
+  <button role="tab" data-panel="home">한눈에 보기</button>
+  <button role="tab" data-panel="plan">날짜별 일정</button>
+  <button role="tab" data-panel="food">맛집·카페</button>
+  <button role="tab" data-panel="spot">볼거리</button>
+  <button role="tab" data-panel="dog">반려견 정보</button>
+  <button role="tab" data-panel="map">지도·길찾기</button>
+  <button role="tab" data-panel="budget">예산 계산</button>
+  <button role="tab" data-panel="check">체크리스트</button>
+  <button role="tab" data-panel="source">출처</button>
+</div></nav>
+
+<main><div class="wrap">
+
+<!-- 한눈에 보기 -->
+<section class="panel" id="home">
+  <div class="sum-grid">
+    <div class="stat"><div class="k">기간</div><div class="v">3박 4일</div><div class="s">10/30(금) – 11/2(월)</div></div>
+    <div class="stat"><div class="k">인원</div><div class="v">성인 6명</div><div class="s">숙소 몽몽 객실 최대 8인</div></div>
+    <div class="stat"><div class="k">반려견</div><div class="v">2마리</div><div class="s">숙소 기준: 15kg 미만</div></div>
+    <div class="stat"><div class="k">숙소</div><div class="v">스테이소몽</div><div class="s">충북 괴산군 청천면</div></div>
+  </div>
+
+  <div class="notice"><b>출발은 각자, 시작은 현지에서.</b> 천안·인천·진해에서 따로 출발하니 1일차는 <b>청천면 카페에서 모였다가 15시 체크인</b>하는 흐름으로 짰어. 출발지별 이동 시간은 지도 앱에서 각자 확인해야 해.</div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>이번 여행의 핵심</h3>
+      <ul style="margin:6px 0 0;padding-left:20px">
+        <li><b>문광저수지 은행나무길</b>: 여러 매체가 10월 하순~11월 초를 절정으로 꼽음 (2026년 실제 단풍 상태는 확인 필요)</li>
+        <li><b>산막이옛길</b>: 호숫가 숲길 산책, 입장 무료·주차 3,000원</li>
+        <li><b>숙소 바비큐 2회</b>: 반려견 동반 식사 문제를 가장 확실하게 푸는 방법</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>꼭 먼저 확인할 것 3가지</h3>
+      <ol style="margin:6px 0 0;padding-left:20px">
+        <li>두 마리 모두 <b>15kg 미만</b>인지 (숙소 규정)</li>
+        <li>숙소에 <b>반려견 2마리 동반 사전 문의</b> (규정상 필수)</li>
+        <li>식당은 반려견 동반 정보가 <b>대부분 확인 안 됨</b> → 전화 확인 또는 포장</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>반려견 동반 표시 기준</h3>
+      <p style="margin:6px 0"><span class="badge b-ok">두 마리 확인 완료</span> 두 마리 동반 조건까지 확인된 곳</p>
+      <p style="margin:6px 0"><span class="badge b-warn">추가 확인 필요</span> '동반 가능' 표기는 있지만 마릿수·크기·좌석 조건 미확인, 또는 정보 없음</p>
+      <p style="margin:6px 0"><span class="badge b-no">동반 불가·조건 불충족</span> 규정상 동반 불가</p>
+      <p class="muted" style="margin:8px 0 0">이번 조사에서 '두 마리 확인 완료' 단계까지 간 곳은 없어. 숙소도 체중 조건 때문에 '추가 확인 필요'로 뒀어.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 날짜별 일정 -->
+<section class="panel" id="plan">
+  <h2>날짜별 일정</h2>
+  <p class="lead">날짜를 누르면 그날 일정만 보여. 이동 시간은 실제로 재 보지 않아서 수치를 적지 않았고, 각 카드의 <b>다음 장소 길찾기</b> 버튼으로 확인하면 돼.</p>
+  <div class="daytabs" role="tablist" id="daytabs"></div>
+  <div class="route" id="dayroute"></div>
+  <div class="timeline" id="daylist"></div>
+</section>
+
+<!-- 맛집·카페 -->
+<section class="panel" id="food">
+  <h2>맛집 · 카페</h2>
+  <p class="lead">2026년 3월 1일부터 식품위생법 시행규칙 개정으로 음식점·카페의 반려동물 동반 출입이 조건부로 허용됐어. 그래도 업소마다 다르니, 아래에서 '추가 확인 필요'인 곳은 방문 전에 전화로 꼭 확인해.</p>
+  <div class="filters" id="foodFilter">
+    <button aria-pressed="true" data-f="all">전체</button>
+    <button aria-pressed="false" data-f="카페">카페</button>
+    <button aria-pressed="false" data-f="식당">식당</button>
+    <button aria-pressed="false" data-f="warn">반려견 추가 확인 필요</button>
+  </div>
+  <div class="grid" id="foodGrid"></div>
+</section>
+
+<!-- 볼거리 -->
+<section class="panel" id="spot">
+  <h2>관광지 · 볼거리</h2>
+  <p class="lead">일정에 넣은 곳과, 조사했지만 반려견 때문에 뺀 곳을 같이 정리했어.</p>
+  <div class="grid" id="spotGrid"></div>
+</section>
+
+<!-- 반려견 정보 -->
+<section class="panel" id="dog">
+  <h2>반려견 동반 정보</h2>
+  <p class="lead">장소별 동반 조건을 한 표로 정리했어. '동반 가능'이라고만 적힌 곳은 두 마리 모두 된다고 보지 않았어.</p>
+  <div class="filters" id="dogFilter">
+    <button aria-pressed="true" data-f="all">전체</button>
+    <button aria-pressed="false" data-f="1">두 마리 확인 완료</button>
+    <button aria-pressed="false" data-f="2">추가 확인 필요</button>
+    <button aria-pressed="false" data-f="3">동반 불가·조건 불충족</button>
+  </div>
+  <div class="grid" id="dogGrid"></div>
+  <div class="card" style="margin-top:16px">
+    <h3>현장 매너 · 법적 기본</h3>
+    <ul style="margin:6px 0 0;padding-left:20px">
+      <li>외출 시 목줄 착용과 배변 수거는 기본. 산책로는 주말에 붐비니 목줄을 짧게.</li>
+      <li>숙소 규정상 <b>맹견·공격성이 강한 개는 입실 불가</b>.</li>
+      <li>국립공원은 지정 구간 외 반려견 출입이 제한돼. 국립공원 반려견 시범 구간(북한산·계룡산·가야산)에 속리산은 없음.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 지도·길찾기 -->
+<section class="panel" id="map">
+  <h2>지도 · 길찾기</h2>
+  <div class="notice">지도 API(키)를 쓰지 않고, 카카오맵·네이버 지도 <b>검색 링크</b>로 연결하는 방식이야. 페이지 안에 지도가 뜨지는 않고, 누르면 새 창에서 지도 앱/사이트가 열려. 링크 동작은 이 파일을 만든 환경에서 실제로 눌러보지 못했으니 처음 한 번 눌러서 확인해줘.</div>
+  <div class="card" style="margin-bottom:16px">
+    <h3>직접 길찾기</h3>
+    <div class="dir">
+      <div><label for="dFrom">출발지</label><input id="dFrom" placeholder="예: 천안역, 집 주소"></div>
+      <div><label for="dTo">목적지</label><input id="dTo" placeholder="예: 스테이소몽" value="충북 괴산군 청천면 괴산로상신2길 52-9"></div>
+      <div class="btns" style="margin:0"><button class="btn primary" id="dGo" type="button">카카오맵 길찾기</button><button class="btn" id="dSwap" type="button">⇅ 바꾸기</button></div>
+    </div>
+    <p class="muted" style="margin:8px 0 0">카카오맵 길찾기 URL은 출발지·목적지를 이름으로 넘기는 방식이라, 열린 뒤 후보 중 정확한 장소를 한 번 골라야 할 수 있어.</p>
+  </div>
+  <h3>날짜별 동선 목록</h3>
+  <div class="grid" id="mapDays"></div>
+</section>
+
+<!-- 예산 -->
+<section class="panel" id="budget">
+  <h2>여행 예산 계산기</h2>
+  <p class="lead">금액을 고치면 바로 다시 계산돼. 상태를 <b>확인됨</b> / <b>예상</b> / <b>미정</b>으로 나눠서, 확인된 금액과 추정 금액을 따로 합산해. 가격을 못 찾은 항목은 0원 '미정'으로 비워 뒀어.</p>
+  <div class="card">
+    <div class="inline-in">
+      <label>인원 <input type="number" id="bPeople" min="1" value="6" style="width:80px"> 명</label>
+      <label>예산 한도 <input type="number" id="bLimit" min="0" step="10000" placeholder="예: 1500000"> 원</label>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="btable">
+      <thead><tr><th>항목</th><th>금액(원)</th><th>상태</th></tr></thead>
+      <tbody id="bBody"></tbody>
+    </table>
+    </div>
+    <div class="bres" id="bRes"></div>
+    <div id="bLimitMsg" style="font-weight:600;margin-bottom:10px"></div>
+    <div class="btns"><button class="btn" id="bReset" type="button">비용 항목 초기화</button></div>
+    <p class="muted" style="margin:10px 0 0">입력값은 이 브라우저에만 저장돼. 다른 폰·PC에서 열면 초기값으로 보여.</p>
+  </div>
+</section>
+
+<!-- 체크리스트 -->
+<section class="panel" id="check">
+  <h2>예약 · 출발 전 체크리스트</h2>
+  <div class="notice">체크 상태는 <b>지금 쓰는 브라우저(localStorage)에만</b> 저장돼. 다른 기기나 다른 사람 폰에는 공유되지 않고, 브라우저 데이터를 지우면 초기화돼.</div>
+  <div id="chkProgressTxt" class="muted"></div>
+  <div class="progress"><div id="chkBar"></div></div>
+  <div id="chkWrap"></div>
+  <div class="btns"><button class="btn" id="chkReset" type="button">체크 전부 해제</button></div>
+</section>
+
+<!-- 출처 -->
+<section class="panel" id="source">
+  <h2>출처 · 확인 날짜</h2>
+  <div class="notice">모든 정보는 <b>2026-10-11에 웹 검색 결과</b>로 확인했어. 이 파일을 만든 환경은 외부 웹페이지에 직접 접속이 막혀 있어서, 원문 페이지를 열어 대조하진 못했어. 그래서 가격·영업시간·동반 조건은 방문 전에 한 번 더 확인하는 걸 전제로 봐줘. 이 페이지는 열 때 인터넷 검색을 하지 않아.</div>
+  <div style="overflow-x:auto"><table class="srctable" id="srcTable"><thead><tr><th>번호</th><th>내용</th><th>출처</th><th>확인일</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+</div></main>
+
+<footer><div class="wrap">
+  괴산 스테이소몽 여행 계획 · 정보 확인일 2026-10-11 · 반려견 동반 조건과 요금은 업체 사정에 따라 바뀔 수 있음
+</div></footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+var CHECKED = "2026-10-11";
+
+/* ---------- 출처 ---------- */
+var SRC = {
+  s1:{t:"스테이소몽 객실·반려견·바비큐 규정 (야놀자)", u:"https://nol.yanolja.com/stay/domestic/10064853"},
+  s2:{t:"스테이소몽 주소·전화 (맘맘)", u:"https://mom-mom.net/travel/properties/68752b3566fa9f7ed41a104c"},
+  s3:{t:"스테이소몽 공식 홈페이지 (검색 결과에 노출된 주소)", u:"http://stay-somong.com/"},
+  s4:{t:"산막이옛길 (괴산군 문화관광)", u:"https://www.goesan.go.kr/tour/selectTourInfo.do?key=858&tourNo=580"},
+  s5:{t:"산막이옛길 (대한민국 구석구석)", u:"https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=f28a4a6d-481e-4895-bb4c-b03e3ecc7664"},
+  s6:{t:"산막이옛길 유람선 운항 중단 기사 (2026-08-20)", u:"https://www.news-wa.com/article/travel/tour-korea/2026/08/20/20260820500061"},
+  s7:{t:"문광저수지 은행나무길 안내 (여행을 말하다)", u:"https://www.telltrip.com/domestic-travel/goesan-mungwang-reservoir-ginkgo-trail-guide/"},
+  s8:{t:"문광저수지 위치·주차 후기 (맘맘)", u:"https://mom-mom.net/travel/places/636ddd285a24c706c916887d"},
+  s9:{t:"숲, Camp&Cafe (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=jJ7guR2h9y8e"},
+  s10:{t:"숲, Camp&Cafe 애견동반 정보 (펫온)", u:"https://peton.me/bbs/board.php?bo_table=addPlace&wr_id=242513"},
+  s11:{t:"카페청안 (한국관광공사 데이터 기반 안내)", u:"https://www.ktriptips.com/kor/food/2857118"},
+  s12:{t:"뭐하농하우스 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=xvPqjLoFmKGZ"},
+  s13:{t:"뭐하농하우스 (대한민국 구석구석 무장애)", u:"https://access.visitkorea.or.kr/ms/detail.do?cotId=ca829283-c851-41d4-9182-7edf494dde59"},
+  s14:{t:"괴산 올갱이해장국 맛집 목록 (다이닝코드)", u:"https://www.diningcode.com/list.dc?query=%EA%B4%B4%EC%82%B0+%EC%98%AC%EA%B0%B1%EC%9D%B4%ED%95%B4%EC%9E%A5%EA%B5%AD"},
+  s15:{t:"괴산 올갱이국 거리 (주차장식당·서울식당·맛식당)", u:"https://www.ktriptips.com/kor/tourspot/704505"},
+  s16:{t:"국립공원 반려견 동행 안내 (국립공원공단 예약시스템)", u:"https://reservation.knps.or.kr/contents/withPet.do"},
+  s17:{t:"국립공원 반려견 시범사업 현황 (한국일보 2026-10-01)", u:"https://www.hankookilbo.com/news/article/A2026100114440002911"},
+  s18:{t:"2026 괴산김장축제 11/5~8 (국제뉴스)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3705317"},
+  s19:{t:"반려동물 동반 가능 음식점 현황 (식품안전나라)", u:"https://www.foodsafetykorea.go.kr/portal/petKorea.do"},
+  s20:{t:"쉼터청천 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=JTfNFW4qhyLq"}
+};
+
+/* ---------- 장소 ----------
+ dog: 1=두 마리 확인 완료, 2=추가 확인 필요, 3=동반 불가·조건 불충족 */
+var P = {
+  somong:{name:"스테이소몽 (몽몽 객실)", cat:"숙소", addr:"충북 괴산군 청천면 괴산로상신2길 52-9",
+    menu:"-", hours:"체크인 15:00 · 체크아웃 11:00", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"소소·몽몽 객실만 동반 가능. 15kg 미만, 1마리당 1박 30,000원(현장 결제), 최대 3마리, 맹견·공격성 강한 개 불가, 사전 문의·상담 필수. → 두 마리가 15kg 미만이면 규정상 가능하지만 아직 숙소 확인 전.",
+    inout:"독채 · 객실별 잔디마당", reserve:"예약 플랫폼 또는 공식 홈페이지. 반려견 동반은 예약 전 문의 필수 규정. 숯·가스버너·장작 반입 사용 불가, 전기그릴 1회 30,000원(입실 후 22시 전).",
+    price:"몽몽 객실 플랫폼 표기 139,000원~ (날짜·인원별 상이, 이번 일정 금액 미확인)", src:["s1","s2","s3"]},
+  forest:{name:"숲, Camp&Cafe", cat:"카페", addr:"충북 괴산군 청천면 금평로 18",
+    menu:"아메리카노 3,500원 · 숲 라떼 5,000원 · 천사 자몽에이드 6,000원", hours:"수~일 10:00–19:00 · 화요일 정기휴무 (월요일 영업 여부는 확인 필요)",
+    parking:"주차장 넓다는 후기 있음", dog:2, dogText:"반려동물 동반 가능·대형견 가능·목줄 착용·실내 이용 가능으로 소개. 두 마리 동시 입장 조건은 명시 없음.",
+    inout:"실내 + 야외 단독 테라스 대여(1시간 10,000원, 이후 1시간당 5,000원)", reserve:"전화번호가 출처마다 다름(0507-1344-8029 / 043-834-5556). 6명+2마리면 테라스 대여 문의 추천.",
+    price:"6명 음료 약 21,000~36,000원 (메뉴 가격 기준 추정)", src:["s9","s10"]},
+  mart:{name:"우리할인마트 (청천면 소재지)", cat:"장보기", addr:"충북 괴산군 청천면 괴산로 1331 일대",
+    menu:"-", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"정보 없음. 장보기는 1~2명만 다녀오는 걸 추천.", inout:"실내",
+    reserve:"다이닝코드에 '우리한식' 위치 설명(우리할인마트 옆)으로만 확인된 상호. 영업 여부·시간은 지도 앱으로 확인.",
+    price:"-", src:["s14"]},
+  mungwang:{name:"문광저수지 은행나무길", cat:"관광지", addr:"충북 괴산군 문광면 양곡리 16",
+    menu:"-", hours:"상시 개방 산책로 (별도 운영시간 정보 없음)", parking:"무료. 성수기 임시주차장 운영 사례 있음, 만차 시 둑방 옆 버스정류장 부근 주차 후기",
+    dog:2, dogText:"반려견 출입 규정을 찾지 못함. 야외 산책로라 목줄 착용 전제로 방문 가능성이 높지만 공식 확인 아님.",
+    inout:"야외 (약 2km 호숫가 길, 데크·흙길)", reserve:"예약 없음. 주말 오전에 붐빔 → 10시 전 도착 권장. 2026년 단풍 상태는 출발 직전 확인.",
+    price:"입장 무료 · 주차 무료", src:["s7","s8"]},
+  sanmak:{name:"산막이옛길", cat:"관광지", addr:"충북 괴산군 칠성면 산막이옛길 (주차장: 칠성면 사은리 523)",
+    menu:"-", hours:"09:00–17:00 연중무휴 안내 (트레킹 자체는 시간 제약 없다는 안내도 있음)", parking:"중소형 3,000원 · 대형 7,000원 (시간 제한 없음)",
+    dog:2, dogText:"반려견 동반 규정을 찾지 못함. 유람선 반려견 탑승 여부도 미확인. 관리사무소(043-832-3527)에 확인 필요.",
+    inout:"야외 (호숫가 숲길·데크길, 편도 약 2.3~4km)", reserve:"예약 없음. 주말 방문객 많음. 유람선(5,000~8,000원)은 2026년 8월 기사 기준 9/20까지 운항 중단이었고 재개 여부 미확인.",
+    price:"입장 무료 · 주차 3,000원", src:["s4","s5","s6"]},
+  jucha:{name:"주차장식당 (괴산읍 올갱이국)", cat:"식당", addr:"충북 괴산군 괴산읍 읍내로 282",
+    menu:"올갱이국 (가격 확인 필요)", hours:"07:00–20:00 (정보 기준일 2026-08-16) · 휴무일 확인 필요", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음. 043-832-2673으로 문의, 안 되면 포장.", inout:"실내",
+    reserve:"6명 단체라 전화로 자리 확인 추천.", price:"<span class='need'>확인 필요</span>", src:["s15"]},
+  seoul:{name:"서울식당 (괴산읍 올갱이국)", cat:"식당", addr:"충북 괴산군 괴산읍 읍내로2길 26-1",
+    menu:"올갱이국 (가격 확인 필요)", hours:"점심 11:00–14:00 · 저녁 17:00–20:00 · 토·일은 점심만", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"전화번호 미확인 → 지도 앱에서 확인.", price:"<span class='need'>확인 필요</span>", src:["s15"]},
+  mat:{name:"맛식당 (괴산읍 올갱이국)", cat:"식당", addr:"충북 괴산군 괴산읍 괴강로 12",
+    menu:"올갱이국 (허영만 『식객』 소개 식당)", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"영업시간 미확인 → 방문 전 확인.", price:"<span class='need'>확인 필요</span>", src:["s15"]},
+  cheongol:{name:"청천올갱이해장국", cat:"식당", addr:"충북 괴산군 청천면 괴산로 1583 (피노키오 펜션 입구 쪽)",
+    menu:"올갱이해장국", hours:"<span class='need'>확인 필요</span> (월요일 영업 여부 포함)", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"인천 서구에 같은 이름 식당이 있으니 지도 검색 시 '괴산' 꼭 붙이기.", price:"<span class='need'>확인 필요</span>", src:["s14"]},
+  jungang:{name:"중앙불고기", cat:"식당", addr:"충북 괴산군 청천면 괴산로 1334",
+    menu:"<span class='need'>확인 필요</span> (상호상 불고기)", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"청천면 소재지라 숙소에서 가까운 대안.", price:"<span class='need'>확인 필요</span>", src:["s14"]},
+  urihansik:{name:"우리한식", cat:"식당", addr:"충북 괴산군 청천면 괴산로 1331",
+    menu:"올갱이해장국", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"청천올갱이해장국이 쉬면 대안.", price:"<span class='need'>확인 필요</span>", src:["s14"]},
+  mwohanong:{name:"뭐하농하우스", cat:"카페", addr:"충북 괴산군 감물면 충민로 694-5",
+    menu:"카페·디저트 (양식 메뉴도 소개됨, 세부 메뉴·가격 확인 필요)", hours:"화~일 11:00–18:00 또는 19:00 (출처마다 다름) · 월요일 휴무",
+    parking:"<span class='need'>확인 필요</span>", dog:2, dogText:"'애견카페가 아닌 애견동반 가능 카페'로 소개. 마릿수·크기·실내 가능 여부는 미확인.",
+    inout:"<span class='need'>확인 필요</span>", reserve:"043-760-7121. 월요일 휴무라 3일차(일) 방문.", price:"<span class='need'>확인 필요</span>", src:["s12","s13"]},
+  cheongan:{name:"카페청안", cat:"카페", addr:"충북 괴산군 청안면 금신로 127",
+    menu:"아메리카노 등 (가격 확인 필요) · 자몽에이드·치즈케이크 후기", hours:"매일 08:00–20:00 연중무휴 (정보 기준일 2026-08-16)",
+    parking:"주차 가능", dog:2, dogText:"야외 테이블만 반려견 동반 가능. 두 마리 조건은 미확인. 10월 말 저녁은 쌀쌀하니 야외석 전제로 겉옷 필요.",
+    inout:"실내(반려견 불가) / 야외석(반려견 가능)", reserve:"070-8861-7004. 숙소(청천면)와 거리가 있어 선택 일정.", price:"<span class='need'>확인 필요</span>", src:["s11"]},
+  shimteo:{name:"쉼터청천", cat:"카페", addr:"충북 괴산군 청천면 화양로 317",
+    menu:"옥수수라떼 등 (가격 확인 필요)", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 여부 확인 못 함.", inout:"<span class='need'>확인 필요</span>", reserve:"화양계곡 방향 계곡 뷰 카페. 일정에는 안 넣은 예비 후보.", price:"<span class='need'>확인 필요</span>", src:["s20"]},
+  hwayang:{name:"화양구곡 · 쌍곡계곡 (속리산국립공원)", cat:"제외", addr:"충북 괴산군 청천면 화양리 일대 / 칠성면 쌍곡리 일대",
+    menu:"-", hours:"-", parking:"-", dog:3,
+    dogText:"국립공원은 자연공원법에 따라 반려견 동반을 제한하고, 반려견 동반 시범 구간은 북한산·계룡산·가야산뿐(속리산 없음). 그래서 일정에서 뺐어.",
+    inout:"야외", reserve:"반려견 없이 일부 인원만 다녀오는 경우만 고려.", price:"-", src:["s16","s17"]},
+  gimjang:{name:"2026 괴산김장축제", cat:"제외", addr:"괴산 유기농엑스포 광장 일대",
+    menu:"-", hours:"2026. 11. 5(목) – 11. 8(일)", parking:"-", dog:2, dogText:"축제 기간이 여행 일정(~11/2) 이후라 해당 없음.",
+    inout:"야외", reserve:"일정이 겹치지 않아 제외. 참고용.", price:"-", src:["s18"]}
+};
+
+/* ---------- 일정 ---------- */
+var DAYS = [
+  {d:"10/30", w:"금", title:"1일차 · 각자 도착, 청천에서 모이기", stops:[
+    {t:"13:30", p:"forest", stay:"1시간~1시간 30분", why:"각자 다른 곳(천안·인천·진해)에서 오니, 반려견과 같이 기다릴 수 있는 카페를 집결지로. 대형견까지 동반 가능하다고 소개된 몇 안 되는 곳.", cost:"음료 6잔 약 21,000~36,000원(추정) · 테라스 대여 시 1시간 10,000원", note:"금요일 영업(화요일 휴무). 두 마리 동시 입장 가능한지 전화로 먼저 확인. 먼저 온 사람이 테라스 잡기."},
+    {t:"15:00", p:"somong", stay:"체크인 후 휴식", why:"독채 + 객실별 잔디마당이라 반려견이 다른 손님과 부딪힐 일이 적음.", cost:"숙박비(예약 금액) + 반려견 2마리 × 30,000원 × 3박 = 180,000원(플랫폼 표기 기준, 현장 결제)", note:"체크인 때 반려견 추가요금 현장 결제. 바비큐 전기그릴 이용 시간(22시 전) 미리 말해두기."},
+    {t:"16:00", p:"mart", stay:"30분 내외", why:"첫날 저녁 바비큐 장보기. 숙소에서 가장 가까운 청천면 소재지 쪽.", cost:"<span class='need'>확인 필요</span> (식비 항목에 입력)", note:"영업시간 미확인. 고기는 출발 전 각자 사 오는 것도 방법. 반려견은 숙소에 두지 말고 1~2명만 다녀오기(숙소 규정상 반려견 단독 두기 가능 여부 미확인)."},
+    {t:"18:00", p:"somong", stay:"저녁 내내", why:"반려견 동반 식사를 가장 확실하게 해결하는 방법.", cost:"전기그릴 30,000원(1회)", note:"개인 숯·가스버너·장작·조개탄 사용 불가. 전기그릴만 가능."}
+  ]},
+  {d:"10/31", w:"토", title:"2일차 · 은행나무길과 산막이옛길", stops:[
+    {t:"10:00", p:"mungwang", stay:"1시간 30분", why:"여러 매체가 10월 하순~11월 초를 은행나무 절정으로 꼽는 곳. 평지 2km 호숫가 길이라 반려견 산책에도 무리 없는 지형.", cost:"입장·주차 무료", note:"토요일이라 혼잡 예상 → 10시 전 도착. 반려견 출입 규정은 공식 확인 안 됨(괴산군청 043-830-2522). 2026년 단풍 상황은 출발 직전 확인."},
+    {t:"12:00", p:"jucha", stay:"1시간", why:"괴산 대표 음식 올갱이국. 문광저수지에서 산막이옛길 가는 길에 있는 괴산읍.", cost:"<span class='need'>확인 필요</span>", note:"반려견 동반 정보 없음 → 전화(043-832-2673) 확인, 안 되면 포장해서 차에서/다음 장소에서. 대안: 서울식당(토요일 점심 11~14시), 맛식당."},
+    {t:"13:30", p:"sanmak", stay:"2시간~2시간 30분", why:"호숫가 숲길·데크길 산책 코스. 입장 무료.", cost:"주차 3,000원(중소형 1대) · 유람선 5,000~8,000원(운항·반려견 탑승 미확인)", note:"반려견 동반 규정 미확인 → 관리사무소(043-832-3527)에 미리 전화. 주말 인파 많으니 목줄 짧게. 유람선은 운항 재개 여부부터 확인."},
+    {t:"17:00", p:"somong", stay:"저녁", why:"이틀째 저녁은 숙소에서 편하게.", cost:"<span class='need'>확인 필요</span>", note:"괴산읍에서 돌아오는 길에 포장 음식이나 장보기. 바비큐를 또 할지는 당일 결정(전기그릴 30,000원)."}
+  ]},
+  {d:"11/1", w:"일", title:"3일차 · 여유로운 카페 데이", stops:[
+    {t:"09:00", p:"somong", stay:"오전", why:"전날 많이 걸었으니 오전은 숙소 잔디마당에서 반려견 쉬게 하기.", cost:"-", note:"수영장은 10월 말 기온상 이용이 어려울 수 있음(운영 여부 확인 필요)."},
+    {t:"11:30", p:"mwohanong", stay:"1시간 30분", why:"애견동반 가능 카페로 소개된 곳. 월요일 휴무라 일요일에 배치.", cost:"<span class='need'>확인 필요</span>", note:"마릿수·실내 동반 가능 여부 전화 확인(043-760-7121). 영업 종료 시간이 출처마다 18시/19시로 다름."},
+    {t:"14:00", p:"cheongan", stay:"1시간 (선택)", why:"통창 논밭뷰 카페. 야외석에서 반려견 동반 가능하다고 안내됨.", cost:"<span class='need'>확인 필요</span>", note:"선택 일정. 반려견은 야외석만 가능. 숙소와 거리가 있으니 컨디션 보고 결정하고, 안 가면 바로 숙소로."},
+    {t:"17:30", p:"somong", stay:"마지막 밤", why:"마지막 밤 바비큐.", cost:"전기그릴 30,000원(1회)", note:"장보기는 돌아오는 길에. 다음날 11시 체크아웃이니 설거지·분리수거는 밤에 미리."}
+  ]},
+  {d:"11/2", w:"월", title:"4일차 · 체크아웃 후 해산", stops:[
+    {t:"10:00", p:"somong", stay:"1시간", why:"짐 정리와 반려견 용품 챙기기.", cost:"-", note:"체크아웃 11:00. 반려견 털 정리(테이프 클리너) 해두면 좋음."},
+    {t:"11:30", p:"cheongol", stay:"1시간", why:"해산 전 마지막 식사. 숙소와 같은 청천면.", cost:"<span class='need'>확인 필요</span>", note:"월요일 영업 여부 미확인 → 전날 확인. 쉬면 우리한식(괴산로 1331)·중앙불고기(괴산로 1334)로. 반려견 동반 정보 없음."},
+    {t:"12:30", p:null, place:"해산 · 각자 귀가", addr:"천안 · 인천 · 진해 방향", stay:"-", why:"출발지가 달라 여기서 해산.", cost:"유류비·통행료는 차량별", note:"장거리(인천·진해)는 반려견 휴게소 산책 시간 넉넉히."}
+  ]}
+];
+
+/* ---------- 예산 ---------- */
+var BUDGET = [
+  {id:"stay",  name:"숙박비", amt:0, st:"미정", note:"몽몽 객실 플랫폼 표기 139,000원~ (1박, 날짜별 상이). 실제 예약 금액을 넣어줘."},
+  {id:"food",  name:"식비", amt:0, st:"미정", note:"식당 메뉴 가격 미확인. 장보기·외식 영수증 기준으로 입력."},
+  {id:"cafe",  name:"카페 및 디저트", amt:0, st:"미정", note:"참고: 숲, Camp&Cafe 아메리카노 3,500원 · 숲 라떼 5,000원."},
+  {id:"ticket",name:"관광지 입장료", amt:0, st:"확인됨", note:"산막이옛길·문광저수지 입장 무료(검색 확인). 유람선 탈 경우 1인 5,000~8,000원 별도."},
+  {id:"fuel",  name:"유류비", amt:0, st:"미정", note:"출발지(천안·인천·진해)와 차량 대수에 따라 다름."},
+  {id:"park",  name:"주차비", amt:3000, st:"확인됨", note:"산막이옛길 중소형 3,000원 × 1대 기준. 차량 대수만큼 고쳐줘. 문광저수지 무료."},
+  {id:"dog",   name:"반려견 추가 비용", amt:180000, st:"예상", note:"30,000원 × 2마리 × 3박 (플랫폼 표기 기준, 숙소 확인 전이라 '예상')."},
+  {id:"etc",   name:"기타 비용", amt:60000, st:"예상", note:"숙소 전기그릴 30,000원 × 2회(1·3일차) 기준."}
+];
+
+/* ---------- 체크리스트 ---------- */
+var CHECK = [
+  {g:"예약", items:[
+    ["c1","숙소(스테이소몽 몽몽 객실) 예약 확정 · 금액 확인"],
+    ["c2","숙소에 반려견 2마리 동반 사전 문의 (규정상 필수)"],
+    ["c3","두 마리 체중 15kg 미만인지 확인 (숙소 기준)"],
+    ["c4","전기그릴 이용 신청 (1회 30,000원, 22시 전)"],
+    ["c5","식당 예약 확인 · 6명 자리 / 반려견 동반 가능 여부 전화"],
+    ["c6","숲, Camp&Cafe 두 마리 입장·테라스 대여 문의"],
+    ["c7","산막이옛길 반려견 동반 가능 여부 · 유람선 운항 확인 (043-832-3527)"],
+    ["c8","출발 직전 문광저수지 단풍 상황 확인"],
+    ["c9","집결 시간(13:30 숲 Camp&Cafe)·차량 배정 단톡 공유"]
+  ]},
+  {g:"반려견", items:[
+    ["d1","반려견 동반 조건 출발 전날 재확인"],
+    ["d2","예방접종(광견병 등) 및 동물등록 상태 확인"],
+    ["d3","목줄과 배변 봉투 넉넉히"],
+    ["d4","사료와 간식 (3박 4일 + 여유분)"],
+    ["d5","이동장 또는 차량용 안전장치(카시트·안전벨트)"],
+    ["d6","강아지 물통과 휴대용 식기"],
+    ["d7","반려견 담요·매트 (숙소 침구 보호)"],
+    ["d8","털 정리용 테이프 클리너·물티슈"]
+  ]},
+  {g:"개인 준비물", items:[
+    ["e1","겉옷과 우천 대비 용품 (10월 말 산간 아침저녁 쌀쌀)"],
+    ["e2","충전기와 보조배터리"],
+    ["e3","걷기 편한 신발 (산막이옛길·은행나무길)"],
+    ["e4","반려견 추가요금 현장 결제 수단"]
+  ]}
+];
+
+/* ---------- 유틸 ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function enc(s){return encodeURIComponent(s)}
+function won(n){return Math.round(n).toLocaleString("ko-KR")+"원"}
+function store(k,v){try{ if(v===undefined){return localStorage.getItem(k)} localStorage.setItem(k,v) }catch(e){return null}}
+function storeDel(k){try{localStorage.removeItem(k)}catch(e){}}
+var toastT;
+function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show")},1800)}
+
+// 지도 검색어: 주소의 괄호 설명은 빼고 사용
+function q(p){ return p.addr.replace(/\s*\(.*?\)\s*/g," ").replace(/ 일대$/,"").trim() }
+function naverUrl(s){return "https://map.naver.com/p/search/"+enc(s)}
+function kakaoUrl(s){return "https://map.kakao.com/?q="+enc(s)}
+function kakaoRoute(a,b){return "https://map.kakao.com/?sName="+enc(a)+"&eName="+enc(b)}
+
+function dogBadge(n){
+  if(n===1) return '<span class="badge b-ok">두 마리 확인 완료</span>';
+  if(n===3) return '<span class="badge b-no">동반 불가·조건 불충족</span>';
+  return '<span class="badge b-warn">추가 확인 필요</span>';
+}
+function srcHtml(ids){
+  return '<div class="src">출처 (확인일 '+CHECKED+'): '+ids.map(function(id){var s=SRC[id];return '<a href="'+s.u+'" target="_blank" rel="noopener">'+esc(s.t)+'</a>'}).join(" · ")+'</div>';
+}
+function mapBtns(p){
+  var s=q(p);
+  return '<a class="btn" href="'+naverUrl(s)+'" target="_blank" rel="noopener">네이버 지도</a>'+
+         '<a class="btn" href="'+kakaoUrl(s)+'" target="_blank" rel="noopener">카카오맵</a>'+
+         '<button class="btn" type="button" data-copy="'+esc(p.addr)+'">주소 복사</button>';
+}
+
+/* ---------- 메뉴 ---------- */
+var panels=$$("section.panel").map(function(s){return s.id});
+function showPanel(id,push){
+  if(panels.indexOf(id)<0) id="home";
+  $$("section.panel").forEach(function(s){s.classList.toggle("active",s.id===id)});
+  $$("#menu button").forEach(function(b){
+    var on=b.getAttribute("data-panel")===id; b.setAttribute("aria-selected",on?"true":"false");
+    if(on && b.scrollIntoView){ try{b.scrollIntoView({block:"nearest",inline:"center"})}catch(e){} }
+  });
+  if(push){ try{history.replaceState(null,"","#"+id)}catch(e){location.hash=id} }
+}
+$("#menu").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-panel]"); if(!b) return;
+  showPanel(b.getAttribute("data-panel"),true);
+  var nav=$("nav.menu"); window.scrollTo({top:nav.offsetTop,behavior:"smooth"});
+});
+window.addEventListener("hashchange",function(){showPanel(location.hash.slice(1),false)});
+
+/* ---------- 일정 ---------- */
+var curDay=0;
+function renderDayTabs(){
+  $("#daytabs").innerHTML=DAYS.map(function(d,i){
+    return '<button role="tab" type="button" data-day="'+i+'" aria-selected="'+(i===curDay)+'"><b>'+d.d+' ('+d.w+')</b><span>'+(i+1)+'일차</span></button>';
+  }).join("");
+}
+function stopInfo(s){
+  if(s.p){var p=P[s.p];return {name:p.name,addr:p.addr,dog:p.dog,dogText:p.dogText,src:p.src,obj:p}}
+  return {name:s.place,addr:s.addr,dog:0,dogText:"-",src:[],obj:null};
+}
+function renderDay(){
+  var d=DAYS[curDay];
+  var names=d.stops.map(function(s){return stopInfo(s).name});
+  $("#dayroute").innerHTML='<b>'+esc(d.title)+'</b><ol>'+d.stops.map(function(s,i){return '<li>'+s.t+' · '+esc(names[i])+'</li>'}).join("")+'</ol>';
+  $("#daylist").innerHTML=d.stops.map(function(s,i){
+    var info=stopInfo(s), nxt=d.stops[i+1], nInfo=nxt?stopInfo(nxt):null;
+    var move="";
+    if(nInfo && nInfo.obj && info.obj){
+      if(nInfo.addr===info.addr){ move='<div class="move">↓ 다음 장소: 같은 장소</div>'; }
+      else move='<div class="move">↓ 다음 장소까지 이동 시간: <span class="need">미측정</span> · <a href="'+kakaoRoute(q(info.obj),q(nInfo.obj))+'" target="_blank" rel="noopener">카카오맵 길찾기로 확인</a></div>';
+    }
+    var dogRow = info.obj ? dogBadge(info.dog)+'<div class="muted" style="margin-top:4px">'+esc(info.dogText)+'</div>' : '-';
+    var btns = info.obj ? '<div class="btns">'+mapBtns(info.obj)+'</div>' : '';
+    return '<div class="stop"><div class="card">'+
+      '<div class="time">'+s.t+'</div><h3>'+esc(info.name)+'</h3>'+
+      '<dl class="kv">'+
+        '<dt>주소</dt><dd>'+esc(info.addr)+'</dd>'+
+        '<dt>체류 시간</dt><dd>'+esc(s.stay)+' (예상)</dd>'+
+        '<dt>추천 이유</dt><dd>'+esc(s.why)+'</dd>'+
+        '<dt>예상 비용</dt><dd>'+s.cost+'</dd>'+
+        '<dt>반려견</dt><dd>'+dogRow+'</dd>'+
+        '<dt>주의사항</dt><dd>'+esc(s.note)+'</dd>'+
+      '</dl>'+btns+(info.src.length?srcHtml(info.src):'')+
+    '</div></div>'+move;
+  }).join("");
+}
+$("#daytabs").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-day]"); if(!b) return;
+  curDay=+b.getAttribute("data-day"); renderDayTabs(); renderDay();
+});
+
+/* ---------- 장소 카드 ---------- */
+function placeCard(p){
+  return '<div class="card" data-cat="'+esc(p.cat)+'" data-dog="'+p.dog+'">'+
+    '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h3>'+esc(p.name)+'</h3><span class="badge b-tag">'+esc(p.cat)+'</span></div>'+
+    dogBadge(p.dog)+
+    '<dl class="kv">'+
+      '<dt>대표 메뉴</dt><dd>'+p.menu+'</dd>'+
+      '<dt>예상 비용</dt><dd>'+p.price+'</dd>'+
+      '<dt>주소</dt><dd>'+esc(p.addr)+'</dd>'+
+      '<dt>영업·휴무</dt><dd>'+p.hours+'</dd>'+
+      '<dt>주차</dt><dd>'+p.parking+'</dd>'+
+      '<dt>반려견</dt><dd>'+esc(p.dogText)+'</dd>'+
+      '<dt>실내·야외</dt><dd>'+p.inout+'</dd>'+
+      '<dt>예약 안내</dt><dd>'+esc(p.reserve)+'</dd>'+
+    '</dl><div class="btns">'+mapBtns(p)+'</div>'+srcHtml(p.src)+'</div>';
+}
+function renderFood(f){
+  var keys=["forest","mwohanong","cheongan","shimteo","jucha","seoul","mat","cheongol","urihansik","jungang"];
+  $("#foodGrid").innerHTML=keys.map(function(k){return P[k]}).filter(function(p){
+    if(f==="all") return true; if(f==="warn") return p.dog===2; return p.cat===f;
+  }).map(placeCard).join("");
+}
+function renderSpot(){
+  $("#spotGrid").innerHTML=["mungwang","sanmak","hwayang","gimjang"].map(function(k){
+    var p=P[k];
+    var html=placeCard(p);
+    if(p.cat==="제외") html=html.replace('<span class="badge b-tag">제외</span>','<span class="badge b-no">일정 제외</span>');
+    return html;
+  }).join("");
+}
+function renderDog(f){
+  var keys=Object.keys(P).filter(function(k){return k!=="gimjang"});
+  $("#dogGrid").innerHTML=keys.map(function(k){return P[k]}).filter(function(p){return f==="all"||String(p.dog)===f}).map(function(p){
+    return '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><h3>'+esc(p.name)+'</h3><span class="badge b-tag">'+esc(p.cat)+'</span></div>'+
+      dogBadge(p.dog)+'<p style="margin:8px 0 0">'+esc(p.dogText)+'</p><p class="muted" style="margin:6px 0 0">실내·야외: '+p.inout+'</p>'+srcHtml(p.src)+'</div>';
+  }).join("") || '<p class="muted">해당하는 장소가 없어. 이번 조사에서는 두 마리 조건까지 확인된 곳이 없었어.</p>';
+}
+function bindFilter(id,fn){
+  $(id).addEventListener("click",function(e){
+    var b=e.target.closest("button[data-f]"); if(!b) return;
+    $$(id+" button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});
+    fn(b.getAttribute("data-f"));
+  });
+}
+bindFilter("#foodFilter",renderFood);
+bindFilter("#dogFilter",renderDog);
+
+/* ---------- 지도 ---------- */
+function renderMapDays(){
+  $("#mapDays").innerHTML=DAYS.map(function(d){
+    var list=d.stops.filter(function(s){return s.p}).map(function(s){return P[s.p]});
+    // 연속 중복 제거 (같은 숙소 연속 방문)
+    var seq=list.filter(function(p,i){return i===0||p!==list[i-1]});
+    return '<div class="card"><h3>'+d.d+' ('+d.w+')</h3><ol style="margin:6px 0 0;padding-left:20px">'+
+      seq.map(function(p,i){
+        var nxt=seq[i+1];
+        return '<li style="margin-bottom:8px"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.addr)+'</div><div class="btns" style="margin-top:4px">'+mapBtns(p)+
+          (nxt?'<a class="btn" href="'+kakaoRoute(q(p),q(nxt))+'" target="_blank" rel="noopener">→ 다음 장소 길찾기</a>':'')+'</div></li>';
+      }).join("")+'</ol></div>';
+  }).join("");
+}
+$("#dGo").addEventListener("click",function(){
+  var a=$("#dFrom").value.trim(), b=$("#dTo").value.trim();
+  if(!a||!b){toast("출발지와 목적지를 모두 입력해줘");return}
+  window.open(kakaoRoute(a,b),"_blank","noopener");
+});
+$("#dSwap").addEventListener("click",function(){var a=$("#dFrom"),b=$("#dTo"),t=a.value;a.value=b.value;b.value=t});
+
+/* ---------- 주소 복사 ---------- */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-copy]"); if(!b) return;
+  var text=b.getAttribute("data-copy");
+  function fallback(){
+    var ta=document.createElement("textarea");ta.value=text;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(err){}
+    document.body.removeChild(ta);toast(ok?"주소를 복사했어":"복사 실패 — 주소를 길게 눌러 복사해줘");
+  }
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast("주소를 복사했어")},fallback)}
+  else fallback();
+});
+
+/* ---------- 예산 ---------- */
+var BKEY="goesan_budget_v1";
+function loadBudget(){
+  var saved=null; try{saved=JSON.parse(store(BKEY)||"null")}catch(e){}
+  return BUDGET.map(function(r){
+    var s=saved&&saved.rows&&saved.rows[r.id];
+    return {id:r.id,name:r.name,note:r.note,amt:s?s.amt:r.amt,st:s?s.st:r.st};
+  });
+}
+var bRows=loadBudget();
+(function(){var saved=null;try{saved=JSON.parse(store(BKEY)||"null")}catch(e){}
+  if(saved){ if(saved.people) $("#bPeople").value=saved.people; if(saved.limit!==undefined&&saved.limit!==null) $("#bLimit").value=saved.limit; }})();
+function saveBudget(){
+  var rows={}; bRows.forEach(function(r){rows[r.id]={amt:r.amt,st:r.st}});
+  store(BKEY,JSON.stringify({rows:rows,people:$("#bPeople").value,limit:$("#bLimit").value}));
+}
+function renderBudgetRows(){
+  $("#bBody").innerHTML=bRows.map(function(r){
+    return '<tr data-id="'+r.id+'"><td><b>'+esc(r.name)+'</b><div class="bnote">'+esc(r.note)+'</div></td>'+
+      '<td><input type="number" min="0" step="1000" inputmode="numeric" value="'+r.amt+'" aria-label="'+esc(r.name)+' 금액"></td>'+
+      '<td><select aria-label="'+esc(r.name)+' 상태">'+["확인됨","예상","미정"].map(function(o){return '<option'+(o===r.st?' selected':'')+'>'+o+'</option>'}).join("")+'</select></td></tr>';
+  }).join("");
+}
+function calcBudget(){
+  var conf=0,est=0,undecided=[];
+  bRows.forEach(function(r){
+    var a=Math.max(0,Number(r.amt)||0);
+    if(r.st==="확인됨") conf+=a; else if(r.st==="예상") est+=a; else { est+=a; if(a===0) undecided.push(r.name); else undecided.push(r.name+"(입력값은 예상에 합산)"); }
+  });
+  var total=conf+est, ppl=Math.max(1,Math.floor(Number($("#bPeople").value)||1));
+  $("#bRes").innerHTML=
+    '<div class="stat"><div class="k">확인된 비용 합계</div><div class="v">'+won(conf)+'</div></div>'+
+    '<div class="stat"><div class="k">예상·미정 비용 합계</div><div class="v">'+won(est)+'</div></div>'+
+    '<div class="stat"><div class="k">전체 예상 비용</div><div class="v">'+won(total)+'</div></div>'+
+    '<div class="stat"><div class="k">1인당 ('+ppl+'명)</div><div class="v">'+won(total/ppl)+'</div><div class="s">확인분만: '+won(conf/ppl)+'</div></div>';
+  var lim=$("#bLimit").value, msg=$("#bLimitMsg");
+  if(lim===""||isNaN(Number(lim))){ msg.className=""; msg.textContent="예산 한도를 입력하면 초과 여부를 알려줘."; }
+  else{
+    var L=Number(lim), diff=L-total;
+    if(diff<0){msg.className="over";msg.textContent="예산 초과: "+won(-diff)+" 넘었어 (한도 "+won(L)+")";}
+    else{msg.className="under";msg.textContent="예산 이내: "+won(diff)+" 남음 (한도 "+won(L)+")";}
+  }
+  if(undecided.length) msg.innerHTML+= '<div class="muted" style="font-weight:400;margin-top:4px">미정 항목: '+esc(undecided.join(", "))+'</div>';
+}
+$("#bBody").addEventListener("input",function(e){
+  var tr=e.target.closest("tr"); if(!tr) return;
+  var r=bRows.filter(function(x){return x.id===tr.getAttribute("data-id")})[0];
+  if(e.target.tagName==="INPUT") r.amt=Math.max(0,Number(e.target.value)||0);
+  calcBudget(); saveBudget();
+});
+$("#bBody").addEventListener("change",function(e){
+  var tr=e.target.closest("tr"); if(!tr) return;
+  var r=bRows.filter(function(x){return x.id===tr.getAttribute("data-id")})[0];
+  if(e.target.tagName==="SELECT") r.st=e.target.value;
+  calcBudget(); saveBudget();
+});
+$("#bPeople").addEventListener("input",function(){calcBudget();saveBudget()});
+$("#bLimit").addEventListener("input",function(){calcBudget();saveBudget()});
+$("#bReset").addEventListener("click",function(){
+  if(!confirm("비용 항목을 처음 값으로 되돌릴까?")) return;
+  storeDel(BKEY); bRows=BUDGET.map(function(r){return {id:r.id,name:r.name,note:r.note,amt:r.amt,st:r.st}});
+  $("#bPeople").value=6; $("#bLimit").value=""; renderBudgetRows(); calcBudget(); toast("초기화했어");
+});
+
+/* ---------- 체크리스트 ---------- */
+var CKEY="goesan_check_v1";
+var cState={}; try{cState=JSON.parse(store(CKEY)||"{}")||{}}catch(e){cState={}}
+function renderCheck(){
+  $("#chkWrap").innerHTML=CHECK.map(function(g){
+    return '<div class="chk-group"><h3>'+esc(g.g)+'</h3>'+g.items.map(function(it){
+      var on=!!cState[it[0]];
+      return '<label class="chk-item'+(on?' done':'')+'"><input type="checkbox" data-c="'+it[0]+'"'+(on?' checked':'')+'><span>'+esc(it[1])+'</span></label>';
+    }).join("")+'</div>';
+  }).join("");
+  updateProgress();
+}
+function updateProgress(){
+  var total=0,done=0; CHECK.forEach(function(g){g.items.forEach(function(it){total++; if(cState[it[0]]) done++})});
+  $("#chkProgressTxt").textContent="완료 "+done+" / "+total+"개";
+  $("#chkBar").style.width=(total?done/total*100:0)+"%";
+}
+$("#chkWrap").addEventListener("change",function(e){
+  var c=e.target.getAttribute("data-c"); if(!c) return;
+  if(e.target.checked) cState[c]=true; else delete cState[c];
+  e.target.closest(".chk-item").classList.toggle("done",e.target.checked);
+  store(CKEY,JSON.stringify(cState)); updateProgress();
+});
+$("#chkReset").addEventListener("click",function(){
+  if(!confirm("체크를 전부 해제할까?")) return;
+  cState={}; storeDel(CKEY); renderCheck(); toast("전부 해제했어");
+});
+
+/* ---------- 출처 표 ---------- */
+$("#srcTable tbody").innerHTML=Object.keys(SRC).map(function(k,i){
+  var s=SRC[k];
+  return '<tr><td>'+(i+1)+'</td><td>'+esc(s.t)+'</td><td><a href="'+s.u+'" target="_blank" rel="noopener">'+esc(s.u)+'</a></td><td>'+CHECKED+'</td></tr>';
+}).join("");
+
+/* ---------- 테마 ---------- */
+var TKEY="goesan_theme";
+function applyTheme(t){ if(t) document.documentElement.setAttribute("data-theme",t); else document.documentElement.removeAttribute("data-theme"); }
+applyTheme(store(TKEY));
+$("#themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var sysDark=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;
+  var isDark=cur?cur==="dark":sysDark; var next=isDark?"light":"dark";
+  applyTheme(next); store(TKEY,next); toast(next==="dark"?"어두운 화면":"밝은 화면");
+});
+
+/* ---------- 시작 ---------- */
+renderDayTabs(); renderDay(); renderFood("all"); renderSpot(); renderDog("all"); renderMapDays();
+renderBudgetRows(); calcBudget(); renderCheck();
+showPanel(location.hash.slice(1)||"home",false);
+})();
+</script>
+</body>
+</html>
