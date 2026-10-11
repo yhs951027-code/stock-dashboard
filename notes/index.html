@@ -1153,8 +1153,16 @@ keepPlace(listPane,()=>[...listPane.querySelectorAll('.item, .top, .menu:not([hi
   navigator.storage?.persist?.().catch(()=>{});
   renderBanners();
   const id=location.hash.slice(1);
+  // 홈 화면 아이콘을 길게 눌러 고른 바로가기 (새 메모 / 체크리스트 / 음성 녹음 / 그림)
+  const act=new URLSearchParams(location.search).get('do');
   history.replaceState(null,'',location.pathname);
-  if(id && find(id)) openNote(id,{focus:false});
+  if(act){
+    newNote();
+    if(act==='check') $('#tCheck').click();
+    else if(act==='rec') startRec();
+    else if(act==='draw') openDraw(null);
+  }
+  else if(id && find(id)) openNote(id,{focus:false});
   else renderList();
 })();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
