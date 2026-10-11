@@ -109,6 +109,15 @@ h3{font-size:18px;margin:0 0 6px}
 .filters button{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:14px}
 .filters button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
 
+.alert{background:var(--no-soft);color:var(--ink);border:1px solid var(--no);border-radius:12px;padding:12px 14px;margin:0 0 14px;font-size:15px}
+.alert b:first-child{display:block;color:var(--no);margin-bottom:4px}
+.alert .btn{margin-top:8px}
+nav.menu a.navlink{flex:0 0 auto;padding:8px 12px;border-radius:20px;font-size:15px;color:var(--brand);white-space:nowrap;text-decoration:none;font-weight:600}
+.rec{display:flex;flex-direction:column;gap:8px}
+.rec .tag{align-self:flex-start}
+.rec h3{margin:0}
+.rec .alts{font-size:14px}
+.rec .alts button{border:0;background:none;padding:0;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:14px}
 /* shop list */
 .shop{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;box-shadow:var(--shadow)}
 .shop summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
@@ -205,7 +214,8 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 
 <nav class="menu" aria-label="메뉴"><div class="wrap" role="tablist" id="menu">
   <button role="tab" data-panel="home">한눈에 보기</button>
-  <button role="tab" data-panel="plan">날짜별 일정</button>
+  <button role="tab" data-panel="plan">추천 코스</button>
+  <a class="navlink" href="travel_schedule.html">시간별 일정 →</a>
   <button role="tab" data-panel="food">맛집·카페</button>
   <button role="tab" data-panel="spot">볼거리</button>
   <button role="tab" data-panel="dog">반려견 정보</button>
@@ -221,13 +231,13 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <section class="panel" id="home">
   <div class="sum-grid">
     <div class="stat"><div class="k">기간</div><div class="v">2박 3일</div><div class="s">10/30(금) – 11/1(일)</div></div>
-    <div class="stat"><div class="k">인원</div><div class="v">성인 6명</div><div class="s">숙소 몽몽 객실 최대 8인</div></div>
-    <div class="stat"><div class="k">반려견</div><div class="v">2마리</div><div class="s">숙소 기준: 15kg 미만</div></div>
-    <div class="stat"><div class="k">숙소</div><div class="v">스테이소몽</div><div class="s">충북 괴산군 청천면</div></div>
+    <div class="stat"><div class="k">인원</div><div class="v">성인 6명</div><div class="s">소몽 객실 기준 2인 · 최대 8인</div></div>
+    <div class="stat"><div class="k">반려견</div><div class="v">2마리</div><div class="s">소몽 애견동반 가능 · 15kg 미만</div></div>
+    <div class="stat"><div class="k">숙소</div><div class="v">스테이소몽 소몽</div><div class="s">수영장 이용 불가 객실</div></div>
   </div>
 
-  <div class="btns" style="margin:0 0 14px"><button class="btn primary" id="shareCopy" type="button">단톡방용 일정 요약 복사</button></div>
-  <div class="notice"><b>출발은 각자, 시작은 현지에서.</b> 천안·인천·진해에서 따로 출발하니 1일차는 <b>청천면 카페에서 모였다가 15시 체크인</b>하는 흐름으로 짰어. 출발지별 이동 시간은 지도 앱에서 각자 확인해야 해.</div>
+  <div class="btns" style="margin:0 0 14px"><a class="btn primary" href="travel_schedule.html">시간별 일정 보기 →</a><button class="btn" id="shareCopy" type="button">단톡방용 추천 요약 복사</button></div>
+  <div class="notice"><b>출발은 각자, 시작은 현지에서.</b> 천안·인천·진해에서 따로 출발하니 청천면에서 모였다가 체크인하는 흐름을 추천해. 시간 단위 일정은 <a href="travel_schedule.html">시간별 일정 페이지</a>에 따로 있어.</div>
 
   <div class="grid">
     <div class="card">
@@ -241,9 +251,9 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
     <div class="card">
       <h3>꼭 먼저 확인할 것 3가지</h3>
       <ol style="margin:6px 0 0;padding-left:20px">
-        <li>두 마리 모두 <b>15kg 미만</b>인지 (숙소 규정)</li>
-        <li>숙소에 <b>반려견 2마리 동반 사전 문의</b> (규정상 필수)</li>
-        <li>식당은 반려견 조건이 확인된 곳이 <b>산막이 세자매 한 곳</b>(소형견·캐리어)뿐 → 나머지는 전화 확인 또는 포장</li>
+        <li>두 마리 모두 <b>15kg 미만</b>인지 (숙소 반려견 규정)</li>
+        <li>숙소에 <b>반려견 2마리 동반 사전 문의</b> (규정상 필수 · 010-4668-7424)</li>
+        <li>식당은 반려견 조건이 확인된 곳이 <b>산막이 세자매 한 곳</b>(소형견·캐리어)뿐 → 나머지는 전화 확인 또는 포장. 맛집 목록은 <b>최근 2년 안에 흔적이 확인된 곳</b>만 기본으로 보여줘.</li>
       </ol>
     </div>
     <div class="card">
@@ -251,24 +261,29 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
       <p style="margin:6px 0"><span class="badge b-ok">두 마리 확인 완료</span> 두 마리 동반 조건까지 확인된 곳</p>
       <p style="margin:6px 0"><span class="badge b-warn">추가 확인 필요</span> '동반 가능' 표기는 있지만 마릿수·크기·좌석 조건 미확인, 또는 정보 없음</p>
       <p style="margin:6px 0"><span class="badge b-no">동반 불가·조건 불충족</span> 규정상 동반 불가</p>
-      <p class="muted" style="margin:8px 0 0">이번 조사에서 '두 마리 확인 완료' 단계까지 간 곳은 없어. 숙소도 체중 조건 때문에 '추가 확인 필요'로 뒀어.</p>
+      <p class="muted" style="margin:8px 0 0">이번 조사에서 '두 마리 확인 완료' 단계까지 간 곳은 없어. 숙소도 사전 문의 규정 때문에 '추가 확인 필요'로 뒀어.</p>
     </div>
   </div>
 </section>
 
-<!-- 날짜별 일정 -->
+<!-- 추천 코스 -->
 <section class="panel" id="plan">
-  <h2>날짜별 일정</h2>
-  <p class="lead">날짜를 누르면 그날 일정만 보여. 이동 시간은 실제로 재 보지 않아서 수치를 적지 않았고, 각 카드의 <b>다음 장소 길찾기</b> 버튼으로 확인하면 돼.</p>
-  <div class="daytabs" role="tablist" id="daytabs"></div>
-  <div class="route" id="dayroute"></div>
-  <div class="timeline" id="daylist"></div>
+  <h2>뭘 하면 좋을까</h2>
+  <p class="lead">시간표 대신 이번 여행에서 해볼 만한 것들을 추천으로 정리했어. 순서나 시간은 그날 상황에 맞춰 고르면 되고, 시간 단위로 짠 일정은 <a href="travel_schedule.html">시간별 일정 페이지</a>에 따로 있어.</p>
+  <div class="filters" id="recFilter">
+    <button aria-pressed="true" data-f="all">전체</button>
+    <button aria-pressed="false" data-f="dog">반려견과 함께</button>
+    <button aria-pressed="false" data-f="food">먹기</button>
+    <button aria-pressed="false" data-f="walk">걷기·구경</button>
+    <button aria-pressed="false" data-f="rest">쉬기</button>
+  </div>
+  <div class="grid" id="recList"></div>
 </section>
 
 <!-- 맛집·카페 -->
 <section class="panel" id="food">
   <h2>맛집 · 카페</h2>
-  <p class="lead">가게 이름을 누르면 가격과 상세 정보가 펼쳐져. 오른쪽 <b>금·토·일</b> 표시는 여행 날짜에 영업하는지야. <span class="oc o">영업</span> 출처상 그날 영업, <span class="oc x">휴무</span> 출처상 휴무, <span class="oc q">모름</span> 휴무일 정보가 없거나 출처끼리 달라서 판단 못 함. 폐업 여부는 실시간으로 확인할 수 없어.</p>
+  <p class="lead"><b>기본으로는 최근 2년(2024년 10월 이후) 안에 날짜가 찍힌 소개글이나 데이터가 확인된 곳만 보여줘.</b> 네이버·구글 리뷰는 이 환경에서 직접 열 수 없어서, 대신 날짜가 확인되는 맛집 소개글·관광공사 데이터·매출 데이터로 판단했어. 그래도 가기 전에 네이버 지도 버튼으로 한 번 더 확인해줘. 가게 이름을 누르면 가격과 상세 정보가 펼쳐져. 오른쪽 <b>금·토·일</b> 표시는 여행 날짜에 영업하는지야. <span class="oc o">영업</span> 출처상 그날 영업, <span class="oc x">휴무</span> 출처상 휴무, <span class="oc q">모름</span> 휴무일 정보가 없거나 출처끼리 달라서 판단 못 함. 폐업 여부는 실시간으로 확인할 수 없어.</p>
   <div class="notice">숙소에서 차로 몇 분인지는 <b>못 넣었어.</b> 이 페이지를 만든 환경에서는 네이버 지도에 접속이 안 돼서 직접 잴 수 없었어. 가게마다 <b>네이버 지도</b> 버튼(가게 검색)과 <b>숙소에서 길찾기</b> 버튼(카카오맵, 숙소→가게 경로)을 넣어뒀으니 누르면 바로 소요시간이 나와. 대신 가게가 어느 면에 있는지 적어뒀어. 숙소는 <b>청천면</b>이야.</div>
   <div class="filters" id="foodFilter">
     <button aria-pressed="true" data-f="all">전체</button>
@@ -280,6 +295,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
     <button aria-pressed="false" data-f="dogcond">반려견 조건 있는 곳</button>
     <button aria-pressed="false" data-f="open3">3일 모두 영업</button>
   </div>
+  <div class="btns" style="margin:0 0 10px"><button class="btn" id="foodAll" type="button" aria-pressed="false"></button></div>
   <p class="muted" id="foodCount" style="margin:0 0 10px"></p>
   <div id="foodList"></div>
 </section>
@@ -325,7 +341,8 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
     </div>
     <p class="muted" style="margin:8px 0 0">카카오맵 길찾기 URL은 출발지·목적지를 이름으로 넘기는 방식이라, 열린 뒤 후보 중 정확한 장소를 한 번 골라야 할 수 있어.</p>
   </div>
-  <h3>날짜별 동선 목록</h3>
+  <h3>추천 장소 위치</h3>
+  <p class="muted" style="margin:0 0 8px">날짜별 동선은 <a href="travel_schedule.html">시간별 일정 페이지</a>에 있어.</p>
   <div class="grid" id="mapDays"></div>
 </section>
 
@@ -421,18 +438,32 @@ var SRC = {
   s36:{t:"카페 피오리토 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=c8MuDml804Va"},
   s37:{t:"카페산책 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=P42Mpmrx8lKc"},
   s38:{t:"피자투어 괴산점 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=T3TFjyom1Aye"},
-  s39:{t:"해듬 파스타&베이커리카페 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=ksGLOWhYP8Tl"}
+  s39:{t:"해듬 파스타&베이커리카페 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=ksGLOWhYP8Tl"},
+  s40:{t:"스테이소몽 객실 정보 (야놀자)", u:"https://nol.yanolja.com/stay/domestic/10064853"},
+  s41:{t:"네이버 지도 스테이소몽 객실 정보 (사용자 확인 화면 기준: 소몽 애견동반가능/수영장이용불가)", u:"https://map.naver.com/p/search/%EC%8A%A4%ED%85%8C%EC%9D%B4%EC%86%8C%EB%AA%BD"},
+  s42:{t:"괴산 맛집 추천 현지인 호응 TOP 5 (식신, 2026-06)", u:"https://www.siksinhot.com/theme/magazine/15682"},
+  s43:{t:"괴산읍 현지인 맛집 베스트 4 (식신, 2026)", u:"https://www.siksinhot.com/theme/magazine/10465"},
+  s44:{t:"괴산읍 가성비 맛집 TOP 4 (식신, 2026-02)", u:"https://www.siksinhot.com/theme/magazine/10466"},
+  s45:{t:"괴산군 로컬 맛 TOP 6 (식신, 2026-02)", u:"https://www.siksinhot.com/theme/magazine/10467"},
+  s46:{t:"즐거운날 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=GOawZcWKFRFF"},
+  s47:{t:"알콩달콩 까망염소 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=BuGiHemk2JUJ"},
+  s48:{t:"영호소머리국밥 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=Q30YKO473nFq"},
+  s49:{t:"괴산매운탕 (괴산군 문화관광)", u:"https://www.goesan.go.kr/tour/selectTourInfo.do?key=858&tourNo=742"},
+  s50:{t:"사나이짬뽕 (테이블링)", u:"https://www.tabling.co.kr/place/677cd7d866de5f069893781e"},
+  s51:{t:"괴산 현지인 추천 맛집 TOP 5 (식신, 2026-04)", u:"https://www.siksinhot.com/theme/magazine/14033"},
+  s52:{t:"털보왕돈까스 (식신 매장 정보)", u:"https://www.siksinhot.com/P/401288"},
+  s53:{t:"자연드림파크 공식 (2026-09-02 일부 식당 운영 중단 공지)", u:"https://naturaldreampark.co.kr/main.html"}
 };
 
 /* ---------- 장소 ----------
  dog: 1=두 마리 확인 완료, 2=추가 확인 필요, 3=동반 불가·조건 불충족 */
 var N = "<span class='need'>확인 필요</span>";
 var P = {
-  somong:{name:"스테이소몽 (몽몽 객실)", cat:"숙소", addr:"충북 괴산군 청천면 괴산로상신2길 52-9",
-    menu:"-", hours:"체크인 15:00 · 체크아웃 11:00", parking:"<span class='need'>확인 필요</span>",
-    dog:2, dogText:"소소·몽몽 객실만 동반 가능. 15kg 미만, 1마리당 1박 30,000원(현장 결제), 최대 3마리, 맹견·공격성 강한 개 불가, 사전 문의·상담 필수. → 두 마리가 15kg 미만이면 규정상 가능하지만 아직 숙소 확인 전.",
-    inout:"독채 · 객실별 잔디마당", reserve:"예약 플랫폼 또는 공식 홈페이지. 반려견 동반은 예약 전 문의 필수 규정. 숯·가스버너·장작 반입 사용 불가, 전기그릴 1회 30,000원(입실 후 22시 전).",
-    price:"몽몽 객실 플랫폼 표기 139,000원~ (날짜·인원별 상이, 이번 일정 금액 미확인)", src:["s1","s2","s3"]},
+  somong:{name:"스테이소몽 (소몽 객실)", cat:"숙소", addr:"충북 괴산군 청천면 괴산로상신2길 52-9",
+    menu:"-", hours:"체크인 15:00 · 체크아웃 11:00", parking:N,
+    dog:2, dogText:"네이버 객실 정보에 '소몽(애견동반가능/수영장이용불가)'로 표기. 숙소 공통 반려견 규정은 15kg 미만, 1마리당 1박 30,000원(현장 결제), 최대 3마리, 맹견 불가, 사전 문의 필수 (예약 사이트 기준).",
+    inout:"독채 · 침실 2 · 욕실 2 · 소몽은 수영장 이용 불가", reserve:"기준 2인 · 최대 8인 (네이버). 숯·가스버너·장작 반입 사용 불가, 전기그릴 1회 30,000원(입실 후 22시 전). 문의 010-4668-7424(공식 홈페이지 기재).",
+    price:"소몽 객실 네이버 표기 119,000 ~ 499,000원 (날짜·인원별 상이, 이번 일정 금액은 예약 내역 확인)", src:["s41","s1","s2","s3"]},
   forest:{name:"숲, Camp&Cafe", cat:"카페", area:"청천면 (숙소와 같은 면)", phone:"0507-1344-8029 / 043-834-5556", open:["o","o","o"], openNote:"화요일 정기휴무 → 금·토·일 영업 (출처 기준)", addr:"충북 괴산군 청천면 금평로 18",
     menu:"아메리카노 3,500원 · 숲 라떼 5,000원 · 천사 자몽에이드 6,000원", hours:"수~일 10:00–19:00 · 화요일 정기휴무 (월요일 영업 여부는 확인 필요)",
     parking:"주차장 넓다는 후기 있음", dog:2, dogText:"반려동물 동반 가능·대형견 가능·목줄 착용·실내 이용 가능으로 소개. 두 마리 동시 입장 조건은 명시 없음.",
@@ -500,15 +531,43 @@ var P = {
     addr:"충북 괴산군 칠성면 자연드림길 240 C동 3층",
     menu:"간짜장 · 탕수육 · 해물짬뽕", hours:"11:00–21:00 (브레이크 15:00–16:00) · 휴무일 모름", parking:"자연드림파크 주차장 (요금 모름)",
     dog:2, dogText:"반려견 동반 정보 없음. 복합시설 3층이라 반려견 동반은 어려울 수 있음(추정, 확인 필요).", inout:"실내", reserve:"자연드림파크 단지 안 식당.", price:"해물짬뽕 15,000원 (다이닝코드 기준)", src:["s29","s30"]},
-  sonjja:{name:"괴산손짜장 (현 홍가네 중화요리?)", cat:"중식", area:"괴산읍", phone:"043-832-6868", open:["?","?","?"], openNote:"주중 영업시간만 있음, 주말·상호 변경 여부 모름",
+  sonjja:{name:"홍가네 중화요리 (구 괴산손짜장)", cat:"중식", area:"괴산읍", phone:"043-832-6868", open:["?","?","?"], openNote:"주중 영업시간만 있음, 주말 영업 여부 모름",
     addr:"충북 괴산군 괴산읍 읍내로18길 19-1",
-    menu:"짬뽕 (홍합·게 들어간 얼큰한 국물 후기)", hours:"주중 10:00–21:00 · 주말 모름", parking:"주차 공간 넉넉하지 않음 (후기)",
-    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"'홍가네'로 상호가 바뀌었다는 후기 있음.", price:N, src:["s31"]},
+    menu:"수타 간짜장 · 짬뽕 · 탕수육", hours:"주중 10:00–21:00 · 주말 모름", parking:"주차 공간 넉넉하지 않음 (후기)",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"괴산손짜장 자리에 홍가네가 들어섰다는 정보. 지도 검색은 '홍가네 괴산'으로.", price:N, src:["s51","s31"]},
+  sanai:{name:"사나이짬뽕", cat:"중식", area:"청천면 (숙소와 같은 면)", phone:"043-832-0066", open:["o","o","o"], openNote:"테이블링 기준 화~일 11:00–19:00, 월은 점심만 → 금·토·일 영업",
+    addr:"충북 괴산군 청천면 송문로덕평길 26",
+    menu:"사나이해물짬뽕 · 짬뽕밥", hours:"화~일 11:00–19:00 (브레이크 14:00–16:30) · 월 11:00–14:00 (출처에 따라 마감 19:30)", parking:"주차 가능",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"예약 가능으로 표기. 브레이크타임(14:00–16:30) 주의.", price:"사나이짬뽕밥 13,000원 (다른 메뉴 가격 모름)", src:["s45","s50"]},
   surawon:{name:"수라원", cat:"중식", area:"문광면 (은행나무길 근처)", phone:"", open:["o","o","o"], openNote:"블로그 소개에 '연중무휴'로 표기",
     addr:"충북 괴산군 문광면 신기리",
     menu:"짬뽕 전문 중화요리", hours:"08:30–20:00 · 연중무휴 (블로그 기준)", parking:"넓은 주차장 · 단체석 있음 (블로그 기준)",
     dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"도로명 주소·전화번호 모름. 문광저수지와 같은 문광면이라 2일차 대안으로 좋음.", price:N, src:["s32"]},
 
+  jeulgeoun:{name:"즐거운날", cat:"한식", area:"괴산읍", phone:"0507-1477-1194 / 043-833-1193", open:["?","?","?"], openNote:"영업시간만 있고 휴무일 정보 없음",
+    addr:"충북 괴산군 괴산읍 읍내로2길 33",
+    menu:"새뱅이(민물새우)전골 · 황태구이 · 정식", hours:"10:00–20:00 · 휴무일 모름", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"반찬이 푸짐한 정식·찌개집으로 소개. 6명이면 전골 대 + 정식 조합 추천.", price:"새뱅이전골 소 25,000 · 중 35,000 · 대 43,000원 · 황태구이정식 13,000원", src:["s42","s46"]},
+  alkong:{name:"알콩달콩 까망염소", cat:"한식", area:"괴산읍", phone:"043-832-6001", open:["o","o","o"], openNote:"월요일 휴무 → 금·토·일 영업 (식신 기준)",
+    addr:"충북 괴산군 괴산읍 괴강로 211 1층",
+    menu:"염소탕 · 염소전골 · 수육 · 구이", hours:"월요일 휴무 · 브레이크타임 있음 (시간 모름)", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"보양식 전문점. 호불호 있는 메뉴라 일행 의견 먼저.", price:"염소탕 16,000 · 특 22,000 · 염소전골 26,000원", src:["s42","s47"]},
+  cheongi:{name:"청이랑콩이랑", cat:"한식", area:"괴산읍", phone:"", open:["o","x","o"], openNote:"토요일 정기휴무 (두 출처 공통)",
+    addr:"충북 괴산군 괴산읍 읍내로6길 27",
+    menu:"능이 두부전골 (2인부터)", hours:"11:00–14:30 또는 11:00–20:00(브레이크 15–17시) · 토요일 휴무", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"점심 피크 혼잡, 전화·예약 권장 (번호 모름 → 지도 앱 확인). 토요일 휴무 주의.", price:"능이 두부전골 1인 15,000~17,000원 (출처마다 다름)", src:["s43"]},
+  yeongho:{name:"영호소머리국밥", cat:"한식", area:"괴산읍", phone:"043-834-7161", open:["?","?","?"], openNote:"영업시간·휴무 정보 없음",
+    addr:"충북 괴산군 괴산읍 괴강로 142",
+    menu:"한우 소머리국밥", hours:"모름 (점심 피크엔 자리 금방 참)", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"이른 점심 방문 권장 (식신).", price:"소머리국밥 14,000 · 특 19,000원", src:["s43","s48"]},
+  ducheon:{name:"두천매운탕", cat:"한식", area:"칠성면 (괴강 쪽)", phone:"043-832-3210", open:["?","?","?"], openNote:"영업시간만 있고 휴무일 정보 없음",
+    addr:"충북 괴산군 칠성면 괴강로 308",
+    menu:"민물매운탕 · 지리탕 · 메기구이 · 철갑상어회", hours:"10:30–21:00 · 휴무일 모름", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"철갑상어회는 예약 권장. 가격은 구성별로 달라 전화 문의.", price:"전화 문의 (공개 가격 없음)", src:["s45"]},
+  gsmaeun:{name:"괴산매운탕", cat:"한식", area:"괴산읍 (괴강 쪽)", phone:"043-832-2838", open:["o","o","o"], openNote:"셋째 주 월요일 휴무 → 금·토·일 영업 (식신 기준)",
+    addr:"충북 괴산군 괴산읍 괴강로 248",
+    menu:"메기·빠가사리·쏘가리 매운탕 · 닭도리탕", hours:"09:00–20:30 (테이블링은 주말 10:00–20:00) · 셋째 주 월요일 휴무", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"괴산군 관광 안내에도 등록된 집.", price:"매운탕 시가 · 닭도리탕 소 60,000원", src:["s45","s49"]},
   misoya:{name:"미소야 괴산점", cat:"일식", area:"괴산읍", phone:"043-834-7789", open:["?","?","?"], openNote:"휴무일 정보 없음",
     addr:"충북 괴산군 괴산읍 읍내로2길 56",
     menu:"일식 돈카츠 · 덮밥 (프랜차이즈)", hours:"11:30–19:22로 표기 (출처 표기 그대로, 확인 필요) · 휴무일 모름", parking:N,
@@ -527,10 +586,10 @@ var P = {
     addr:"충북 괴산군 문광면 양곡리 476-2",
     menu:"브런치 · 유럽 가정식 · 피자 · 돈가스", hours:"모름", parking:N,
     dog:2, dogText:"반려견 동반 정보 없음.", inout:N, reserve:"문광저수지와 같은 양곡리. 은행나무길 산책 전후 후보.", price:"마르게리따 피자 17,000원 · 산책 수제돈가스 13,000원 (다이닝코드 기준)", src:["s37"]},
-  teolbo:{name:"털보왕돈까스", cat:"양식", area:"괴산읍", phone:"", open:["o","o","o"], openNote:"한 출처 기준 수요일 휴무 → 금·토·일 영업 (다른 출처는 시간만 다르게 표기)",
+  teolbo:{name:"털보왕돈까스", cat:"양식", area:"괴산읍", phone:"0507-1375-7207", open:["o","o","o"], openNote:"한 출처 기준 수요일 휴무 → 금·토·일 영업 (다른 출처는 시간만 다르게 표기)",
     addr:"충북 괴산군 괴산읍 읍내로2길 45-1",
-    menu:"왕돈까스 · 수제비 · 덮밥", hours:"11:00–20:00 · 수요일 휴무 (다른 출처 10:50–18:46)", parking:N,
-    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"여러 메뉴 나눠 먹기 좋다는 소개.", price:N, src:["s34","s24"]},
+    menu:"수제 왕돈까스 · 오징어·제육·김치덮밥", hours:"11:00–20:00 · 수요일 휴무 (여러 자료 공통, 시간은 출처마다 다름)", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"주소가 읍내로13길 26으로 적힌 자료도 있음. 전화 0507-1375-7207(식신 기재).", price:"왕돈까스 10,000원 · 덮밥 8,000~9,000원 (2026년 식신 기준)", src:["s44","s52","s34"]},
   pizzatour:{name:"피자투어 괴산점", cat:"양식", area:"괴산읍", phone:"", open:["?","?","?"], openNote:"영업시간만 있고 휴무일 정보 없음",
     addr:"충북 괴산군 괴산읍 읍내로4길 6-8",
     menu:"피자", hours:"11:00–22:00 · 휴무일 모름", parking:N,
@@ -540,9 +599,9 @@ var P = {
     menu:"파스타 · 베이커리", hours:"09:30–19:00 · 휴무일 모름", parking:"주차 공간 넓다는 후기",
     dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"카페청안과 같은 청안면.", price:N, src:["s39"]},
 
-  mwohanong:{name:"뭐하농하우스", cat:"카페", area:"감물면", phone:"043-760-7121", open:["o","o","o"], openNote:"월요일 휴무 → 금·토·일 영업 (출처 기준)",
+  mwohanong:{name:"뭐하농하우스", cat:"카페", area:"감물면", phone:"043-760-7121", open:["?","o","o"], openNote:"다이닝코드에 '주말(토·일) 11–18시만 영업' 표기, 다른 출처는 화~일 → 금요일은 모름, 토·일은 영업",
     addr:"충북 괴산군 감물면 충민로 694-5",
-    menu:"카페·디저트 (양식 메뉴도 소개됨)", hours:"화~일 11:00–18:00 또는 19:00 (출처마다 다름) · 월요일 휴무",
+    menu:"카페·디저트 (양식 메뉴도 소개됨)", hours:"주말(토·일) 11:00–18:00만 영업이라는 정보와 화~일 영업 정보가 섞여 있음",
     parking:N, dog:2, dogText:"'애견카페가 아닌 애견동반 가능 카페'로 소개. 마릿수·크기·실내 가능 여부는 미확인.",
     inout:N, reserve:"3일차(일) 체크아웃 후 마지막 코스.", price:N, src:["s12","s13"]},
   cheongan:{name:"카페청안", cat:"카페", area:"청안면", phone:"070-8861-7004", open:["o","o","o"], openNote:"연중무휴 (정보 기준일 2026-08-16)",
@@ -563,25 +622,52 @@ var P = {
     inout:"야외", reserve:"일정이 겹치지 않아 제외. 참고용.", price:"-", src:["s18"]}
 };
 
-/* ---------- 일정 ---------- */
-var DAYS = [
-  {d:"10/30", w:"금", title:"1일차 · 각자 도착, 청천에서 모이기", stops:[
-    {t:"13:30", p:"forest", stay:"1시간~1시간 30분", why:"각자 다른 곳(천안·인천·진해)에서 오니, 반려견과 같이 기다릴 수 있는 카페를 집결지로. 대형견까지 동반 가능하다고 소개된 몇 안 되는 곳.", cost:"음료 6잔 약 21,000~36,000원(추정) · 테라스 대여 시 1시간 10,000원", note:"금요일 영업(화요일 휴무). 두 마리 동시 입장 가능한지 전화로 먼저 확인. 먼저 온 사람이 테라스 잡기."},
-    {t:"15:00", p:"somong", stay:"체크인 후 휴식", why:"독채 + 객실별 잔디마당이라 반려견이 다른 손님과 부딪힐 일이 적음.", cost:"숙박비(예약 금액) + 반려견 2마리 × 30,000원 × 2박 = 120,000원(플랫폼 표기 기준, 현장 결제)", note:"체크인 때 반려견 추가요금 현장 결제. 바비큐 전기그릴 이용 시간(22시 전) 미리 말해두기."},
-    {t:"16:00", p:"mart", stay:"30분 내외", why:"첫날 저녁 바비큐 장보기. 숙소에서 가장 가까운 청천면 소재지 쪽.", cost:"<span class='need'>확인 필요</span> (식비 항목에 입력)", note:"영업시간 미확인. 고기는 출발 전 각자 사 오는 것도 방법. 반려견은 숙소에 두지 말고 1~2명만 다녀오기(숙소 규정상 반려견 단독 두기 가능 여부 미확인)."},
-    {t:"18:00", p:"somong", stay:"저녁 내내", why:"반려견 동반 식사를 가장 확실하게 해결하는 방법.", cost:"전기그릴 30,000원(1회)", note:"개인 숯·가스버너·장작·조개탄 사용 불가. 전기그릴만 가능."}
-  ]},
-  {d:"10/31", w:"토", title:"2일차 · 은행나무길과 산막이옛길", stops:[
-    {t:"10:00", p:"mungwang", stay:"1시간 30분", why:"여러 매체가 10월 하순~11월 초를 은행나무 절정으로 꼽는 곳. 평지 2km 호숫가 길이라 반려견 산책에도 무리 없는 지형.", cost:"입장·주차 무료", note:"토요일이라 혼잡 예상 → 10시 전 도착. 반려견 출입 규정은 공식 확인 안 됨(괴산군청 043-830-2522). 2026년 단풍 상황은 출발 직전 확인."},
-    {t:"12:00", p:"sejamae", stay:"1시간", why:"이번 조사에서 반려견 동반 조건이 명시된 유일한 식당. 산막이옛길 주차장 바로 뒤라 점심 먹고 그대로 산책 시작.", cost:"버섯전골(중) 50,000원 기준, 6명이면 2~3개 주문 예상 (후기 가격·인분 미확인)", note:"소형견(10kg 미만)·가방/캐리어 필수 조건. 캐리어 챙겨 가기. 조건이 안 맞으면 대안: 괴산읍 주차장식당(올갱이국 12,000원, 043-832-2673) 포장."},
-    {t:"13:00", p:"sanmak", stay:"2시간~2시간 30분", why:"호숫가 숲길·데크길 산책 코스. 입장 무료.", cost:"주차 3,000원(중소형 1대, 점심 때 이미 주차했으면 추가 없음) · 유람선 5,000~8,000원(운항·반려견 탑승 미확인)", note:"반려견 동반 규정 미확인 → 관리사무소(043-832-3527)에 미리 전화. 주말 인파 많으니 목줄 짧게. 유람선은 운항 재개 여부부터 확인."},
-    {t:"17:00", p:"somong", stay:"마지막 밤", why:"마지막 밤 바비큐. 반려견과 같이 저녁 먹기 가장 편한 방법.", cost:"전기그릴 30,000원(1회)", note:"돌아오는 길에 장보기. 피자 포장(피자투어 괴산점, 14,000~19,000원대)을 곁들이는 것도 방법. 다음날 11시 체크아웃이니 설거지·분리수거는 밤에 미리."}
-  ]},
-  {d:"11/1", w:"일", title:"3일차 · 체크아웃 후 브런치, 해산", stops:[
-    {t:"09:00", p:"somong", stay:"2시간", why:"짐 정리하고 반려견은 잔디마당에서 마지막 산책.", cost:"-", note:"체크아웃 11:00. 반려견 털 정리(테이프 클리너) 해두기."},
-    {t:"11:30", p:"mwohanong", stay:"1시간 30분", why:"일요일 영업(월요일 휴무) 애견동반 가능 카페로 소개됨. 양식 메뉴도 있어 브런치 겸 마지막 식사.", cost:"<span class='need'>확인 필요</span>", note:"마릿수·실내 동반 가능 여부 전화 확인(043-760-7121). 대안: 카페청안(야외석 반려견 가능, 매일 08–20시) 또는 카페 피오리토(야외 정원·루프탑 반려견 가능, 연풍면)."},
-    {t:"13:00", p:null, place:"해산 · 각자 귀가", addr:"천안 · 인천 · 진해 방향", stay:"-", why:"출발지가 달라 여기서 해산.", cost:"유류비·통행료는 차량별", note:"장거리(인천·진해)는 휴게소에서 반려견 산책 시간 넉넉히."}
-  ]}
+/* ---------- 최근 2년 내 흔적 ---------- */
+// 2024-10 이후 날짜가 확인된 소개글·데이터가 있는 곳만 기록. 없으면 '최근 흔적 확인 못 함'.
+var VER = {
+  sejamae:"펫온 등록 정보 2026-02 갱신", jucha:"관광공사 데이터 기준일 2026-08-16 · 2026년 식신 소개", seoul:"2026-04 식신 소개(가격 12,000원)",
+  jeulgeoun:"2026-06 식신 추천", alkong:"2026-06 식신 추천", cheongi:"2026년 식신 추천", yeongho:"2026년 식신 추천",
+  ducheon:"2026-01·02 식신 소개", gsmaeun:"2026-02 식신 소개 · 괴산군 관광 안내 등록", sanai:"2026년 식신 소개",
+  sonjja:"2026년 식신 소개(홍가네)", misoya:"카드 매출 데이터 2026-06 갱신", teolbo:"2026-02·04 식신 소개",
+  pizzatour:"2025-10 기준 영업 정보", mwohanong:"2025년 방문 후기", cheongan:"관광공사 데이터 기준일 2026-08-16"
+};
+var VNOTE = {
+  songmyeon:"찾은 후기가 약 3년 전", gwejja:"자연드림파크가 2026-09-02에 '일부 식당 운영 중단'을 공지 — 괴짜루 해당 여부 모름",
+  surawon:"다이닝코드엔 오리주물럭·한식뷔페로 분류돼 업종도 불확실", forest:"2024-10 이후 날짜가 있는 후기를 못 찾음",
+  fiorito:"'신상 카페' 후기만 있고 날짜 확인 안 됨"
+};
+Object.keys(P).forEach(function(k){ P[k].ver=VER[k]||""; P[k].vnote=VNOTE[k]||""; });
+
+/* ---------- 추천 ---------- */
+// g: dog=반려견과 함께 가기 좋음, food=먹기, walk=걷기·구경, rest=쉬기
+var RECS = [
+  {title:"은행나무길 따라 호숫가 산책", tag:"걷기·구경", g:["walk","dog"], p:"mungwang",
+    why:"여러 매체가 10월 하순~11월 초를 은행나무 절정으로 꼽는 곳이라 여행 시기와 딱 맞아. 2km 정도 평지 호숫가 길이라 반려견이랑 걷기 무난한 지형이야.",
+    cost:"입장·주차 무료", tip:"주말에는 오전 일찍 가야 덜 붐벼. 올해 단풍 상태는 출발 직전에 확인.", near:["jeulgeoun","yeongho"]},
+  {title:"산막이옛길 걷고 버섯전골 먹기", tag:"걷기·먹기", g:["walk","food","dog"], p:"sanmak",
+    why:"호숫가 숲길·데크길 산책 코스인데, 바로 옆 '산막이 세자매'가 이번 조사에서 반려견 조건(소형견·캐리어)이 적힌 유일한 식당이야. 밥 먹고 바로 걷기 좋은 조합.",
+    cost:"입장 무료 · 주차 3,000원 · 버섯전골(중) 50,000원(후기)", tip:"산막이옛길 반려견 규정은 확인 못 했어(043-832-3527). 세자매는 캐리어 필수라 챙겨 가기.", near:["sejamae","ducheon"]},
+  {title:"숙소에서 바비큐 저녁", tag:"먹기·쉬기", g:["food","rest","dog"], p:"somong",
+    why:"반려견이랑 같이 저녁 먹는 가장 확실한 방법. 6명이 편하게 오래 앉아 있기도 좋아.",
+    cost:"전기그릴 1회 30,000원 + 장보기", tip:"숯·가스버너·장작 사용 불가, 전기그릴만 돼(22시 전). 소몽은 수영장 이용 불가 객실이야.", near:["mart","pizzatour"]},
+  {title:"애견동반 카페에서 쉬어가기", tag:"쉬기", g:["rest","dog"], p:"cheongan",
+    why:"야외 테이블에서 반려견 동반이 된다고 안내된 통창 논밭뷰 카페. 관광공사 데이터(2026-08) 기준 매일 08–20시 영업이라 헛걸음할 가능성이 낮은 편이야.",
+    cost:"가격 모름", tip:"반려견은 야외석만. 10월 말이라 겉옷 챙기기. 숙소(청천면)와 거리가 있으니 길찾기로 시간 확인.", near:["mwohanong"]},
+  {title:"괴산읍에서 든든한 한식 한 상", tag:"먹기", g:["food"], p:"jeulgeoun",
+    why:"2026년 맛집 소개글에 꾸준히 나온 집들. 새뱅이(민물새우)전골은 괴산다운 메뉴라 6명이 나눠 먹기 좋아.", 
+    cost:"새뱅이전골 대 43,000원 · 정식 13,000원~", tip:"반려견 동반 정보 없음 → 포장 또는 교대 식사. 청이랑콩이랑은 토요일 휴무.", near:["cheongi","yeongho","alkong"]},
+  {title:"괴산 올갱이국 한 그릇", tag:"먹기", g:["food"], p:"jucha",
+    why:"괴산 대표 향토 음식. 괴산읍에 올갱이국 집이 모여 있어.",
+    cost:"1인 12,000원 안팎 (후기·기사 기준)", tip:"반려견 동반 정보가 없어서 포장하거나, 반려견 담당 1~2명은 밖에서 교대로 먹는 방식 추천.", near:["seoul"]},
+  {title:"숙소 근처에서 짬뽕 한 그릇", tag:"먹기", g:["food"], p:"sanai",
+    why:"숙소와 같은 청천면에 있고 2026년 소개글에도 나온 짬뽕집. 멀리 나가기 싫은 날 가까운 선택지야.",
+    cost:"사나이짬뽕밥 13,000원", tip:"브레이크타임 14:00–16:30, 월요일은 점심만. 숙소로 포장해 오는 것도 방법.", near:["sonjja"]},
+  {title:"비 오거나 늘어지고 싶은 날", tag:"쉬기", g:["rest","dog"], p:"pizzatour",
+    why:"무리해서 나가지 말고 피자 포장해서 숙소에서 쉬는 날로. 반려견도 편해.",
+    cost:"피자 14,000~19,000원대", tip:"휴무일 정보 없음 → 전화 확인.", near:["teolbo","misoya"]},
+  {title:"반려견 없이 갈 사람만: 화양구곡 단풍", tag:"걷기·구경", g:["walk"], p:"hwayang",
+    why:"괴산 대표 계곡 단풍 명소지만 국립공원이라 반려견은 못 들어가. 6명이니 반려견 볼 사람과 구경 갈 사람을 나눠 다녀오는 방법이 있어.",
+    cost:"모름", tip:"반려견 시범 허용 구간은 북한산·계룡산·가야산뿐이라 속리산(화양구곡)은 해당 없음.", near:["shimteo"]}
 ];
 
 /* ---------- 예산 ---------- */
@@ -592,19 +678,20 @@ var BUDGET = [
   {id:"ticket",name:"관광지 입장료", amt:0, st:"확인됨", note:"산막이옛길·문광저수지 입장 무료(검색 확인). 유람선 탈 경우 1인 5,000~8,000원 별도."},
   {id:"fuel",  name:"유류비", amt:0, st:"미정", note:"출발지(천안·인천·진해)와 차량 대수에 따라 다름."},
   {id:"park",  name:"주차비", amt:3000, st:"확인됨", note:"산막이옛길 중소형 3,000원 × 1대 기준. 차량 대수만큼 고쳐줘. 문광저수지 무료."},
-  {id:"dog",   name:"반려견 추가 비용", amt:120000, st:"예상", note:"30,000원 × 2마리 × 2박 (플랫폼 표기 기준, 숙소 확인 전이라 '예상')."},
+  {id:"dog",   name:"반려견 추가 비용", amt:120000, st:"예상", note:"30,000원 × 2마리 × 2박 (예약 사이트 표기 기준, 숙소 확인 전이라 '예상')."},
   {id:"etc",   name:"기타 비용", amt:60000, st:"예상", note:"숙소 전기그릴 30,000원 × 2회(금·토 저녁) 기준."}
 ];
 
 /* ---------- 체크리스트 ---------- */
 var CHECK = [
   {g:"예약", items:[
-    ["c1","숙소(스테이소몽 몽몽 객실) 예약 확정 · 금액 확인"],
-    ["c2","숙소에 반려견 2마리 동반 사전 문의 (규정상 필수)"],
+    ["c1","숙소(스테이소몽 소몽 객실) 예약 확정 · 금액 확인"],
+    ["c2","숙소에 반려견 2마리 동반 사전 문의 (규정상 필수 · 010-4668-7424)"],
+    ["c11","가기 전에 식당 영업 여부 네이버 지도에서 한 번 더 확인"],
     ["c3","두 마리 체중 15kg 미만인지 확인 (숙소 기준)"],
     ["c4","전기그릴 이용 신청 (1회 30,000원, 22시 전)"],
     ["c5","식당 예약 확인 · 6명 자리 / 반려견 동반 가능 여부 전화"],
-    ["c6","숲, Camp&Cafe 두 마리 입장·테라스 대여 문의"],
+    ["c6","카페청안(야외석)·뭐하농하우스 반려견 동반 조건 문의"],
     ["c10","산막이 세자매(0507-1349-5714) 반려견 2마리·6명 자리 확인"],
     ["c7","산막이옛길 반려견 동반 가능 여부 · 유람선 운항 확인 (043-832-3527)"],
     ["c8","출발 직전 문광저수지 단풍 상황 확인"],
@@ -685,46 +772,37 @@ $("#menu").addEventListener("click",function(e){
 });
 window.addEventListener("hashchange",function(){showPanel(location.hash.slice(1),false)});
 
-/* ---------- 일정 ---------- */
-var curDay=0;
-function renderDayTabs(){
-  $("#daytabs").innerHTML=DAYS.map(function(d,i){
-    return '<button role="tab" type="button" data-day="'+i+'" aria-selected="'+(i===curDay)+'"><b>'+d.d+' ('+d.w+')</b><span>'+(i+1)+'일차</span></button>';
-  }).join("");
+/* ---------- 추천 ---------- */
+function recCard(r){
+  var p=P[r.p], base=P.somong;
+  var near=(r.near||[]).filter(function(k){return P[k]}).map(function(k){return '<button type="button" data-goshop="'+k+'">'+esc(P[k].name)+'</button>'}).join(" · ");
+  var route = p===base ? '' : '<a class="btn primary" href="'+kakaoRoute(q(base),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기</a>';
+  return '<div class="card rec">'+
+    '<span class="badge b-tag tag">'+esc(r.tag)+'</span>'+
+    '<h3>'+esc(r.title)+'</h3>'+
+    '<div class="muted">'+esc(p.name)+' · '+esc(p.area||p.addr)+'</div>'+
+    '<p style="margin:0">'+esc(r.why)+'</p>'+
+    '<dl class="kv" style="margin:2px 0">'+
+      '<dt>비용</dt><dd>'+esc(r.cost)+'</dd>'+
+      '<dt>반려견</dt><dd>'+dogBadge(p.dog)+'</dd>'+
+      '<dt>팁</dt><dd>'+esc(r.tip)+'</dd>'+
+    '</dl>'+
+    (near?'<div class="alts"><span class="muted">근처·대안: </span>'+near+'</div>':'')+
+    '<div class="btns" style="margin-top:2px">'+route+mapBtns(p)+'</div>'+
+  '</div>';
 }
-function stopInfo(s){
-  if(s.p){var p=P[s.p];return {name:p.name,addr:p.addr,dog:p.dog,dogText:p.dogText,src:p.src,obj:p}}
-  return {name:s.place,addr:s.addr,dog:0,dogText:"-",src:[],obj:null};
+function renderRecs(f){
+  $("#recList").innerHTML=RECS.filter(function(r){return f==="all"||r.g.indexOf(f)>=0}).map(recCard).join("");
 }
-function renderDay(){
-  var d=DAYS[curDay];
-  var names=d.stops.map(function(s){return stopInfo(s).name});
-  $("#dayroute").innerHTML='<b>'+esc(d.title)+'</b><ol>'+d.stops.map(function(s,i){return '<li>'+s.t+' · '+esc(names[i])+'</li>'}).join("")+'</ol>';
-  $("#daylist").innerHTML=d.stops.map(function(s,i){
-    var info=stopInfo(s), nxt=d.stops[i+1], nInfo=nxt?stopInfo(nxt):null;
-    var move="";
-    if(nInfo && nInfo.obj && info.obj){
-      if(nInfo.addr===info.addr){ move='<div class="move">↓ 다음 장소: 같은 장소</div>'; }
-      else move='<div class="move">↓ 다음 장소까지 이동 시간: <span class="need">미측정</span> · <a href="'+kakaoRoute(q(info.obj),q(nInfo.obj))+'" target="_blank" rel="noopener">카카오맵 길찾기로 확인</a></div>';
-    }
-    var dogRow = info.obj ? dogBadge(info.dog)+'<div class="muted" style="margin-top:4px">'+esc(info.dogText)+'</div>' : '-';
-    var btns = info.obj ? '<div class="btns">'+mapBtns(info.obj)+'</div>' : '';
-    return '<div class="stop"><div class="card">'+
-      '<div class="time">'+s.t+'</div><h3>'+esc(info.name)+'</h3>'+
-      '<dl class="kv">'+
-        '<dt>주소</dt><dd>'+esc(info.addr)+'</dd>'+
-        '<dt>체류 시간</dt><dd>'+esc(s.stay)+' (예상)</dd>'+
-        '<dt>추천 이유</dt><dd>'+esc(s.why)+'</dd>'+
-        '<dt>예상 비용</dt><dd>'+s.cost+'</dd>'+
-        '<dt>반려견</dt><dd>'+dogRow+'</dd>'+
-        '<dt>주의사항</dt><dd>'+esc(s.note)+'</dd>'+
-      '</dl>'+btns+(info.src.length?srcHtml(info.src):'')+
-    '</div></div>'+move;
-  }).join("");
-}
-$("#daytabs").addEventListener("click",function(e){
-  var b=e.target.closest("button[data-day]"); if(!b) return;
-  curDay=+b.getAttribute("data-day"); renderDayTabs(); renderDay();
+// 근처·대안 가게 이름을 누르면 맛집 탭의 그 가게를 펼쳐서 보여줌
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-goshop]"); if(!b) return;
+  var k=b.getAttribute("data-goshop");
+  if(FOOD_KEYS.indexOf(k)<0){ showPanel(P[k].cat==="장보기"?"map":"spot",true); window.scrollTo({top:$("nav.menu").offsetTop,behavior:"smooth"}); return; }
+  $$("#foodFilter button").forEach(function(x){x.setAttribute("aria-pressed",x.getAttribute("data-f")==="all"?"true":"false")});
+  if(!P[k].ver) showAll=true;
+  renderFood("all"); showPanel("food",true);
+  var d=$('#foodList details[data-k="'+k+'"]'); if(d){ d.open=true; d.scrollIntoView({block:"start",behavior:"smooth"}); }
 });
 
 /* ---------- 장소 카드 ---------- */
@@ -743,7 +821,8 @@ function placeCard(p){
       '<dt>예약 안내</dt><dd>'+esc(p.reserve)+'</dd>'+
     '</dl><div class="btns">'+mapBtns(p)+'</div>'+srcHtml(p.src)+'</div>';
 }
-var FOOD_KEYS=["sejamae","jucha","seoul","gisa","mat","cheongol","jungang","urihansik","songmyeon","daeil","gwejja","sonjja","surawon","misoya","gorae","fiorito","sanchaek","teolbo","pizzatour","haedeum","forest","mwohanong","cheongan","shimteo"];
+var FOOD_KEYS=["sejamae","jucha","seoul","jeulgeoun","alkong","cheongi","yeongho","ducheon","gsmaeun","gisa","mat","cheongol","jungang","urihansik","sanai","sonjja","songmyeon","daeil","gwejja","surawon","misoya","gorae","teolbo","pizzatour","fiorito","sanchaek","haedeum","mwohanong","cheongan","forest","shimteo"];
+var showAll=false, curFoodFilter="all";
 var DAYNAMES=["금","토","일"];
 function openChips(p){
   return '<span class="days" aria-label="여행 날짜 영업 여부">'+(p.open||["?","?","?"]).map(function(v,i){
@@ -756,10 +835,11 @@ function shopItem(k){
   var p=P[k], base=P.somong;
   var phone = p.phone ? p.phone.split(" / ").map(function(n){return esc(n)+' <button class="btn" type="button" data-copy="'+esc(n)+'" data-what="번호">번호 복사</button>'}).join(" ") : "모름";
   return '<details class="shop" data-k="'+k+'"><summary>'+
-      '<span class="nm">'+esc(p.name)+'<small>'+esc(p.cat)+' · '+esc(p.area||"")+'</small></span>'+
+      '<span class="nm">'+esc(p.name)+'<small>'+esc(p.cat)+' · '+esc(p.area||"")+(p.ver?'':' · <span style="color:var(--no)">최근 흔적 확인 못 함</span>')+'</small></span>'+
       openChips(p)+'<span class="chev" aria-hidden="true">▼</span></summary>'+
     '<div class="body">'+
       '<div class="pricebox"><b>가격</b>'+p.price+'</div>'+
+      (p.ver?'<p class="muted" style="margin:6px 0 0">최근 2년 내 흔적: '+esc(p.ver)+'</p>':'<p style="margin:6px 0 0;color:var(--no);font-size:14px">최근 2년 내 흔적을 확인 못 함'+(p.vnote?' — '+esc(p.vnote):'')+'. 폐업했거나 정보가 바뀌었을 수 있어.</p>')+
       '<dl class="kv">'+
         '<dt>메뉴</dt><dd>'+p.menu+'</dd>'+
         '<dt>영업</dt><dd>'+p.hours+'<div class="muted">여행 날짜 판단 근거: '+esc(p.openNote||"정보 없음")+'</div></dd>'+
@@ -776,16 +856,22 @@ function shopItem(k){
     '</div></details>';
 }
 function renderFood(f){
-  var keys=FOOD_KEYS.filter(function(k){
+  if(f) curFoodFilter=f; f=curFoodFilter;
+  var base=FOOD_KEYS.filter(function(k){
     var p=P[k];
     if(f==="all") return true;
     if(f==="dogcond") return hasDogCond(p);
     if(f==="open3") return (p.open||[]).join("")==="ooo";
     return p.cat===f;
   });
-  $("#foodCount").textContent=keys.length+"곳";
-  $("#foodList").innerHTML=keys.map(shopItem).join("") || '<p class="muted">해당하는 가게가 없어.</p>';
+  var hidden=base.filter(function(k){return !P[k].ver}).length;
+  var keys=showAll?base:base.filter(function(k){return P[k].ver});
+  $("#foodAll").textContent=showAll?"최근 확인된 곳만 보기":"최근 흔적 확인 못 한 곳도 보기 ("+hidden+"곳)";
+  $("#foodAll").setAttribute("aria-pressed",showAll?"true":"false");
+  $("#foodCount").textContent=keys.length+"곳"+(showAll?" (최근 확인 못 한 곳 포함)":"");
+  $("#foodList").innerHTML=keys.map(shopItem).join("") || '<p class="muted">이 분류에서 최근 2년 내 흔적이 확인된 곳은 없어.'+(hidden?' 위 버튼으로 확인 못 한 곳까지 볼 수 있어.':'')+'</p>';
 }
+$("#foodAll").addEventListener("click",function(){ showAll=!showAll; renderFood(); });
 function renderSpot(){
   $("#spotGrid").innerHTML=["mungwang","sanmak","hwayang","gimjang"].map(function(k){
     var p=P[k];
@@ -810,20 +896,16 @@ function bindFilter(id,fn){
 }
 bindFilter("#foodFilter",renderFood);
 bindFilter("#dogFilter",renderDog);
+bindFilter("#recFilter",renderRecs);
 
 /* ---------- 지도 ---------- */
 function renderMapDays(){
-  $("#mapDays").innerHTML=DAYS.map(function(d){
-    var list=d.stops.filter(function(s){return s.p}).map(function(s){return P[s.p]});
-    // 연속 중복 제거 (같은 숙소 연속 방문)
-    var seq=list.filter(function(p,i){return i===0||p!==list[i-1]});
-    return '<div class="card"><h3>'+d.d+' ('+d.w+')</h3><ol style="margin:6px 0 0;padding-left:20px">'+
-      seq.map(function(p,i){
-        var nxt=seq[i+1];
-        return '<li style="margin-bottom:8px"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.addr)+'</div><div class="btns" style="margin-top:4px">'+mapBtns(p)+
-          (nxt?'<a class="btn" href="'+kakaoRoute(q(p),q(nxt))+'" target="_blank" rel="noopener">→ 다음 장소 길찾기</a>':'')+'</div></li>';
-      }).join("")+'</ol></div>';
-  }).join("");
+  var keys=["somong"]; RECS.forEach(function(r){ if(keys.indexOf(r.p)<0) keys.push(r.p); });
+  $("#mapDays").innerHTML='<div class="card"><ol style="margin:0;padding-left:20px">'+keys.map(function(k){
+    var p=P[k];
+    return '<li style="margin-bottom:10px"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.addr)+'</div><div class="btns" style="margin-top:4px">'+
+      (k!=="somong"?'<a class="btn" href="'+kakaoRoute(q(P.somong),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기</a>':'')+mapBtns(p)+'</div></li>';
+  }).join("")+'</ol></div>';
 }
 function syncRoute(){var a=$("#dFrom").value.trim(), b=$("#dTo").value.trim(); $("#dGo").href = (a&&b) ? kakaoRoute(a,b) : "#";}
 $("#dFrom").addEventListener("input",syncRoute); $("#dTo").addEventListener("input",syncRoute);
@@ -845,7 +927,7 @@ document.addEventListener("click",function(e){
 });
 
 /* ---------- 예산 ---------- */
-var BKEY="goesan_budget_v2";
+var BKEY="goesan_budget_v4";
 function loadBudget(){
   var saved=null; try{saved=JSON.parse(store(BKEY)||"null")}catch(e){}
   return BUDGET.map(function(r){
@@ -938,19 +1020,16 @@ $("#chkReset").addEventListener("click",function(){
 
 /* ---------- 단톡방 요약 ---------- */
 function shareText(){
-  var lines=["[괴산 스테이소몽 2박 3일] 10/30(금)–11/1(일) · 6명 + 반려견 2마리",""];
-  DAYS.forEach(function(d){
-    lines.push("■ "+d.d+"("+d.w+") "+d.title.replace(/^\d일차 · /,""));
-    d.stops.forEach(function(s){ lines.push("  "+s.t+" "+stopInfo(s).name); });
-  });
-  lines.push("","숙소: 충북 괴산군 청천면 괴산로상신2길 52-9 (체크인 15:00 / 체크아웃 11:00)");
-  lines.push("반려견: 숙소 15kg 미만·1박 1마리 3만원 / 산막이 세자매는 10kg 미만·캐리어 필수");
+  var lines=["[괴산 스테이소몽 2박 3일] 10/30(금)–11/1(일) · 6명 + 반려견 2마리","","■ 추천"];
+  RECS.forEach(function(r){ lines.push("- "+r.title+" ("+P[r.p].name+")"); });
+  lines.push("","숙소: 충북 괴산군 청천면 괴산로상신2길 52-9 (소몽 객실 · 체크인 15:00 / 체크아웃 11:00)");
+  lines.push("※ 소몽 객실: 애견동반 가능 · 수영장 이용 불가");
   return lines.join("\n");
 }
 $("#shareCopy").addEventListener("click",function(){
   var text=shareText();
-  function fb(){var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);toast(ok?"일정 요약을 복사했어":"복사 실패 — 다시 눌러줘");}
-  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast("일정 요약을 복사했어")},fb)} else fb();
+  function fb(){var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);toast(ok?"추천 요약을 복사했어":"복사 실패 — 다시 눌러줘");}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast("추천 요약을 복사했어")},fb)} else fb();
 });
 
 /* ---------- 출처 표 ---------- */
@@ -971,7 +1050,7 @@ $("#themeBtn").addEventListener("click",function(){
 });
 
 /* ---------- 시작 ---------- */
-renderDayTabs(); renderDay(); renderFood("all"); renderSpot(); renderDog("all"); renderMapDays();
+renderRecs("all"); renderFood("all"); renderSpot(); renderDog("all"); renderMapDays();
 renderBudgetRows(); calcBudget(); renderCheck();
 showPanel(location.hash.slice(1)||"home",false);
 })();
