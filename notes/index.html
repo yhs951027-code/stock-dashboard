@@ -186,6 +186,90 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
   .sheet{padding:18px 24px 0}
   .paper-lined.sheet{padding-left:60px}
 }
+
+/* ---------- 보기 전환 (메모 / 달력) ---------- */
+.views{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--card);border-radius:14px;padding:5px;box-shadow:var(--shadow)}
+.views button{min-height:48px;border:0;border-radius:10px;background:transparent;font-size:18px;font-weight:700;color:var(--sub)}
+.views button[aria-selected="true"]{background:var(--brand);color:var(--brand-ink)}
+
+/* ---------- 달력 ---------- */
+:root{--sun:#C4122F;--sat:#1B4FC4}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--sun:#FF7A8C;--sat:#7FA8FF} }
+:root[data-theme="dark"]{--sun:#FF7A8C;--sat:#7FA8FF}
+.calview{height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.cal-main,.cal-day{padding-inline:max(12px,calc(50% - 320px));display:flex;flex-direction:column;gap:12px}
+.cal-main{padding-top:calc(14px + env(safe-area-inset-top,0px))}
+.cal-day{padding-top:14px;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+.cal-main .top .gap{display:flex;gap:8px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cal-head h2{font-family:var(--f-num);font-size:24px;font-weight:700;flex:1;text-align:center}
+.cal-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cchip{min-height:44px;padding:6px 12px;border-radius:999px;border:2px solid var(--line);background:var(--card);font-size:16px;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.cchip i{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
+.cchip[aria-pressed="false"]{color:var(--sub);opacity:.6}
+.cchip[aria-pressed="false"] i{background:transparent;box-shadow:inset 0 0 0 2px var(--c)}
+.cchip[aria-checked="true"]{border-color:var(--c);background:color-mix(in srgb,var(--c) 16%,var(--card))}
+.cchip.manage{color:var(--sub);font-weight:500}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;touch-action:pan-y}
+.wd-h{padding:6px 0;text-align:center;font-size:14.5px;font-weight:700;color:var(--sub);border-bottom:1px solid var(--line)}
+.wd-h.sun{color:var(--sun)} .wd-h.sat{color:var(--sat)}
+.cell{min-height:78px;border:0;border-top:1px solid var(--line);border-left:1px solid var(--line);background:transparent;padding:3px 2px 4px;display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;min-width:0;overflow:hidden}
+.cell:nth-child(7n+1){border-left:0}
+.cell .dn{font-family:var(--f-num);font-size:15px;font-weight:600;align-self:center;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;flex:none}
+.cell.sun .dn{color:var(--sun)} .cell.sat .dn{color:var(--sat)}
+.cell.out{opacity:.4}
+.cell.today .dn{background:var(--brand);color:var(--brand-ink)}
+.cell[aria-selected="true"]{background:var(--soft);box-shadow:inset 0 0 0 2px var(--brand)}
+.tg{display:block;font-size:12.5px;line-height:1.35;padding:1px 2px 1px 3px;border-radius:4px;background:color-mix(in srgb,var(--c) 20%,transparent);border-left:3px solid var(--c);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:clip;letter-spacing:-.03em;font-weight:500}
+@media (min-width:600px){ .tg{text-overflow:ellipsis;letter-spacing:0} }
+.more{font-size:12px;color:var(--sub);text-align:center;font-weight:700}
+.cal-tip{font-size:14.5px;color:var(--sub);text-align:center}
+
+.day-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.day-h h2{font-family:var(--f-num);font-size:22px;font-weight:700}
+.badge{font-size:14px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--brand);color:var(--brand-ink)}
+.evs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ev{display:flex;gap:10px;align-items:stretch;width:100%;padding:12px 14px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);border:2px solid transparent;text-align:left}
+.ev[aria-current="true"]{border-color:var(--brand)}
+.ev .bar{width:6px;border-radius:3px;background:var(--c);flex:none}
+.ev .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ev .tx{font-size:18.5px;white-space:pre-wrap}
+.ev .mt{font-size:14.5px;color:var(--sub);font-family:var(--f-num)}
+.day-empty{color:var(--sub);background:var(--card);border-radius:12px;padding:16px;text-align:center}
+.ev-form{display:flex;flex-direction:column;gap:10px;background:var(--card);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.ev-form h3{margin:0;font-size:17px;color:var(--sub)}
+.ev-form .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ev-form input[type=text],.ev-form input[type=time]{min-height:54px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:19px;padding:8px 12px}
+.ev-form input[type=text]{width:100%}
+.ev-form input[type=time]{flex:1;min-width:140px}
+.ev-form .acts{display:flex;gap:8px;justify-content:flex-end}
+.ev-form .acts .btn{flex:1}
+
+.cal-rows{display:flex;flex-direction:column;gap:10px;max-height:52dvh;overflow-y:auto}
+.crow{display:flex;flex-direction:column;gap:8px;background:var(--card);border-radius:12px;padding:10px}
+.crow .r1{display:flex;gap:8px;align-items:center}
+.crow input[type=text]{flex:1;min-width:0;min-height:48px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:18px;padding:6px 10px}
+.swatch{width:44px;height:44px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 2px var(--line);background:var(--c);flex:none}
+.pal{display:flex;flex-wrap:wrap;gap:8px}
+.pal button{width:40px;height:40px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 2px var(--line);background:var(--c)}
+.pal button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.crow .note{font-size:14px;color:var(--sub)}
+.vis{display:flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap}
+.vis input{width:24px;height:24px;accent-color:var(--brand)}
+.share-acts{display:flex;flex-direction:column;gap:8px}
+.share-acts .btn{text-align:left}
+.share-acts small{display:block;font-weight:500;font-size:14.5px;color:var(--sub)}
+.bsheet .hint{font-size:14.5px;color:var(--sub)}
+.bsheet{max-height:92dvh;overflow-y:auto}
+
+@media (min-width:600px){
+  .calview{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,38%);overflow:hidden}
+  .cal-main,.cal-day{height:100dvh;overflow-y:auto;padding-inline:16px}
+  .cal-main{padding-bottom:24px}
+  .cal-day{border-left:1px solid var(--line);padding-top:calc(14px + env(safe-area-inset-top,0px))}
+  .cell{min-height:96px}
+}
+@media (min-width:1000px){ .cell{min-height:118px} .tg{font-size:13.5px} }
 </style>
 </head>
 <body>
@@ -196,11 +280,15 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
       <h1>📝 메모장</h1>
       <button class="btn ghost icon" id="btnMenu" type="button" aria-expanded="false" aria-controls="menu" aria-label="설정 열기">⋯</button>
     </header>
+    <div class="views" role="tablist" aria-label="화면 선택">
+      <button type="button" role="tab" data-view="notes" aria-selected="true">📝 메모</button>
+      <button type="button" role="tab" data-view="cal" aria-selected="false">📅 달력</button>
+    </div>
     <div id="banners"></div>
     <section class="menu" id="menu" hidden>
       <div class="row" id="installRow" hidden><button class="btn fill" id="btnInstall" type="button">📲 홈 화면에 앱으로 설치</button></div>
       <p id="installHint" hidden>삼성 인터넷: 아래 메뉴(≡) → <b>현재 페이지 추가 → 홈 화면</b><br>크롬: 오른쪽 위 ⋮ → <b>홈 화면에 추가</b> 또는 <b>앱 설치</b></p>
-      <p>메모는 이 휴대폰 안에만 저장됩니다. 휴대폰을 바꾸거나 앱 데이터를 지우기 전에 백업해 두세요.</p>
+      <p>메모와 달력은 이 휴대폰 안에만 저장됩니다. 휴대폰을 바꾸거나 앱 데이터를 지우기 전에 백업해 두세요. (백업 파일에 메모·그림·녹음·달력이 모두 들어가요)</p>
       <div class="row">
         <button class="btn" id="btnExport" type="button">백업 파일 저장</button>
         <button class="btn" id="btnImport" type="button">백업 불러오기</button>
@@ -241,6 +329,74 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
       <button class="tool" id="tPaper" type="button"><b>📄</b>메모지</button>
     </div>
   </section>
+</div>
+
+<div class="calview" id="calView" hidden>
+  <section class="cal-main" id="calMain">
+    <header class="top">
+      <h1>📅 달력</h1>
+      <div class="gap"><button class="btn ghost" id="calShareBtn" type="button">📤 공유</button></div>
+    </header>
+    <div class="views" role="tablist" aria-label="화면 선택">
+      <button type="button" role="tab" data-view="notes">📝 메모</button>
+      <button type="button" role="tab" data-view="cal">📅 달력</button>
+    </div>
+    <div class="cal-head">
+      <button class="btn ghost icon" id="calPrev" type="button" aria-label="이전 달">‹</button>
+      <h2 id="calTitle" aria-live="polite"></h2>
+      <button class="btn ghost icon" id="calNext" type="button" aria-label="다음 달">›</button>
+      <button class="btn ghost" id="calToday" type="button">오늘</button>
+    </div>
+    <div class="cal-chips" id="calChips" role="group" aria-label="보이는 달력"></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <p class="cal-tip">날짜를 누르면 일정이 보이고, 한 번 더 누르면 바로 적을 수 있어요 · 좌우로 밀면 달이 바뀌어요</p>
+  </section>
+  <section class="cal-day" id="calDay" aria-label="선택한 날의 일정">
+    <div class="day-h"><h2 id="dayTitle"></h2><span class="badge" id="dayBadge" hidden>오늘</span></div>
+    <ul class="evs" id="dayList"></ul>
+    <form class="ev-form" id="evForm" autocomplete="off">
+      <h3 id="evFormH">일정 적기</h3>
+      <div class="cal-chips" id="evCals" role="radiogroup" aria-label="어느 달력에"></div>
+      <input type="text" id="evText" placeholder="이 날 적을 내용" aria-label="내용" enterkeyhint="done" maxlength="300">
+      <div class="row">
+        <input type="time" id="evTime" aria-label="시간 (선택)">
+        <button class="btn ghost" id="evNoTime" type="button">시간 없음</button>
+      </div>
+      <div class="acts">
+        <button class="btn danger" id="evDel" type="button" hidden>삭제</button>
+        <button class="btn ghost" id="evCancel" type="button" hidden>취소</button>
+        <button class="btn fill" id="evSave" type="submit">추가</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<!-- 달력 관리 -->
+<div class="dim" id="calsDlg" hidden>
+  <div class="bsheet" role="dialog" aria-modal="true" aria-labelledby="calsH">
+    <h2 id="calsH">달력 관리</h2>
+    <p class="hint">색 동그라미를 누르면 색을 바꿀 수 있어요.</p>
+    <div class="cal-rows" id="calRows"></div>
+    <button class="btn" id="calAdd" type="button">＋ 새 달력 만들기</button>
+    <button class="btn ghost" type="button" data-close>닫기</button>
+  </div>
+</div>
+
+<!-- 달력 공유 -->
+<div class="dim" id="shareDlg" hidden>
+  <div class="bsheet" role="dialog" aria-modal="true" aria-labelledby="shareH">
+    <h2 id="shareH">달력 공유</h2>
+    <div class="cal-chips" id="shareCals" role="radiogroup" aria-label="공유할 달력"></div>
+    <div class="share-acts">
+      <button class="btn" id="shText" type="button">💬 <span id="shMonth"></span> 일정 글로 보내기<small>카톡·문자로 바로 보낼 수 있어요</small></button>
+      <button class="btn" id="shIcs" type="button">📆 삼성·구글 캘린더 파일<small>받은 사람이 자기 캘린더에 추가할 수 있어요 (.ics)</small></button>
+      <button class="btn" id="shApp" type="button">📲 이 앱 쓰는 사람에게 보내기<small>받은 사람 앱에 달력째로 들어가요. 다시 보내면 최신 내용으로 바뀌어요</small></button>
+    </div>
+    <button class="btn ghost" id="shImport" type="button">📥 받은 달력 파일 불러오기</button>
+    <p class="hint">보내는 순간의 내용이 전달돼요. 서로 실시간으로 같이 고치는 기능은 아니에요.</p>
+    <input type="file" id="calFileIn" accept=".json,.txt,.ics,text/calendar,application/json,text/plain" hidden>
+    <button class="btn ghost" type="button" data-close>닫기</button>
+  </div>
 </div>
 
 <!-- 메모지 고르기 -->
@@ -313,9 +469,13 @@ const mediaCache=new Map(), urlCache=new Map();
 const DB={
   db:null,
   open(){ return new Promise((res,rej)=>{
-    const r=indexedDB.open('memo-app',1);
-    r.onupgradeneeded=()=>{ const d=r.result; d.createObjectStore('notes',{keyPath:'id'}); d.createObjectStore('media',{keyPath:'id'}); };
-    r.onsuccess=()=>{ DB.db=r.result; res(); };
+    const r=indexedDB.open('memo-app',2);
+    r.onupgradeneeded=e=>{
+      const d=r.result, v=e.oldVersion;
+      if(v<1){ d.createObjectStore('notes',{keyPath:'id'}); d.createObjectStore('media',{keyPath:'id'}); }
+      if(v<2){ d.createObjectStore('cals',{keyPath:'id'}); d.createObjectStore('events',{keyPath:'id'}); } // 달력 추가
+    };
+    r.onsuccess=()=>{ DB.db=r.result; DB.db.onversionchange=()=>{ DB.db.close(); location.reload(); }; res(); };
     r.onerror=()=>rej(r.error);
   });},
   run(store,mode,fn){ return new Promise((res,rej)=>{
@@ -927,7 +1087,7 @@ function wirePlayer(b,play,track,bar,time){
 /* ================= 겹쳐 뜨는 화면 + 뒤로가기 ================= */
 // 그림판·녹음·메모지 창도 휴대폰 뒤로가기로 닫히게 history에 한 칸씩 쌓는다
 let overlay=null;
-const OV={paper:'#paperDlg',draw:'#drawDlg',rec:'#recDlg'};
+const OV={paper:'#paperDlg',draw:'#drawDlg',rec:'#recDlg',cals:'#calsDlg',share:'#shareDlg'};
 function openOverlay(name){
   overlay=name; $(OV[name]).hidden=false;
   D.discard=false;
@@ -994,25 +1154,35 @@ async function dataURLToBlob(u){ return (await fetch(u)).blob(); }
 async function exportAll(){
   flush();
   const list=notes.filter(n=>!isEmpty(n));
-  if(!list.length){ toast('백업할 메모가 없습니다.'); return; }
+  if(!list.length && !evts.length){ toast('백업할 메모나 일정이 없습니다.'); return; }
   const media=[];
   for(const id of list.flatMap(mediaIds)){
     const m=await getMedia(id); if(!m) continue;
     media.push(m.kind==='audio'? {id:m.id,kind:'audio',mime:m.mime,dur:m.dur,data:await blobToDataURL(m.blob)} : m);
   }
-  const blob=new Blob([JSON.stringify({app:'notes',version:2,exported:Date.now(),notes:list,media})],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({app:'notes',version:3,exported:Date.now(),notes:list,media,cals,events:evts})],{type:'application/json'});
   const d=new Date(), a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download=`메모백업_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
   document.body.append(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-  toast(`메모 ${list.length}개를 백업 파일로 저장했습니다.`);
+  toast(`메모 ${list.length}개, 일정 ${evts.length}개를 백업 파일로 저장했습니다.`);
 }
 async function importFile(file){
   let j;
   try{ j=JSON.parse(await file.text()); }catch(e){ toast('백업 파일을 읽을 수 없습니다.'); return; }
+  if(j && j.app==='memo-cal') return importShared(j);
   const incoming=(Array.isArray(j)? j : j.notes||[]).map(m=> typeof m.body==='string'? fromV1(m) : normalize(m)).filter(Boolean);
-  if(!incoming.length){ toast('불러올 메모가 없습니다.'); return; }
+  // 달력·일정 합치기 (같은 것은 더 최근에 고친 쪽)
+  let evAdded=0;
+  for(const c of (j.cals||[])){ if(!c||!c.id) continue; const cur=calOf(c.id); if(!cur){ cals.push(c); saveCal(c); } }
+  for(const e of (j.events||[])){
+    if(!e||!e.id||!e.date) continue;
+    const cur=evts.find(x=>x.id===e.id);
+    if(!cur){ evts.push(e); saveEv(e); evAdded++; } else if((e.updated||0)>(cur.updated||0)){ Object.assign(cur,e); saveEv(cur); evAdded++; }
+  }
+  if(view==='cal') renderCalAll();
+  if(!incoming.length){ toast(evAdded? `일정 ${evAdded}개를 불러왔습니다.` : '불러올 메모가 없습니다.'); return; }
   for(const m of (j.media||[])){
     try{
       if(m.kind==='audio') await putMedia({id:m.id,kind:'audio',mime:m.mime,dur:m.dur,blob:await dataURLToBlob(m.data)});
@@ -1027,7 +1197,7 @@ async function importFile(file){
     else if(n.updated>c.updated && n.id!==curId){ Object.assign(c,n); updated++; await saveNote(c); }
   }
   renderList();
-  toast(`새 메모 ${added}개, 갱신 ${updated}개를 불러왔습니다.`);
+  toast(`새 메모 ${added}개, 갱신 ${updated}개${evAdded?`, 일정 ${evAdded}개`:''}를 불러왔습니다.`);
 }
 // 이전 버전(글자만 있던 메모) 변환
 function fromV1(m){
@@ -1154,6 +1324,371 @@ function listWidthChanged(){
 }
 keepPlace(listPane,()=>[...listPane.querySelectorAll('.item, .top, .menu:not([hidden]), .search')],listWidthChanged);
 
+/* ================= 달력 ================= */
+// 달력(카테고리) 여러 개 + 날짜별 글. 저장은 IndexedDB 'cals', 'events'.
+// 일정: {id, cal, date:'YYYY-MM-DD', time:'HH:MM'|'' , text, created, updated}
+const CAL_COLORS=['#1F4FD1','#D7263D','#1E8C4E','#E07A10','#7B3FC4','#D63384','#0F8B8D','#5B6472'];
+const WD=['일','월','화','수','목','금','토'];
+let cals=[], evts=[], view='notes';
+let calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let selDay=ymd(new Date()), editEv=null, formCal=null, shareCal=null, openPal=null;
+
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parseYmd(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function calOf(id){ return cals.find(c=>c.id===id); }
+function visibleCals(){ return cals.filter(c=>c.visible!==false); }
+function sortEv(a,b){ return (a.time?1:0)-(b.time?1:0) || (a.time||'').localeCompare(b.time||'') || a.created-b.created; }
+function dayLabel(s,withYear){
+  const d=parseYmd(s);
+  return (withYear? d.getFullYear()+'년 ' : '')+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+WD[d.getDay()]+'요일';
+}
+function timeLabel(t){ if(!t) return ''; const [h,m]=t.split(':').map(Number); return (h<12?'오전 ':'오후 ')+((h%12)||12)+(m?':'+String(m).padStart(2,'0'):'시'); }
+
+async function loadCal(){
+  cals=(await DB.all('cals').catch(()=>[])).filter(c=>c && c.id).sort((a,b)=>(a.order||0)-(b.order||0));
+  evts=(await DB.all('events').catch(()=>[])).filter(e=>e && e.id && e.date);
+  if(!cals.length){
+    cals=[['개인',0],['업무',2],['가족',1]].map(([name,ci],i)=>({id:uid(),name,color:CAL_COLORS[ci],visible:true,order:i,created:Date.now()}));
+    for(const c of cals) DB.put('cals',c).catch(()=>{});
+  }
+  formCal=cals[0].id;
+}
+function saveCal(c){ return DB.put('cals',c).catch(()=>{ storageErr=true; renderBanners(); }); }
+function saveEv(e){ return DB.put('events',e).catch(()=>{ storageErr=true; renderBanners(); toast('일정을 저장하지 못했습니다.'); }); }
+
+/* ---------- 보기 전환 ---------- */
+function setView(v,{remember=true}={}){
+  view=v;
+  if(v==='cal' && curId) closeNote();
+  $('.layout').hidden= v!=='notes';
+  $('#calView').hidden= v!=='cal';
+  document.querySelectorAll('.views button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.view===v)));
+  if(remember){ try{ localStorage.setItem('notes.view',v); }catch(e){} }
+  if(v==='cal') renderCalAll();
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('.views button'); if(b) setView(b.dataset.view); });
+
+function renderCalAll(){ renderCalChips(); renderGrid(); renderDay(); renderEvCals(); }
+
+/* ---------- 상단: 보이는 달력 ---------- */
+function renderCalChips(){
+  $('#calChips').innerHTML=cals.map(c=>`<button class="cchip" type="button" data-cal="${c.id}" style="--c:${c.color}" aria-pressed="${c.visible!==false}"><i></i>${esc(c.name)}${c.shared?' 📥':''}</button>`).join('')
+    +`<button class="cchip manage" type="button" id="calManage">⚙ 달력 관리</button>`;
+}
+$('#calChips').addEventListener('click',e=>{
+  if(e.target.closest('#calManage')) return openCals();
+  const b=e.target.closest('[data-cal]'); if(!b) return;
+  const c=calOf(b.dataset.cal); c.visible=c.visible===false; saveCal(c);
+  renderCalChips(); renderGrid(); renderDay();
+});
+
+/* ---------- 월 달력 ---------- */
+function renderGrid(){
+  const y=calMonth.getFullYear(), m=calMonth.getMonth();
+  $('#calTitle').textContent=`${y}년 ${m+1}월`;
+  const first=new Date(y,m,1), start=new Date(y,m,1-first.getDay());
+  const last=new Date(y,m+1,0), weeks=Math.ceil((first.getDay()+last.getDate())/7);
+  const vis=new Set(visibleCals().map(c=>c.id));
+  const byDay={};
+  for(const e of evts) if(vis.has(e.cal)) (byDay[e.date]||=[]).push(e);
+  const today=ymd(new Date());
+  const maxTags= innerWidth>=1000? 4 : wide.matches? 3 : 2;
+  let h=WD.map((w,i)=>`<div class="wd-h${i===0?' sun':i===6?' sat':''}">${w}</div>`).join('');
+  for(let i=0;i<weeks*7;i++){
+    const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i), k=ymd(d);
+    const list=(byDay[k]||[]).sort(sortEv);
+    const cls=['cell']; if(d.getMonth()!==m) cls.push('out'); if(d.getDay()===0) cls.push('sun'); if(d.getDay()===6) cls.push('sat'); if(k===today) cls.push('today');
+    const shown=list.length>maxTags? list.slice(0,maxTags-1) : list;
+    const tags=shown.map(e=>`<span class="tg" style="--c:${calOf(e.cal)?.color||'#888'}">${esc(e.text)}</span>`).join('');
+    const more=list.length>shown.length? `<span class="more">+${list.length-shown.length}</span>` : '';
+    const label=`${d.getMonth()+1}월 ${d.getDate()}일${list.length?`, 일정 ${list.length}개`:''}`;
+    h+=`<button class="${cls.join(' ')}" type="button" data-d="${k}" aria-selected="${k===selDay}" aria-label="${label}"><span class="dn">${d.getDate()}</span>${tags}${more}</button>`;
+  }
+  $('#calGrid').innerHTML=h;
+}
+function moveMonth(n){ calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+n,1); renderGrid(); }
+$('#calPrev').onclick=()=>moveMonth(-1);
+$('#calNext').onclick=()=>moveMonth(1);
+$('#calToday').onclick=()=>{ const t=new Date(); calMonth=new Date(t.getFullYear(),t.getMonth(),1); selectDay(ymd(t)); };
+function selectDay(k){
+  if(k===selDay){ // 같은 날을 한 번 더 누르면 바로 적기
+    $('#evText').focus({preventScroll:true}); $('#evForm').scrollIntoView({block:'nearest',behavior:'smooth'}); return;
+  }
+  selDay=k; resetForm();
+  const d=parseYmd(k);
+  if(d.getMonth()!==calMonth.getMonth() || d.getFullYear()!==calMonth.getFullYear()) calMonth=new Date(d.getFullYear(),d.getMonth(),1);
+  renderGrid(); renderDay();
+}
+// 좌우로 밀어서 달 넘기기
+let swipe=null, swiped=false;
+$('#calGrid').addEventListener('pointerdown',e=>{ swipe={x:e.clientX,y:e.clientY}; swiped=false; });
+$('#calGrid').addEventListener('pointerup',e=>{
+  if(!swipe) return; const dx=e.clientX-swipe.x, dy=e.clientY-swipe.y; swipe=null;
+  if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5){ swiped=true; moveMonth(dx<0?1:-1); }
+});
+$('#calGrid').addEventListener('pointercancel',()=>{ swipe=null; });
+$('#calGrid').addEventListener('click',e=>{
+  if(swiped){ swiped=false; return; }
+  const c=e.target.closest('.cell'); if(c) selectDay(c.dataset.d);
+});
+
+/* ---------- 선택한 날 ---------- */
+function renderDay(){
+  $('#dayTitle').textContent=dayLabel(selDay);
+  $('#dayBadge').hidden= selDay!==ymd(new Date());
+  $('#evText').placeholder=`${parseYmd(selDay).getMonth()+1}월 ${parseYmd(selDay).getDate()}일에 적을 내용`;
+  const vis=new Set(visibleCals().map(c=>c.id));
+  const list=evts.filter(e=>e.date===selDay && vis.has(e.cal)).sort(sortEv);
+  const hidden=evts.filter(e=>e.date===selDay && !vis.has(e.cal)).length;
+  $('#dayList').innerHTML= list.length
+    ? list.map(e=>{ const c=calOf(e.cal); return `<li><button class="ev" type="button" data-ev="${e.id}" style="--c:${c?.color||'#888'}" aria-current="${editEv===e.id}"><span class="bar"></span><span class="bd"><span class="tx">${esc(e.text)}</span><span class="mt">${[timeLabel(e.time),c?.name].filter(Boolean).join(' · ')}</span></span></button></li>`; }).join('')
+      +(hidden?`<li class="cal-tip">숨긴 달력에 일정 ${hidden}개가 더 있어요</li>`:'')
+    : `<li class="day-empty">${hidden?`숨긴 달력에만 일정 ${hidden}개가 있어요.`:'이 날 일정이 없어요. 아래에 적어보세요.'}</li>`;
+}
+$('#dayList').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ev]'); if(!b) return;
+  const ev=evts.find(x=>x.id===b.dataset.ev); if(!ev) return;
+  editEv=ev.id; formCal=ev.cal;
+  $('#evText').value=ev.text; $('#evTime').value=ev.time||'';
+  $('#evFormH').textContent='일정 고치기'; $('#evSave').textContent='고친 내용 저장';
+  $('#evDel').hidden=false; $('#evCancel').hidden=false;
+  renderEvCals(); renderDay();
+  $('#evForm').scrollIntoView({block:'nearest',behavior:'smooth'});
+  $('#evText').focus({preventScroll:true});
+});
+
+/* ---------- 적기 / 고치기 ---------- */
+function renderEvCals(){
+  if(!calOf(formCal)) formCal=cals[0]?.id;
+  $('#evCals').innerHTML=cals.map(c=>`<button class="cchip" type="button" role="radio" data-cal="${c.id}" style="--c:${c.color}" aria-checked="${c.id===formCal}"><i></i>${esc(c.name)}</button>`).join('');
+}
+$('#evCals').addEventListener('click',e=>{ const b=e.target.closest('[data-cal]'); if(!b) return; formCal=b.dataset.cal; renderEvCals(); });
+function resetForm(){
+  editEv=null; $('#evText').value=''; $('#evTime').value='';
+  $('#evFormH').textContent='일정 적기'; $('#evSave').textContent='추가';
+  $('#evDel').hidden=true; $('#evCancel').hidden=true;
+}
+$('#evNoTime').onclick=()=>{ $('#evTime').value=''; };
+$('#evCancel').onclick=()=>{ resetForm(); renderDay(); };
+$('#evForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const text=$('#evText').value.trim();
+  if(!text){ $('#evText').focus(); toast('내용을 적어주세요.'); return; }
+  const now=Date.now(), time=$('#evTime').value||'';
+  const c=calOf(formCal);
+  if(c && c.visible===false){ c.visible=true; saveCal(c); renderCalChips(); }
+  if(editEv){
+    const ev=evts.find(x=>x.id===editEv);
+    if(ev){ Object.assign(ev,{text,time,cal:formCal,updated:now}); saveEv(ev); }
+    toast('일정을 고쳤습니다.');
+  }else{
+    const ev={id:uid(),cal:formCal,date:selDay,time,text,created:now,updated:now};
+    evts.push(ev); saveEv(ev);
+  }
+  resetForm(); renderGrid(); renderDay();
+  $('#evText').focus({preventScroll:true}); // 이어서 하나 더 적을 수 있게
+});
+$('#evDel').onclick=()=>{
+  const ev=evts.find(x=>x.id===editEv); if(!ev) return;
+  evts=evts.filter(x=>x!==ev); DB.del('events',ev.id).catch(()=>{});
+  resetForm(); renderGrid(); renderDay();
+  toast('일정을 지웠습니다.','되돌리기',()=>{ evts.push(ev); saveEv(ev); renderGrid(); renderDay(); });
+};
+
+/* ---------- 달력 관리 ---------- */
+function openCals(){ openPal=null; renderCalRows(); openOverlay('cals'); }
+function renderCalRows(){
+  $('#calRows').innerHTML=cals.map(c=>{
+    const n=evts.filter(e=>e.cal===c.id).length;
+    return `<div class="crow" data-cal="${c.id}">
+      <div class="r1">
+        <button class="swatch" type="button" style="--c:${c.color}" aria-label="색 바꾸기" aria-expanded="${openPal===c.id}"></button>
+        <input type="text" value="${esc(c.name)}" aria-label="달력 이름" maxlength="20">
+        <label class="vis"><input type="checkbox" ${c.visible!==false?'checked':''}>보기</label>
+        <button class="x" type="button" aria-label="${esc(c.name)} 달력 지우기">🗑</button>
+      </div>
+      ${openPal===c.id?`<div class="pal">${CAL_COLORS.map(k=>`<button type="button" style="--c:${k}" data-color="${k}" aria-pressed="${k===c.color}" aria-label="색 ${k}"></button>`).join('')}</div>`:''}
+      <span class="note">일정 ${n}개${c.shared?' · 받은 달력: 다시 받으면 보낸 사람 내용으로 바뀌어요':''}</span>
+    </div>`;
+  }).join('');
+}
+$('#calRows').addEventListener('click',e=>{
+  const row=e.target.closest('.crow'); if(!row) return;
+  const c=calOf(row.dataset.cal); if(!c) return;
+  if(e.target.closest('.swatch')){ openPal= openPal===c.id? null : c.id; renderCalRows(); return; }
+  const col=e.target.closest('[data-color]');
+  if(col){ c.color=col.dataset.color; saveCal(c); openPal=null; renderCalRows(); renderCalAll(); return; }
+  if(e.target.closest('.x')){
+    if(cals.length<=1){ toast('달력은 하나 이상 있어야 해요.'); return; }
+    const n=evts.filter(x=>x.cal===c.id).length;
+    if(!confirm(`'${c.name}' 달력${n?`과 일정 ${n}개`:''}를 지울까요?`)) return;
+    const gone=evts.filter(x=>x.cal===c.id);
+    evts=evts.filter(x=>x.cal!==c.id); gone.forEach(x=>DB.del('events',x.id).catch(()=>{}));
+    cals=cals.filter(x=>x!==c); DB.del('cals',c.id).catch(()=>{});
+    renderCalRows(); renderCalAll();
+  }
+});
+$('#calRows').addEventListener('change',e=>{
+  const row=e.target.closest('.crow'); const c=row && calOf(row.dataset.cal); if(!c) return;
+  if(e.target.type==='checkbox'){ c.visible=e.target.checked; saveCal(c); renderCalAll(); }
+});
+$('#calRows').addEventListener('input',e=>{
+  if(e.target.type!=='text') return;
+  const c=calOf(e.target.closest('.crow').dataset.cal); if(!c) return;
+  c.name=e.target.value.trim()||'이름 없음'; saveCal(c); renderCalChips(); renderEvCals(); renderDay();
+});
+$('#calAdd').onclick=()=>{
+  const used=new Set(cals.map(c=>c.color));
+  const c={id:uid(),name:'새 달력',color:CAL_COLORS.find(k=>!used.has(k))||CAL_COLORS[cals.length%CAL_COLORS.length],visible:true,order:Math.max(0,...cals.map(x=>x.order||0))+1,created:Date.now()};
+  cals.push(c); saveCal(c); renderCalRows(); renderCalAll();
+  const inp=document.querySelector(`.crow[data-cal="${c.id}"] input[type=text]`); inp?.focus(); inp?.select();
+};
+$('#calsDlg').addEventListener('click',e=>{ if(e.target===e.currentTarget || e.target.matches('[data-close]')) closeOverlay(); });
+
+/* ---------- 공유 ---------- */
+function openShare(){
+  if(!calOf(shareCal)) shareCal=visibleCals()[0]?.id||cals[0]?.id;
+  renderShareCals();
+  $('#shMonth').textContent=(calMonth.getMonth()+1)+'월';
+  openOverlay('share');
+}
+function renderShareCals(){
+  $('#shareCals').innerHTML=cals.map(c=>`<button class="cchip" type="button" role="radio" data-cal="${c.id}" style="--c:${c.color}" aria-checked="${c.id===shareCal}"><i></i>${esc(c.name)}</button>`).join('');
+}
+$('#calShareBtn').onclick=openShare;
+$('#shareCals').addEventListener('click',e=>{ const b=e.target.closest('[data-cal]'); if(b){ shareCal=b.dataset.cal; renderShareCals(); } });
+$('#shareDlg').addEventListener('click',e=>{ if(e.target===e.currentTarget || e.target.matches('[data-close]')) closeOverlay(); });
+function stamp(){ const d=new Date(); return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`; }
+function safeName(s){ return s.replace(/[\\/:*?"<>|\s]+/g,'_'); }
+// 공유창으로 보내고, 안 되면 파일로 저장
+async function sendFile(name,type,content,shareType){
+  const file=new File([content],name,{type:shareType||type});
+  if(navigator.canShare?.({files:[file]})){
+    try{ await navigator.share({files:[file],title:name}); return; }catch(e){ if(e.name==='AbortError') return; }
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name;
+  document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast(`'${name}' 파일을 저장했어요. 카톡 등에서 파일로 보내면 돼요.`);
+}
+$('#shText').onclick=async()=>{
+  const c=calOf(shareCal); if(!c) return;
+  const y=calMonth.getFullYear(), m=calMonth.getMonth();
+  const prefix=`${y}-${String(m+1).padStart(2,'0')}-`;
+  const list=evts.filter(e=>e.cal===c.id && e.date.startsWith(prefix)).sort((a,b)=>a.date.localeCompare(b.date)||sortEv(a,b));
+  if(!list.length){ toast(`${m+1}월 '${c.name}' 달력에 일정이 없어요.`); return; }
+  const lines=[`📅 ${c.name} · ${y}년 ${m+1}월`,''];
+  let prev='';
+  for(const e of list){
+    const d=parseYmd(e.date);
+    const head=e.date!==prev? `${d.getMonth()+1}/${d.getDate()} (${WD[d.getDay()]})` : '      ';
+    lines.push(`${head} ${e.time?timeLabel(e.time)+' ':''}${e.text}`); prev=e.date;
+  }
+  const text=lines.join('\n');
+  if(navigator.share){ try{ await navigator.share({text}); return; }catch(e){ if(e.name==='AbortError') return; } }
+  try{ await navigator.clipboard.writeText(text); toast('일정 글을 복사했어요. 카톡에 붙여넣기 하세요.'); }catch(e){ toast('공유와 복사가 모두 막혀 있어요.'); }
+};
+function icsEsc(s){ return s.replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
+function icsFold(line){ // 한 줄 75바이트 제한
+  const enc=new TextEncoder(); let out='', cur='', n=0;
+  for(const ch of line){ const b=enc.encode(ch).length; if(n+b>(out?74:75)){ out+=(out?'\r\n ':'')+cur; cur=''; n=0; } cur+=ch; n+=b; }
+  return out+(out?'\r\n ':'')+cur;
+}
+function buildIcs(c){
+  const now=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//memo-app//KO','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:'+icsEsc(c.name)];
+  for(const e of evts.filter(e=>e.cal===c.id)){
+    const d=e.date.replace(/-/g,'');
+    L.push('BEGIN:VEVENT','UID:'+e.id+'@memo-app','DTSTAMP:'+now);
+    if(e.time){
+      const [h,mi]=e.time.split(':').map(Number), end=new Date(...e.date.split('-').map((v,i)=>i===1?v-1:+v),h+1,mi);
+      const t=e.time.replace(':','')+'00';
+      L.push('DTSTART:'+d+'T'+t,'DTEND:'+ymd(end).replace(/-/g,'')+'T'+String(end.getHours()).padStart(2,'0')+String(end.getMinutes()).padStart(2,'0')+'00');
+    }else{
+      const nx=parseYmd(e.date); nx.setDate(nx.getDate()+1);
+      L.push('DTSTART;VALUE=DATE:'+d,'DTEND;VALUE=DATE:'+ymd(nx).replace(/-/g,''));
+    }
+    L.push('SUMMARY:'+icsEsc(e.text),'END:VEVENT');
+  }
+  L.push('END:VCALENDAR');
+  return L.map(icsFold).join('\r\n')+'\r\n';
+}
+$('#shIcs').onclick=()=>{
+  const c=calOf(shareCal); if(!c) return;
+  if(!evts.some(e=>e.cal===c.id)){ toast(`'${c.name}' 달력에 일정이 없어요.`); return; }
+  sendFile(`${safeName(c.name)}_${stamp()}.ics`,'text/calendar',buildIcs(c));
+};
+$('#shApp').onclick=()=>{
+  const c=calOf(shareCal); if(!c) return;
+  const data={app:'memo-cal',version:1,exported:Date.now(),calendar:{id:c.id,name:c.name,color:c.color},events:evts.filter(e=>e.cal===c.id)};
+  // 공유창은 .txt만 받는 경우가 많아서 txt로 보낸다 (불러올 때는 json/txt 모두 됨)
+  sendFile(`달력_${safeName(c.name)}_${stamp()}.txt`,'text/plain',JSON.stringify(data));
+};
+$('#shImport').onclick=()=>$('#calFileIn').click();
+$('#calFileIn').onchange=async e=>{ const f=e.target.files[0]; e.target.value=''; if(f) await importCalFile(f); };
+
+async function importCalFile(file){
+  const text=await file.text();
+  if(/BEGIN:VCALENDAR/.test(text)) return importIcs(text,file.name);
+  let j; try{ j=JSON.parse(text); }catch(e){ toast('달력 파일을 읽을 수 없어요.'); return; }
+  if(j.app==='memo-cal' && j.calendar) return importShared(j);
+  if(j.notes || j.cals){ await importFile(file); return; } // 전체 백업 파일을 넣은 경우
+  toast('이 앱의 달력 파일이 아니에요.');
+}
+async function importShared(j){
+  const src=j.calendar; let c=calOf(src.id);
+  const incoming=(j.events||[]).filter(e=>e && e.id && /^\d{4}-\d{2}-\d{2}$/.test(e.date)).map(e=>({...e,cal:src.id,text:String(e.text||''),time:e.time||''}));
+  let msg;
+  if(c && !c.shared){ // 내가 만든 달력 → 합치기 (최근에 고친 쪽)
+    let n=0;
+    for(const e of incoming){ const cur=evts.find(x=>x.id===e.id); if(!cur){ evts.push(e); n++; saveEv(e); } else if(e.updated>cur.updated){ Object.assign(cur,e); n++; saveEv(cur); } }
+    msg=`'${c.name}' 달력에 ${n}개를 합쳤어요.`;
+  }else{ // 처음 받았거나 전에 받은 달력 → 보낸 사람 내용으로 바꾸기
+    if(!c){ c={id:src.id,name:String(src.name||'받은 달력'),color:CAL_COLORS.includes(src.color)?src.color:CAL_COLORS[0],visible:true,shared:true,order:Math.max(0,...cals.map(x=>x.order||0))+1,created:Date.now()}; cals.push(c); }
+    else { c.name=String(src.name||c.name); c.color=CAL_COLORS.includes(src.color)?src.color:c.color; c.visible=true; }
+    saveCal(c);
+    evts.filter(x=>x.cal===c.id).forEach(x=>DB.del('events',x.id).catch(()=>{}));
+    evts=evts.filter(x=>x.cal!==c.id).concat(incoming);
+    incoming.forEach(saveEv);
+    msg=`'${c.name}' 달력을 받았어요 (일정 ${incoming.length}개).`;
+  }
+  if(overlay) closeOverlay();
+  setView('cal'); renderCalAll(); toast(msg);
+}
+function importIcs(text,fname){
+  const lines=text.replace(/\r?\n[ \t]/g,'').split(/\r?\n/);
+  const unesc=s=>s.replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1');
+  let name=(lines.find(l=>l.startsWith('X-WR-CALNAME'))||'').split(':').slice(1).join(':')||fname.replace(/\.ics$/i,'');
+  const out=[]; let cur=null;
+  for(const l of lines){
+    if(l==='BEGIN:VEVENT') cur={};
+    else if(l==='END:VEVENT'){ if(cur && cur.date && cur.text) out.push(cur); cur=null; }
+    else if(cur){
+      const i=l.indexOf(':'); if(i<0) continue;
+      const key=l.slice(0,i), val=l.slice(i+1);
+      if(key.startsWith('DTSTART')){
+        const m=val.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})\d{0,2}(Z)?)?/); if(!m) continue;
+        if(m[4]){
+          let d=new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5]);
+          if(m[6]) d=new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5]));
+          cur.date=ymd(d); cur.time=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+        }else{ cur.date=`${m[1]}-${m[2]}-${m[3]}`; cur.time=''; }
+      }else if(key.startsWith('SUMMARY')) cur.text=unesc(val);
+      else if(key==='UID') cur.uid=val;
+    }
+  }
+  if(!out.length){ toast('파일에서 일정을 찾지 못했어요.'); return; }
+  const c={id:uid(),name:unesc(name).slice(0,20)||'가져온 달력',color:CAL_COLORS[cals.length%CAL_COLORS.length],visible:true,shared:false,order:Math.max(0,...cals.map(x=>x.order||0))+1,created:Date.now()};
+  cals.push(c); saveCal(c);
+  const now=Date.now();
+  for(const e of out){ const ev={id:uid(),cal:c.id,date:e.date,time:e.time,text:e.text,created:now,updated:now}; evts.push(ev); saveEv(ev); }
+  if(overlay) closeOverlay();
+  setView('cal'); renderCalAll();
+  toast(`'${c.name}' 달력으로 일정 ${out.length}개를 가져왔어요. (반복 일정은 첫 날만 들어가요)`);
+}
+// 접고 펼치면 칸 크기가 달라지니 달력만 다시 그림 (적던 글은 그대로)
+wide.addEventListener('change',()=>{ if(view==='cal') renderGrid(); });
+addEventListener('resize',()=>{ if(view==='cal') { clearTimeout(window._calRz); window._calRz=setTimeout(renderGrid,120); } });
+
 /* ================= 시작 ================= */
 (async function start(){
   applyTheme(getTheme());
@@ -1168,6 +1703,7 @@ keepPlace(listPane,()=>[...listPane.querySelectorAll('.item, .top, .menu:not([hi
     }
   }catch(e){}
   notes=(await DB.all('notes').catch(()=>[])).map(normalize).filter(Boolean);
+  await loadCal();
   // 어느 메모에도 안 쓰이는 그림·녹음 정리 (삭제 직후 앱을 닫은 경우 등)
   try{
     const used=new Set(notes.flatMap(mediaIds));
@@ -1180,7 +1716,10 @@ keepPlace(listPane,()=>[...listPane.querySelectorAll('.item, .top, .menu:not([hi
   // 홈 화면 아이콘을 길게 눌러 고른 바로가기 (새 메모 / 체크리스트 / 음성 녹음 / 그림)
   const act=new URLSearchParams(location.search).get('do');
   history.replaceState(null,'',location.pathname);
-  if(act){
+  let lastView='notes'; try{ lastView=localStorage.getItem('notes.view')||'notes'; }catch(e){}
+  if(act==='cal' || (!act && !(id && find(id)) && lastView==='cal')){ setView('cal',{remember:!act}); renderList(); }
+  else if(act){
+    setView('notes',{remember:false});
     newNote();
     if(act==='check') $('#tCheck').click();
     else if(act==='rec') startRec();
