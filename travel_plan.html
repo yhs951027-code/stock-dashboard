@@ -122,6 +122,14 @@ nav.menu a.navlink{flex:0 0 auto;padding:8px 12px;border-radius:20px;font-size:1
 .outlist summary{cursor:pointer;padding:6px 0}
 .outlist ul{margin:4px 0 0;padding-left:20px}
 .today{background:var(--brand-soft);border:1px solid var(--brand);border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:15px}
+.rank{display:grid;grid-template-columns:32px 1fr auto;gap:4px 10px;align-items:start;padding:10px 12px;border-bottom:1px solid var(--line)}
+.rank:last-child{border-bottom:0}
+.rank .no{font-weight:700;color:var(--brand);font-size:18px;text-align:center}
+.rank .pr{font-weight:700;white-space:nowrap;text-align:right}
+.rank .nt{grid-column:2 / 4;font-size:14px;color:var(--sub)}
+.rank input{width:20px;height:20px;accent-color:var(--brand)}
+.rank label{display:flex;gap:8px;align-items:center;font-weight:600;cursor:pointer}
+@media (max-width:640px){.rank{grid-template-columns:26px 1fr}.rank .pr{grid-column:2;text-align:left}.rank .nt{grid-column:2}}
 /* shop list */
 .shop{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;box-shadow:var(--shadow)}
 .shop summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
@@ -222,6 +230,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
   <a class="navlink" href="travel_schedule.html">시간별 일정 →</a>
   <button role="tab" data-panel="food">맛집·카페</button>
   <button role="tab" data-panel="spot">볼거리</button>
+  <button role="tab" data-panel="shop">장보기·빵</button>
   <button role="tab" data-panel="dog">반려견 정보</button>
   <button role="tab" data-panel="map">지도·길찾기</button>
   <button role="tab" data-panel="budget">예산 계산</button>
@@ -302,6 +311,19 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
   </div>
   <p class="muted" id="foodCount" style="margin:0 0 10px"></p>
   <div id="foodList"></div>
+</section>
+
+<!-- 장보기·빵 -->
+<section class="panel" id="shop">
+  <h2>장보기 · 빵</h2>
+  <p class="lead">트레이더스 여행용 추천과 성심당 베이커리·케익부띠끄 TOP 10이야. 숙소 규정에 안 맞는 상품(숯·가스)과 여행 기간에 안 파는 시즌 케이크는 자동으로 뺐어. 살 것에 체크하면 아래에 합계가 나와(가격이 범위·미상인 건 합계에서 빠져).</p>
+  <div class="filters" id="shopFilter">
+    <button aria-pressed="true" data-f="traders">트레이더스</button>
+    <button aria-pressed="false" data-f="bakery">성심당 베이커리</button>
+    <button aria-pressed="false" data-f="cake">성심당 케익부띠끄</button>
+  </div>
+  <div id="shopList"></div>
+  <div class="card" style="margin-top:12px"><b>체크한 상품 합계</b> <span id="shopSum"></span> <button class="btn" id="shopToBudget" type="button" style="margin-left:6px">예산 '식비'에 더하기</button></div>
 </section>
 
 <!-- 볼거리 -->
@@ -471,7 +493,28 @@ var SRC = {
   s61:{t:"청남대 축제/행사 공고 (2026 가을축제 10/31~11/8)", u:"https://www.chungbuk.go.kr/chnam/bbs/list.do?key=2004170453801"},
   s62:{t:"청남대 가을축제 안내 (여행을 말하다)", u:"https://www.telltrip.com/festival/cheongnamdae-autumn-festival/"},
   s63:{t:"청남대 영춘제 요금 (국제뉴스, 2026 봄)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3564924"},
-  s64:{t:"반려동물과 충주 여행 · 중앙탑사적공원 (대한민국 구석구석)", u:"https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=c967ab4f-9053-465b-ad66-77e3845b638e"}
+  s64:{t:"반려동물과 충주 여행 · 중앙탑사적공원 (대한민국 구석구석)", u:"https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=c967ab4f-9053-465b-ad66-77e3845b638e"},
+  s65:{t:"2026 성심당 본점 메뉴·가격 총정리 (대전넷)", u:"https://daejeon.xn--o39an2bqdw74b8te7xy.com/sungsimdang-menu-price-2026/"},
+  s66:{t:"성심당/제품 (나무위키)", u:"https://namu.wiki/w/%EC%84%B1%EC%8B%AC%EB%8B%B9/%EC%A0%9C%ED%92%88"},
+  s67:{t:"성심당 빵 추천 TOP 12 (젝키)", u:"https://gazet.ai/news/7333"},
+  s68:{t:"성심당 무화과시루 출시 (위키트리)", u:"https://www.wikitree.co.kr/articles/1153149"},
+  s69:{t:"2026 성심당 케이크 종류·판매시기 (타코야끼포테이토)", u:"https://takoyakipotato.com/2026-%ec%84%b1%ec%8b%ac%eb%8b%b9-%ec%bc%80%ec%9d%b4%ed%81%ac-%ec%a2%85%eb%a5%98-%ed%8c%90%eb%a7%a4%ec%8b%9c%ea%b8%b0-%ec%b4%9d%ec%a0%95%eb%a6%ac/"},
+  s70:{t:"성심당 시루 판매 시즌 총정리 (여행픽)", u:"https://www.thetrippick.com/news/articleView.html?idxno=1647"},
+  s71:{t:"트레이더스 미국산 냉동 LA갈비 2.5kg (YES24 입점)", u:"https://www.yes24.com/product/goods/146961308"},
+  s72:{t:"트레이더스 수입 냉동 대패 삼겹살 4kg (YES24 입점)", u:"https://www.yes24.com/product/goods/146961327"},
+  s73:{t:"이마트 트레이더스 LA갈비 가격 (2026-09 블로그, 광고 포함)", u:"https://www.sano.co.kr/%EC%9D%B4%EB%A7%88%ED%8A%B8-%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%8D%94%EC%8A%A4-la%EA%B0%88%EB%B9%84-%EA%B0%80%EA%B2%A9%EA%B3%BC-%EA%B3%A0%EB%A5%B4%EB%8A%94-%ED%8C%81"},
+  s74:{t:"트레이더스 뼈삼겹 후기 (스레드, 2026-04)", u:"https://www.threads.com/@farm_ersbasket/post/DXBXyKQkXzi"},
+  s75:{t:"이마트몰 '캠핑고기' 검색 (트레이더스 배송 상품)", u:"https://emart.ssg.com/search.ssg?query=%EC%BA%A0%ED%95%91%EA%B3%A0%EA%B8%B0"},
+  s76:{t:"이마트몰 '캠핑용품' 검색 (트레이더스 배송 상품)", u:"https://emart.ssg.com/search.ssg?query=%EC%BA%A0%ED%95%91%EC%9A%A9%ED%92%88"},
+  s77:{t:"트레이더스 안주용 밀키트 추천 (블로그)", u:"https://rorajumak.com/entry/%EC%9D%B4%EB%A7%88%ED%8A%B8-%ED%8A%B8%EB%A0%88%EC%9D%B4%EB%8D%94%EC%8A%A4-%EC%95%88%EC%A3%BC%ED%95%98%EA%B8%B0-%EC%A2%8B%EC%9D%80-%EC%A6%89%EC%84%9D-%EC%8B%9D%ED%92%88-%EB%B0%80%ED%82%A4%ED%8A%B8-%EC%B6%94%EC%B2%9C"},
+  s78:{t:"트레이더스 가성비 밀키트 질문 (아하, 2026)", u:"https://www.a-ha.io/questions/4c32fb633a5469349e7a6dc95ca7b7f2"},
+  s79:{t:"트레이더스 밀키트 추천 질문 (아하, 2026)", u:"https://www.a-ha.io/questions/41288274cac5847b9f5bb7cf2d896982"},
+  s80:{t:"조령산묵밥청국장 (테이블링)", u:"https://www.tabling.co.kr/place/677ccb3166de5f06987cccce"},
+  s81:{t:"조령산묵밥청국장 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=WtcdAXg4o05f"},
+  s82:{t:"안성집 설농탕 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=23fdB6H70qIK"},
+  s83:{t:"안성집 설농탕 (당근 로컬 프로필)", u:"https://www.daangn.com/kr/local-profile/%EC%95%88%EC%84%B1%EC%A7%91%EC%84%A4%EB%86%8D%ED%83%95-544q9zs3ozu2/"},
+  s84:{t:"옛날병천순대 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=2kGB4YuOT8GU"},
+  s85:{t:"괴산산막이매운탕 (로컬즈)", u:"https://localz.kr/c/maeuntang"}
 };
 
 /* ---------- 장소 ----------
@@ -587,6 +630,22 @@ var P = {
     addr:"충북 괴산군 괴산읍 괴강로 248",
     menu:"메기·빠가사리·쏘가리 매운탕 · 닭도리탕", hours:"09:00–20:30 (테이블링은 주말 10:00–20:00) · 셋째 주 월요일 휴무", parking:N,
     dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"괴산군 관광 안내에도 등록된 집.", price:"매운탕 시가 · 닭도리탕 소 60,000원", src:["s45","s49"]},
+  joryeong:{name:"조령산묵밥청국장", cat:"한식", area:"괴산 연풍면 (수옥폭포·연풍새재 근처)", phone:"043-833-4687", open:["o","o","o"], openNote:"테이블링 기준 매일 08:00–19:00 연중무휴 (식신은 10–19시)",
+    addr:"충북 괴산군 연풍면 새재로 1854",
+    menu:"묵밥 · 청국장 · 두부전골 · 도토리묵 · 더덕구이", hours:"08:00–19:00 연중무휴 (출처마다 10:00 시작)", parking:"무료 주차 · 야외 테이블 있음 (다이닝코드)",
+    dog:2, dogText:"반려견 동반 정보 없음. 야외 테이블이 있다는 정보가 있어 전화로 물어볼 만해.", inout:"실내 + 야외 테이블", reserve:"조령산자연휴양림 입구. 산채비빔밥은 미리 예약해야 할 수 있음. 아침 일찍은 밥이 안 될 수 있다는 후기.", price:"묵밥·청국장 10,000원 · 두부전골 15,000원 · 도토리묵 13,000원 · 더덕구이 20,000원", src:["s80","s81"]},
+  ansung:{name:"안성집 설농탕", cat:"한식", area:"괴산읍", phone:"043-833-5558", open:["x","o","o"], openNote:"식신 기준 금요일 휴무 → 금 휴무, 토·일 영업",
+    addr:"충북 괴산군 괴산읍 읍내로15길 36",
+    menu:"설농탕 · 갈비탕 · 도가니탕 · 꼬리곰탕", hours:"09:00–20:00 (브레이크 15:00–16:30) · 금요일 휴무", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"현금만 받는다는 후기가 있어 카드 되는지 전화 확인.", price:"설농탕 10,000~11,000원 · 갈비탕 15,000원 · 도가니탕 18,000원 · 꼬리곰탕 22,000원", src:["s43","s82","s83"]},
+  byeongcheon:{name:"옛날병천순대", cat:"한식", area:"괴산 문광면 (은행나무길 근처)", phone:"", open:["?","?","?"], openNote:"영업시간·휴무 정보 없음",
+    addr:"충북 괴산군 문광면 광덕1길 37",
+    menu:"순대국 · 돈까스(대표) · 치즈까스 · 생선까스", hours:"모름", parking:"주차 공간 넓음 (후기)",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"순대국집인데 돈까스가 대표로 알려진 곳. 문광저수지 은행나무길과 같은 문광면.", price:"순대국 10,000 · 특 13,000원 · 돈까스 11,000원 · 치즈까스 12,000원", src:["s45","s84"]},
+  sanmaeun:{name:"괴산산막이매운탕", cat:"한식", area:"괴산 칠성면 (산막이옛길 입구)", phone:"", open:["?","?","?"], openNote:"오래된 블로그 기준 매일 10–19시",
+    addr:"충북 괴산군 칠성면 산막이옛길 80-11",
+    menu:"메기·빠가사리 민물매운탕 · 도리뱅뱅이", hours:"매일 10:00–19:00 (오래된 정보)", parking:N,
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내 (약 200석)", reserve:"산막이옛길 입구 30년 된 집으로 소개.", price:N, src:["s85"]},
   misoya:{name:"미소야 괴산점", cat:"일식", area:"괴산읍", phone:"043-834-7789", open:["?","?","?"], openNote:"휴무일 정보 없음",
     addr:"충북 괴산군 괴산읍 읍내로2길 56",
     menu:"일식 돈카츠 · 덮밥 (프랜차이즈)", hours:"11:30–19:22로 표기 (출처 표기 그대로, 확인 필요) · 휴무일 모름", parking:N,
@@ -676,14 +735,72 @@ var VER = {
   jeulgeoun:"2026-06 식신 추천", alkong:"2026-06 식신 추천", cheongi:"2026년 식신 추천", yeongho:"2026년 식신 추천",
   ducheon:"2026-01·02 식신 소개", gsmaeun:"2026-02 식신 소개 · 괴산군 관광 안내 등록", sanai:"2026년 식신 소개",
   sonjja:"2026년 식신 소개(홍가네)", misoya:"카드 매출 데이터 2026-06 갱신", teolbo:"2026-02·04 식신 소개",
-  pizzatour:"2025-10 기준 영업 정보", mwohanong:"2025년 방문 후기", cheongan:"관광공사 데이터 기준일 2026-08-16"
+  pizzatour:"2025-10 기준 영업 정보", mwohanong:"2025년 방문 후기", cheongan:"관광공사 데이터 기준일 2026-08-16",
+  ansung:"2026년 식신 괴산읍 맛집 소개", byeongcheon:"2026-02 식신 괴산 로컬 맛집 소개", joryeong:"테이블링 매장 등록 정보(2025-01 생성, 연중무휴 표기)"
 };
 var VNOTE = {
   songmyeon:"찾은 후기가 약 3년 전", gwejja:"자연드림파크가 2026-09-02에 '일부 식당 운영 중단'을 공지 — 괴짜루 해당 여부 모름",
   surawon:"다이닝코드엔 오리주물럭·한식뷔페로 분류돼 업종도 불확실", forest:"2024-10 이후 날짜가 있는 후기를 못 찾음",
-  fiorito:"'신상 카페' 후기만 있고 날짜 확인 안 됨"
+  fiorito:"'신상 카페' 후기만 있고 날짜 확인 안 됨", sanmaeun:"찾은 후기가 모두 몇 년 전"
 };
 Object.keys(P).forEach(function(k){ P[k].ver=VER[k]||""; P[k].vnote=VNOTE[k]||""; });
+
+/* ---------- 장보기·빵 TOP 10 ---------- */
+// won: 확정 숫자 가격(장바구니 합계용, 범위·미상은 null) · ban: 숙소 규정 위반 · months: 판매 월(여행 10·11월과 겹쳐야 표시)
+var SHOP = {
+  traders:{title:"트레이더스 여행용 추천 TOP 10", lead:"숙소 바비큐(전기그릴 전용)와 6명 2박 기준으로 골랐어. 가격은 쇼핑몰 입점가·후기 기준이라 매장가와 다를 수 있어. 출발 전 각자 동네 트레이더스에서 사서 아이스박스로 가져오는 걸 추천해.",
+    store:{name:"이마트 트레이더스", nq:"트레이더스"},
+    items:[
+      {name:"미국산 냉동 꽃갈비(LA갈비) 2.3kg", price:"79,800원 (호주산 77,800원)", won:79800, note:"전기그릴에 굽기 좋은 두께. 2026-09 블로그 기준(광고 포함). 2.5kg 입점가는 115,500~122,700원.", src:["s73","s71"]},
+      {name:"돼지 양념 LA식 갈비구이 2.1kg", price:"27,980원", won:27980, note:"가성비 메인. 양념이라 전기그릴 바닥이 탈 수 있으니 호일 깔기.", src:["s73"]},
+      {name:"수입 냉동 대패 삼겹살 4kg", price:"54,400~60,900원", won:null, note:"얇아서 전기그릴에서도 빨리 익음. 6명 2끼 넉넉.", src:["s72"]},
+      {name:"뼈삼겹", price:"100g당 1,980원", won:null, note:"2026-04 후기 기준 행사가. 상시 판매인지는 모름.", src:["s74"]},
+      {name:"티스탠다드 통그릴 비엔나 1kg", price:"10,480원", won:10480, note:"고기 굽기 전 애피타이저·아침용.", src:["s75"]},
+      {name:"티스탠다드 통그릴 프랑크 1.2kg", price:"12,980원", won:12980, note:"반려견 간식으로는 주지 말기(염분).", src:["s75"]},
+      {name:"후라이드 치킨 2마리", price:"약 18,000원", won:18000, note:"도착 첫날 저녁 전 허기 달래기용. 2026 질문답변 기준.", src:["s78"]},
+      {name:"칼바사 부대찌개 밀키트", price:"17,980원", won:17980, note:"바비큐 마무리 국물. 가격은 2024년 무렵 기준이라 바뀌었을 수 있음.", src:["s77"]},
+      {name:"밀푀유나베 밀키트", price:"24,980원", won:24980, note:"전기그릴 말고 숙소 주방에서 끓이기. 가격 2024년 무렵 기준.", src:["s77"]},
+      {name:"오뚜기 진라면 볶음밥 1kg (5인분)", price:"11,980원", won:11980, note:"체크아웃 날 아침 간단히. 2026 질문답변 기준.", src:["s79"]},
+      {name:"큐맥 팜볼 야자 숯 10kg", price:"24,680원", won:24680, ban:"숙소 규정상 개인 숯 사용 불가 (전기그릴만 가능)", src:["s76"]},
+      {name:"맥스 구공탄 가스레인지", price:"27,980원", won:27980, ban:"숙소 규정상 가스버너 사용 불가", src:["s76"]}
+    ]},
+  bakery:{title:"성심당 베이커리 TOP 10", lead:"여러 추천글에 자주 오른 순서로 정리했어(성심당 공식 순위 아님). 대전에 들를 수 있는 사람이 사 오면 좋아. 가격은 2026년 정리글 기준이 우선이고, 없으면 다른 출처 가격을 적었어.",
+    store:{name:"성심당 본점", nq:"성심당 본점"},
+    items:[
+      {name:"튀김소보로", price:"1,700원대", won:null, note:"가장 많이 꼽히는 1위. 6개 세트 약 10,000원.", src:["s65","s66"]},
+      {name:"명란바게트", price:"3,800원", won:3800, note:"맥주 안주로 인기. 가격은 예전 후기 기준.", src:["s67"]},
+      {name:"판타롱부추빵", price:"약 2,000원", won:2000, note:"부추·고기 필링, 식사 대용.", src:["s66"]},
+      {name:"보문산메아리", price:"6,000원", won:6000, note:"페스츄리. 여럿이 나눠 먹기 좋음.", src:["s65"]},
+      {name:"크림치즈화이트번", price:"3,300원", won:3300, note:"2026 정리글 단과자빵 추천 상위.", src:["s65"]},
+      {name:"초코튀소", price:"2,000원대", won:null, note:"튀소의 초코 버전.", src:["s65"]},
+      {name:"토요빵", price:"3,800원", won:3800, note:"자색고구마 + 타피오카의 쫀득한 식감.", src:["s66"]},
+      {name:"작은메아리", price:"모름", won:null, note:"추천 목록에 자주 오르지만 가격 정보 없음.", src:["s67"]},
+      {name:"순수롤", price:"약 14,000원 (DCC점 기준)", won:null, note:"본점 가격은 확인 못 함.", src:["s65"]},
+      {name:"말차순크림빵", price:"3,000원", won:3000, note:"순크림빵 시리즈(시즌성일 수 있음).", src:["s65"]}
+    ]},
+  cake:{title:"성심당 케익부띠끄 TOP 10", lead:"여행 기간(10월 말~11월 초)에 파는 케이크만 자동으로 남겼어. 시루 케이크는 오전에 품절되기 쉽고 일부는 1인 구매 수량 제한이 있을 수 있어.",
+    store:{name:"성심당 케익부띠끄 본점", nq:"성심당 케익부띠끄 본점"},
+    items:[
+      {name:"무화과시루", price:"45,000원", won:45000, months:[8,9,10,11,12], note:"8~12월 판매(8/20부터 전 지점).", src:["s68","s70"]},
+      {name:"알밤시루", price:"45,000원", won:45000, months:[10,11,12], note:"10~11월 한정이라는 글과 12월 중순 DCC점이라는 글이 섞여 있음 → 판매 여부 전화 확인.", src:["s69","s70"]},
+      {name:"생귤시루", price:"모름", won:null, months:[7,8,9,10], note:"7~10월 판매 → 10월 말엔 끝났을 수 있음.", src:["s70"]},
+      {name:"키리쉬 모짜르트 3호", price:"36,000원", won:36000, note:"연중 판매.", src:["s69"]},
+      {name:"부띠끄 생케이크 2호", price:"35,000원", won:35000, note:"연중 판매.", src:["s69"]},
+      {name:"딸기모짜르트 2호", price:"31,000원", won:31000, note:"상시 케이크.", src:["s70"]},
+      {name:"메리무스 1호", price:"29,000원", won:29000, note:"상시 케이크.", src:["s70"]},
+      {name:"샤인이랑멜론", price:"37,000원", won:37000, note:"2026 메뉴표 생크림 케이크.", src:["s65"]},
+      {name:"망고망고", price:"39,000원", won:39000, note:"2026 메뉴표 생크림 케이크.", src:["s65"]},
+      {name:"무화과타르트", price:"42,000원", won:42000, note:"2026 메뉴표.", src:["s65"]},
+      {name:"딸기시루", price:"43,000~52,000원 (출처마다 다름)", won:null, months:[12,1,2,3], note:"겨울 한정.", src:["s69","s70"]},
+      {name:"망고시루", price:"모름", won:null, months:[4,5,6,7], note:"봄~여름 한정.", src:["s70"]},
+      {name:"샤인멜론시루", price:"43,000원", won:43000, months:[6,7,8], note:"여름 한정.", src:["s70"]}
+    ]}
+};
+function shopOut(it){
+  if(it.ban) return it.ban;
+  if(it.months && it.months.indexOf(10)<0 && it.months.indexOf(11)<0) return "여행 기간(10~11월)에 안 파는 시즌 상품";
+  return "";
+}
 
 /* ---------- 자동 넣고 빼기 규칙 ---------- */
 // 1) 여행 3일(금·토·일) 모두 운영 안 함 → 제외
@@ -728,6 +845,9 @@ var RECS = [
   {title:"숙소 근처에서 짬뽕 한 그릇", tag:"먹기", g:["food"], p:"sanai",
     why:"숙소와 같은 청천면에 있고 2026년 소개글에도 나온 짬뽕집. 멀리 나가기 싫은 날 가까운 선택지야.",
     cost:"사나이짬뽕밥 13,000원", tip:"브레이크타임 14:00–16:30, 월요일은 점심만. 숙소로 포장해 오는 것도 방법.", near:["sonjja"]},
+  {title:"연풍에서 묵밥 먹고 폭포 구경", tag:"걷기·먹기", g:["walk","food"], p:"joryeong",
+    why:"조령산묵밥청국장은 연중무휴로 등록된 집이고, 바로 근처가 수옥폭포·연풍새재 옛길이야. 문경새재 사과축제 가는 길에 묶기 좋아.",
+    cost:"묵밥·청국장 10,000원 · 두부전골 15,000원", tip:"야외 테이블이 있다는 정보가 있어 반려견 동반은 전화로 물어보기(043-833-4687).", near:["suok","yeonpung"]},
   {title:"비 오거나 늘어지고 싶은 날", tag:"쉬기", g:["rest","dog"], p:"pizzatour",
     why:"무리해서 나가지 말고 피자 포장해서 숙소에서 쉬는 날로. 반려견도 편해.",
     cost:"피자 14,000~19,000원대", tip:"휴무일 정보 없음 → 전화 확인.", near:["teolbo","misoya"]},
@@ -786,7 +906,9 @@ var CHECK = [
     ["e1","겉옷과 우천 대비 용품 (10월 말 산간 아침저녁 쌀쌀 · 출발 전날 네이버 날씨 확인)"],
     ["e2","충전기와 보조배터리"],
     ["e3","걷기 편한 신발 (산막이옛길·은행나무길)"],
-    ["e4","반려견 추가요금 현장 결제 수단"]
+    ["e4","반려견 추가요금 현장 결제 수단"],
+    ["e5","아이스박스·아이스팩 (트레이더스 고기, 성심당 케이크 운반)"],
+    ["e6","전기그릴용 호일·키친타월 (양념 고기 눌어붙음 방지)"]
   ]}
 ];
 
@@ -899,7 +1021,7 @@ function placeCard(p){
       '<dt>예약 안내</dt><dd>'+esc(p.reserve)+'</dd>'+
     '</dl><div class="btns">'+mapBtns(p)+'</div>'+srcHtml(p.src)+'</div>';
 }
-var FOOD_KEYS=["sejamae","jucha","seoul","jeulgeoun","alkong","cheongi","yeongho","ducheon","gsmaeun","gisa","mat","cheongol","jungang","urihansik","sanai","sonjja","songmyeon","daeil","gwejja","surawon","misoya","gorae","teolbo","pizzatour","fiorito","sanchaek","haedeum","mwohanong","cheongan","forest","shimteo"];
+var FOOD_KEYS=["sejamae","joryeong","ansung","byeongcheon","jucha","seoul","jeulgeoun","alkong","cheongi","yeongho","ducheon","gsmaeun","sanmaeun","gisa","mat","cheongol","jungang","urihansik","sanai","sonjja","songmyeon","daeil","gwejja","surawon","misoya","gorae","teolbo","pizzatour","fiorito","sanchaek","haedeum","mwohanong","cheongan","forest","shimteo"];
 var curFoodFilter="all";
 var DAYNAMES=["금","토","일"];
 function openChips(p){
@@ -1144,6 +1266,42 @@ $("#themeBtn").addEventListener("click",function(){
   applyTheme(next); store(TKEY,next); toast(next==="dark"?"어두운 화면":"밝은 화면");
 });
 
+/* ---------- 장보기·빵 렌더 ---------- */
+var SKEY="goesan_shop_v1", shopSel={}; try{shopSel=JSON.parse(store(SKEY)||"{}")||{}}catch(e){shopSel={}}
+var curShop="traders";
+function renderShop(g){
+  if(g) curShop=g; var S=SHOP[curShop];
+  var keepI=S.items.filter(function(it){return !shopOut(it)}).slice(0,10), outI=S.items.filter(function(it){return shopOut(it)});
+  $("#shopList").innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">'+esc(S.title)+'</h3>'+
+    '<a class="btn primary" href="'+naverUrl(S.store.nq)+'" target="_blank" rel="noopener">네이버 지도: '+esc(S.store.name)+'</a></div>'+
+    '<p class="muted" style="margin:6px 0 8px">'+esc(S.lead)+'</p>'+
+    keepI.map(function(it,i){
+      var id=curShop+":"+it.name;
+      return '<div class="rank"><span class="no">'+(i+1)+'</span><label><input type="checkbox" data-shop="'+esc(id)+'"'+(shopSel[id]?' checked':'')+'> '+esc(it.name)+'</label><span class="pr">'+esc(it.price)+'</span>'+
+        '<span class="nt">'+esc(it.note)+(it.src?' · <span class="muted">출처: '+it.src.map(function(k){return '<a href="'+SRC[k].u+'" target="_blank" rel="noopener">'+esc(SRC[k].t)+'</a>'}).join(", ")+'</span>':'')+'</span></div>';
+    }).join("")+
+    (outI.length?'<details class="outlist"><summary>자동으로 뺀 상품 '+outI.length+'개 (이유 보기)</summary><ul>'+outI.map(function(it){return '<li><b>'+esc(it.name)+'</b> ('+esc(it.price)+') — '+esc(shopOut(it))+'</li>'}).join("")+'</ul></details>':'')+
+  '</div>';
+  shopSum();
+}
+function shopSum(){
+  var t=0,n=0,unk=0;
+  Object.keys(SHOP).forEach(function(g){ SHOP[g].items.forEach(function(it){ if(shopSel[g+":"+it.name] && !shopOut(it)){ n++; if(it.won) t+=it.won; else unk++; } }); });
+  $("#shopSum").textContent=n? (won(t)+" ("+n+"개"+(unk?", 가격 미확정 "+unk+"개 제외":"")+")") : "아직 없음";
+  return t;
+}
+$("#shopList").addEventListener("change",function(e){
+  var id=e.target.getAttribute("data-shop"); if(!id) return;
+  if(e.target.checked) shopSel[id]=true; else delete shopSel[id];
+  store(SKEY,JSON.stringify(shopSel)); shopSum();
+});
+bindFilter("#shopFilter",renderShop);
+$("#shopToBudget").addEventListener("click",function(){
+  var t=shopSum(); if(!t){toast("체크한 상품이 없어");return}
+  var r=bRows.filter(function(x){return x.id==="food"})[0]; r.amt=(Number(r.amt)||0)+t; if(r.st==="미정") r.st="예상";
+  renderBudgetRows(); calcBudget(); saveBudget(); toast("식비에 "+won(t)+" 더했어");
+});
+
 /* ---------- 오늘 안내 (자동) ---------- */
 (function(){
   var t=new Date(), ymd=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
@@ -1154,7 +1312,7 @@ $("#themeBtn").addEventListener("click",function(){
 })();
 
 /* ---------- 시작 ---------- */
-renderRecs("all"); renderFood("all"); renderSpot("all"); renderDog("all"); renderMapDays();
+renderRecs("all"); renderFood("all"); renderSpot("all"); renderShop("traders"); renderDog("all"); renderMapDays();
 renderBudgetRows(); calcBudget(); renderCheck();
 showPanel(location.hash.slice(1)||"home",false);
 })();
