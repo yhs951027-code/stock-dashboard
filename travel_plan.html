@@ -118,6 +118,10 @@ nav.menu a.navlink{flex:0 0 auto;padding:8px 12px;border-radius:20px;font-size:1
 .rec h3{margin:0}
 .rec .alts{font-size:14px}
 .rec .alts button{border:0;background:none;padding:0;color:var(--brand);text-decoration:underline;cursor:pointer;font-size:14px}
+.outlist{margin:12px 0 0;font-size:14px;color:var(--sub)}
+.outlist summary{cursor:pointer;padding:6px 0}
+.outlist ul{margin:4px 0 0;padding-left:20px}
+.today{background:var(--brand-soft);border:1px solid var(--brand);border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:15px}
 /* shop list */
 .shop{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;box-shadow:var(--shadow)}
 .shop summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
@@ -236,7 +240,8 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
     <div class="stat"><div class="k">숙소</div><div class="v">스테이소몽 소몽</div><div class="s">수영장 이용 불가 객실</div></div>
   </div>
 
-  <div class="btns" style="margin:0 0 14px"><a class="btn primary" href="travel_schedule.html">시간별 일정 보기 →</a><button class="btn" id="shareCopy" type="button">단톡방용 추천 요약 복사</button></div>
+  <div id="todayBox"></div>
+  <div class="btns" style="margin:0 0 14px"><a class="btn primary" href="travel_schedule.html">시간별 일정 보기 →</a><a class="btn" href="https://search.naver.com/search.naver?query=%EA%B4%B4%EC%82%B0%EA%B5%B0+%EC%B2%AD%EC%B2%9C%EB%A9%B4+%EB%82%A0%EC%94%A8" target="_blank" rel="noopener">괴산 청천 날씨 (네이버)</a><button class="btn" id="shareCopy" type="button">단톡방용 추천 요약 복사</button></div>
   <div class="notice"><b>출발은 각자, 시작은 현지에서.</b> 천안·인천·진해에서 따로 출발하니 청천면에서 모였다가 체크인하는 흐름을 추천해. 시간 단위 일정은 <a href="travel_schedule.html">시간별 일정 페이지</a>에 따로 있어.</div>
 
   <div class="grid">
@@ -283,8 +288,8 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 맛집·카페 -->
 <section class="panel" id="food">
   <h2>맛집 · 카페</h2>
-  <p class="lead"><b>기본으로는 최근 2년(2024년 10월 이후) 안에 날짜가 찍힌 소개글이나 데이터가 확인된 곳만 보여줘.</b> 네이버·구글 리뷰는 이 환경에서 직접 열 수 없어서, 대신 날짜가 확인되는 맛집 소개글·관광공사 데이터·매출 데이터로 판단했어. 그래도 가기 전에 네이버 지도 버튼으로 한 번 더 확인해줘. 가게 이름을 누르면 가격과 상세 정보가 펼쳐져. 오른쪽 <b>금·토·일</b> 표시는 여행 날짜에 영업하는지야. <span class="oc o">영업</span> 출처상 그날 영업, <span class="oc x">휴무</span> 출처상 휴무, <span class="oc q">모름</span> 휴무일 정보가 없거나 출처끼리 달라서 판단 못 함. 폐업 여부는 실시간으로 확인할 수 없어.</p>
-  <div class="notice">숙소에서 차로 몇 분인지는 <b>못 넣었어.</b> 이 페이지를 만든 환경에서는 네이버 지도에 접속이 안 돼서 직접 잴 수 없었어. 가게마다 <b>네이버 지도</b> 버튼(가게 검색)과 <b>숙소에서 길찾기</b> 버튼(카카오맵, 숙소→가게 경로)을 넣어뒀으니 누르면 바로 소요시간이 나와. 대신 가게가 어느 면에 있는지 적어뒀어. 숙소는 <b>청천면</b>이야.</div>
+  <p class="lead"><b>최근 2년(2024년 10월 이후) 안에 날짜가 찍힌 소개글이나 데이터가 확인된 곳만 보여줘.</b> 네이버·구글 리뷰는 이 환경에서 직접 열 수 없어서, 날짜가 확인되는 맛집 소개글·관광공사 데이터·매출 데이터로 판단했어. 가기 전에 네이버 지도 버튼으로 리뷰를 한 번 더 확인해줘. 가게 이름을 누르면 가격과 상세 정보가 펼쳐져. 오른쪽 <b>금·토·일</b> 표시는 여행 날짜에 영업하는지야. <span class="oc o">영업</span> 출처상 그날 영업, <span class="oc x">휴무</span> 출처상 휴무, <span class="oc q">모름</span> 휴무일 정보가 없거나 출처끼리 달라서 판단 못 함. 폐업 여부는 실시간으로 확인할 수 없어.</p>
+  <div class="notice">숙소에서 차로 몇 분인지는 <b>못 넣었어</b>(이 환경에서 네이버 지도 접속이 안 돼서 직접 잴 수 없었어). 가게를 펼쳐서 <b>네이버 지도</b> 버튼 → '길찾기' → 출발지 '스테이소몽'으로 확인해줘. 아래 목록은 <b>자동 기준</b>으로 걸렀어: 여행 기간 운영 · 반려견 동반 불가 아님 · 최근 2년 내 영업 흔적. 빠진 곳은 맨 아래 '자동으로 뺀 곳'에서 이유를 볼 수 있어.</div>
   <div class="filters" id="foodFilter">
     <button aria-pressed="true" data-f="all">전체</button>
     <button aria-pressed="false" data-f="한식">한식</button>
@@ -295,7 +300,6 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
     <button aria-pressed="false" data-f="dogcond">반려견 조건 있는 곳</button>
     <button aria-pressed="false" data-f="open3">3일 모두 영업</button>
   </div>
-  <div class="btns" style="margin:0 0 10px"><button class="btn" id="foodAll" type="button" aria-pressed="false"></button></div>
   <p class="muted" id="foodCount" style="margin:0 0 10px"></p>
   <div id="foodList"></div>
 </section>
@@ -303,7 +307,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 볼거리 -->
 <section class="panel" id="spot">
   <h2>관광지 · 볼거리</h2>
-  <p class="lead">여행 기간(10/30 금 – 11/1 일)에 갈 수 있는 곳만 남겼어. 오른쪽 금·토·일 표시가 그날 운영 여부야. 괴산 밖이라 거리가 있는 곳도 넣었으니 <b>숙소에서 길찾기</b>로 시간 먼저 확인해줘.</p>
+  <p class="lead">여행 기간(10/30 금 – 11/1 일)에 반려견과 갈 수 있는 곳만 자동으로 남겼어. 오른쪽 금·토·일 표시가 그날 운영 여부야. 괴산 밖이라 거리가 있는 곳도 있으니 <b>네이버 지도</b> → 길찾기로 시간 먼저 확인해줘.</p>
   <div class="filters" id="spotFilter">
     <button aria-pressed="true" data-f="all">전체</button>
     <button aria-pressed="false" data-f="near">괴산 안</button>
@@ -337,15 +341,14 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 지도·길찾기 -->
 <section class="panel" id="map">
   <h2>지도 · 길찾기</h2>
-  <div class="notice">지도 API(키)를 쓰지 않고, 카카오맵·네이버 지도 <b>검색 링크</b>로 연결하는 방식이야. 페이지 안에 지도가 뜨지는 않고, 누르면 새 창에서 지도 앱/사이트가 열려. 링크 동작은 이 파일을 만든 환경에서 실제로 눌러보지 못했으니 처음 한 번 눌러서 확인해줘.</div>
+  <div class="notice">모든 지도 버튼은 <b>네이버 지도</b> 검색으로 열려(지도 API 키 없이 링크 방식). '지역명 + 상호'로 검색해서 네이버 리뷰·영업 정보를 바로 확인할 수 있어. 페이지 안에 지도가 뜨지는 않고, 누르면 새 창에서 지도 앱/사이트가 열려. 링크 동작은 이 파일을 만든 환경에서 실제로 눌러보지 못했으니 처음 한 번 눌러서 확인해줘.</div>
   <div class="card" style="margin-bottom:16px">
-    <h3>직접 길찾기</h3>
-    <div class="dir">
-      <div><label for="dFrom">출발지</label><input id="dFrom" placeholder="예: 천안역, 집 주소"></div>
-      <div><label for="dTo">목적지</label><input id="dTo" placeholder="예: 스테이소몽" value="충북 괴산군 청천면 괴산로상신2길 52-9"></div>
-      <div class="btns" style="margin:0"><a class="btn primary" id="dGo" href="#" target="_blank" rel="noopener">카카오맵 길찾기</a><button class="btn" id="dSwap" type="button">⇅ 바꾸기</button></div>
+    <h3>네이버 지도에서 찾기</h3>
+    <div class="dir" style="grid-template-columns:1fr auto">
+      <div><label for="dTo">장소 이름 또는 주소</label><input id="dTo" placeholder="예: 괴산 즐거운날" value="스테이소몽"></div>
+      <div class="btns" style="margin:0"><a class="btn primary" id="dGo" href="#" target="_blank" rel="noopener">네이버 지도 열기</a></div>
     </div>
-    <p class="muted" style="margin:8px 0 0">카카오맵 길찾기 URL은 출발지·목적지를 이름으로 넘기는 방식이라, 열린 뒤 후보 중 정확한 장소를 한 번 골라야 할 수 있어.</p>
+    <p class="muted" style="margin:8px 0 0">네이버 지도는 장소 이름만으로 경로를 미리 채워서 열 수가 없어. 장소를 연 다음 '길찾기'를 누르고 출발지에 각자 출발지나 '스테이소몽'을 넣으면 돼.</p>
   </div>
   <h3>추천 장소 위치</h3>
   <p class="muted" style="margin:0 0 8px">날짜별 동선은 <a href="travel_schedule.html">시간별 일정 페이지</a>에 있어.</p>
@@ -682,6 +685,25 @@ var VNOTE = {
 };
 Object.keys(P).forEach(function(k){ P[k].ver=VER[k]||""; P[k].vnote=VNOTE[k]||""; });
 
+/* ---------- 자동 넣고 빼기 규칙 ---------- */
+// 1) 여행 3일(금·토·일) 모두 운영 안 함 → 제외
+// 2) 반려견 동반 불가 → 제외 (반려견 2마리와 함께 다니는 여행이라)
+// 3) 식당·카페인데 최근 2년(2024-10 이후) 영업 흔적이 없음 → 제외
+var FOODCATS=["한식","중식","일식","양식","카페"];
+function autoOut(k){
+  var p=P[k]; if(!p) return "데이터 없음";
+  if(p.open && p.open.join("")==="xxx") return "여행 기간(금·토·일) 모두 운영 안 함";
+  if(p.dog===3) return "반려견 동반 불가";
+  if(FOODCATS.indexOf(p.cat)>=0 && !p.ver) return "최근 2년 내 영업 흔적 확인 못 함"+(p.vnote?" ("+p.vnote+")":"");
+  return "";
+}
+function keep(k){ return !autoOut(k); }
+function outListHtml(keys){
+  var out=keys.filter(function(k){return !keep(k)});
+  if(!out.length) return "";
+  return '<details class="outlist"><summary>자동으로 뺀 곳 '+out.length+'곳 (이유 보기)</summary><ul>'+out.map(function(k){return '<li><b>'+esc(P[k].name)+'</b> — '+esc(autoOut(k))+'</li>'}).join("")+'</ul></details>';
+}
+
 /* ---------- 추천 ---------- */
 // g: dog=반려견과 함께 가기 좋음, food=먹기, walk=걷기·구경, rest=쉬기
 var RECS = [
@@ -761,7 +783,7 @@ var CHECK = [
     ["d8","털 정리용 테이프 클리너·물티슈"]
   ]},
   {g:"개인 준비물", items:[
-    ["e1","겉옷과 우천 대비 용품 (10월 말 산간 아침저녁 쌀쌀)"],
+    ["e1","겉옷과 우천 대비 용품 (10월 말 산간 아침저녁 쌀쌀 · 출발 전날 네이버 날씨 확인)"],
     ["e2","충전기와 보조배터리"],
     ["e3","걷기 편한 신발 (산막이옛길·은행나무길)"],
     ["e4","반려견 추가요금 현장 결제 수단"]
@@ -789,8 +811,14 @@ function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");
 // 지도 검색어: 주소의 괄호 설명은 빼고 사용
 function q(p){ if(p.mapq) return p.mapq; return p.addr.replace(/\s*\(.*?\)\s*/g," ").replace(/ 일대$/,"").trim() }
 function naverUrl(s){return "https://map.naver.com/p/search/"+enc(s)}
-function kakaoUrl(s){return "https://map.kakao.com/?q="+enc(s)}
-function kakaoRoute(a,b){return "https://map.kakao.com/?sName="+enc(a)+"&eName="+enc(b)}
+// 네이버 지도 검색어: 지역명 + 상호 (괄호 설명 제거). 관광지는 mapq 우선.
+function nq(p){
+  if(p.nq) return p.nq; if(p.mapq) return p.mapq;
+  var nm=p.name.replace(/\s*\(.*?\)\s*/g," ").trim();
+  var m=(p.area||"").match(/^(괴산|문경|청주|충주)/);
+  return (m?m[1]:"괴산")+" "+nm;
+}
+var ROUTE_TIP="네이버 지도에서 '길찾기' → 출발지에 '스테이소몽' 입력하면 차로 몇 분인지 나와";
 
 function dogBadge(n){
   if(n===1) return '<span class="badge b-ok">두 마리 확인 완료</span>';
@@ -801,9 +829,7 @@ function srcHtml(ids){
   return '<div class="src">출처 (확인일 '+CHECKED+'): '+ids.map(function(id){var s=SRC[id];return '<a href="'+s.u+'" target="_blank" rel="noopener">'+esc(s.t)+'</a>'}).join(" · ")+'</div>';
 }
 function mapBtns(p){
-  var s=q(p);
-  return '<a class="btn" href="'+naverUrl(s)+'" target="_blank" rel="noopener">네이버 지도</a>'+
-         '<a class="btn" href="'+kakaoUrl(s)+'" target="_blank" rel="noopener">카카오맵</a>'+
+  return '<a class="btn primary" href="'+naverUrl(nq(p))+'" target="_blank" rel="noopener">네이버 지도</a>'+
          '<button class="btn" type="button" data-copy="'+esc(p.addr)+'">주소 복사</button>';
 }
 
@@ -828,8 +854,8 @@ window.addEventListener("hashchange",function(){showPanel(location.hash.slice(1)
 /* ---------- 추천 ---------- */
 function recCard(r){
   var p=P[r.p], base=P.somong;
-  var near=(r.near||[]).filter(function(k){return P[k]}).map(function(k){return '<button type="button" data-goshop="'+k+'">'+esc(P[k].name)+'</button>'}).join(" · ");
-  var route = p===base ? '' : '<a class="btn primary" href="'+kakaoRoute(q(base),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기</a>';
+  var near=(r.near||[]).filter(function(k){return P[k]&&keep(k)}).map(function(k){return '<button type="button" data-goshop="'+k+'">'+esc(P[k].name)+'</button>'}).join(" · ");
+  var route = '';
   return '<div class="card rec">'+
     '<span class="badge b-tag tag">'+esc(r.tag)+'</span>'+
     '<h3>'+esc(r.title)+'</h3>'+
@@ -845,7 +871,7 @@ function recCard(r){
   '</div>';
 }
 function renderRecs(f){
-  $("#recList").innerHTML=RECS.filter(function(r){return f==="all"||r.g.indexOf(f)>=0}).map(recCard).join("");
+  $("#recList").innerHTML=RECS.filter(function(r){return keep(r.p) && (f==="all"||r.g.indexOf(f)>=0)}).map(recCard).join("");
 }
 // 근처·대안 가게 이름을 누르면 맛집 탭의 그 가게를 펼쳐서 보여줌
 document.addEventListener("click",function(e){
@@ -853,7 +879,6 @@ document.addEventListener("click",function(e){
   var k=b.getAttribute("data-goshop");
   if(FOOD_KEYS.indexOf(k)<0){ showPanel(P[k].cat==="장보기"?"map":"spot",true); window.scrollTo({top:$("nav.menu").offsetTop,behavior:"smooth"}); return; }
   $$("#foodFilter button").forEach(function(x){x.setAttribute("aria-pressed",x.getAttribute("data-f")==="all"?"true":"false")});
-  if(!P[k].ver) showAll=true;
   renderFood("all"); showPanel("food",true);
   var d=$('#foodList details[data-k="'+k+'"]'); if(d){ d.open=true; d.scrollIntoView({block:"start",behavior:"smooth"}); }
 });
@@ -875,7 +900,7 @@ function placeCard(p){
     '</dl><div class="btns">'+mapBtns(p)+'</div>'+srcHtml(p.src)+'</div>';
 }
 var FOOD_KEYS=["sejamae","jucha","seoul","jeulgeoun","alkong","cheongi","yeongho","ducheon","gsmaeun","gisa","mat","cheongol","jungang","urihansik","sanai","sonjja","songmyeon","daeil","gwejja","surawon","misoya","gorae","teolbo","pizzatour","fiorito","sanchaek","haedeum","mwohanong","cheongan","forest","shimteo"];
-var showAll=false, curFoodFilter="all";
+var curFoodFilter="all";
 var DAYNAMES=["금","토","일"];
 function openChips(p){
   return '<span class="days" aria-label="여행 날짜 영업 여부">'+(p.open||["?","?","?"]).map(function(v,i){
@@ -896,7 +921,7 @@ function shopItem(k){
       '<dl class="kv">'+
         '<dt>메뉴</dt><dd>'+p.menu+'</dd>'+
         '<dt>영업</dt><dd>'+p.hours+'<div class="muted">여행 날짜 판단 근거: '+esc(p.openNote||"정보 없음")+'</div></dd>'+
-        '<dt>숙소에서 차로</dt><dd><span class="need">미측정</span> · 아래 버튼으로 확인 ('+esc(p.area||"")+')</dd>'+
+        '<dt>숙소에서 차로</dt><dd><span class="need">미측정</span> · '+ROUTE_TIP+' ('+esc(p.area||"")+')</dd>'+
         '<dt>주소</dt><dd>'+esc(p.addr)+'</dd>'+
         '<dt>전화</dt><dd>'+phone+'</dd>'+
         '<dt>주차</dt><dd>'+p.parking+'</dd>'+
@@ -904,7 +929,7 @@ function shopItem(k){
         '<dt>실내·야외</dt><dd>'+p.inout+'</dd>'+
         '<dt>참고</dt><dd>'+esc(p.reserve)+'</dd>'+
       '</dl>'+
-      '<div class="btns"><a class="btn primary" href="'+kakaoRoute(q(base),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기 (카카오맵)</a>'+mapBtns(p)+'</div>'+
+      '<div class="btns">'+mapBtns(p)+'</div>'+
       srcHtml(p.src)+
     '</div></details>';
 }
@@ -917,18 +942,14 @@ function renderFood(f){
     if(f==="open3") return (p.open||[]).join("")==="ooo";
     return p.cat===f;
   });
-  var hidden=base.filter(function(k){return !P[k].ver}).length;
-  var keys=showAll?base:base.filter(function(k){return P[k].ver});
-  $("#foodAll").textContent=showAll?"최근 확인된 곳만 보기":"최근 흔적 확인 못 한 곳도 보기 ("+hidden+"곳)";
-  $("#foodAll").setAttribute("aria-pressed",showAll?"true":"false");
-  $("#foodCount").textContent=keys.length+"곳"+(showAll?" (최근 확인 못 한 곳 포함)":"");
-  $("#foodList").innerHTML=keys.map(shopItem).join("") || '<p class="muted">이 분류에서 최근 2년 내 흔적이 확인된 곳은 없어.'+(hidden?' 위 버튼으로 확인 못 한 곳까지 볼 수 있어.':'')+'</p>';
+  var keys=base.filter(keep);
+  $("#foodCount").textContent=keys.length+"곳";
+  $("#foodList").innerHTML=(keys.map(shopItem).join("") || '<p class="muted">이 분류에서 기준을 통과한 곳이 없어.</p>')+outListHtml(base);
 }
-$("#foodAll").addEventListener("click",function(){ showAll=!showAll; renderFood(); });
 var SPOT_KEYS=["mungwang","sanmak","suok","yeonpung","jungangtap","cnd","mgsaejae","mghealing","hwayang"];
 function renderSpot(f){
   f=f||"all";
-  var keys=SPOT_KEYS.filter(function(k){
+  var keys=SPOT_KEYS.filter(keep).filter(function(k){
     var p=P[k];
     if(f==="near") return /^괴산/.test(p.area);
     if(f==="far") return !/^괴산/.test(p.area);
@@ -943,19 +964,19 @@ function renderSpot(f){
         '<div class="pricebox"><b>비용</b>'+p.price+'</div>'+
         '<dl class="kv">'+
           '<dt>운영</dt><dd>'+p.hours+'<div class="muted">여행 날짜 판단 근거: '+esc(p.openNote||"")+'</div></dd>'+
-          '<dt>숙소에서 차로</dt><dd><span class="need">미측정</span> · 아래 버튼으로 확인</dd>'+
+          '<dt>숙소에서 차로</dt><dd><span class="need">미측정</span> · '+ROUTE_TIP+'</dd>'+
           '<dt>주소</dt><dd>'+esc(p.addr)+'</dd>'+
           '<dt>주차</dt><dd>'+p.parking+'</dd>'+
           '<dt>반려견</dt><dd>'+dogBadge(p.dog)+'<div class="muted" style="margin-top:4px">'+esc(p.dogText)+'</div></dd>'+
           '<dt>공간</dt><dd>'+p.inout+'</dd>'+
           '<dt>참고</dt><dd>'+esc(p.reserve)+'</dd>'+
         '</dl>'+
-        '<div class="btns"><a class="btn primary" href="'+kakaoRoute(q(base),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기 (카카오맵)</a>'+mapBtns(p)+'</div>'+srcHtml(p.src)+
+        '<div class="btns">'+mapBtns(p)+'</div>'+srcHtml(p.src)+
       '</div></details>';
-  }).join("");
+  }).join("")+outListHtml(SPOT_KEYS);
 }
 function renderDog(f){
-  var keys=Object.keys(P);
+  var keys=Object.keys(P).filter(keep);
   $("#dogGrid").innerHTML=keys.map(function(k){return P[k]}).filter(function(p){return f==="all"||String(p.dog)===f}).map(function(p){
     return '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><h3>'+esc(p.name)+'</h3><span class="badge b-tag">'+esc(p.cat)+'</span></div>'+
       dogBadge(p.dog)+'<p style="margin:8px 0 0">'+esc(p.dogText)+'</p><p class="muted" style="margin:6px 0 0">실내·야외: '+p.inout+'</p>'+srcHtml(p.src)+'</div>';
@@ -975,17 +996,16 @@ bindFilter("#spotFilter",renderSpot);
 
 /* ---------- 지도 ---------- */
 function renderMapDays(){
-  var keys=["somong"]; RECS.forEach(function(r){ if(keys.indexOf(r.p)<0) keys.push(r.p); }); SPOT_KEYS.forEach(function(k){ if(keys.indexOf(k)<0) keys.push(k); });
+  var keys=["somong"]; RECS.forEach(function(r){ if(keys.indexOf(r.p)<0) keys.push(r.p); }); SPOT_KEYS.forEach(function(k){ if(keys.indexOf(k)<0) keys.push(k); }); keys=keys.filter(keep);
   $("#mapDays").innerHTML='<div class="card"><ol style="margin:0;padding-left:20px">'+keys.map(function(k){
     var p=P[k];
     return '<li style="margin-bottom:10px"><b>'+esc(p.name)+'</b><div class="muted">'+esc(p.addr)+'</div><div class="btns" style="margin-top:4px">'+
-      (k!=="somong"?'<a class="btn" href="'+kakaoRoute(q(P.somong),q(p))+'" target="_blank" rel="noopener">숙소에서 길찾기</a>':'')+mapBtns(p)+'</div></li>';
+      mapBtns(p)+'</div></li>';
   }).join("")+'</ol></div>';
 }
-function syncRoute(){var a=$("#dFrom").value.trim(), b=$("#dTo").value.trim(); $("#dGo").href = (a&&b) ? kakaoRoute(a,b) : "#";}
-$("#dFrom").addEventListener("input",syncRoute); $("#dTo").addEventListener("input",syncRoute);
-$("#dGo").addEventListener("click",function(e){ if($("#dGo").getAttribute("href")==="#"){ e.preventDefault(); toast("출발지와 목적지를 모두 입력해줘"); } });
-$("#dSwap").addEventListener("click",function(){var a=$("#dFrom"),b=$("#dTo"),t=a.value;a.value=b.value;b.value=t;syncRoute()});
+function syncRoute(){var b=$("#dTo").value.trim(); $("#dGo").href = b ? naverUrl(b) : "#";}
+$("#dTo").addEventListener("input",syncRoute);
+$("#dGo").addEventListener("click",function(e){ if($("#dGo").getAttribute("href")==="#"){ e.preventDefault(); toast("장소 이름을 입력해줘"); } });
 syncRoute();
 
 /* ---------- 주소 복사 ---------- */
@@ -1123,6 +1143,15 @@ $("#themeBtn").addEventListener("click",function(){
   var isDark=cur?cur==="dark":sysDark; var next=isDark?"light":"dark";
   applyTheme(next); store(TKEY,next); toast(next==="dark"?"어두운 화면":"밝은 화면");
 });
+
+/* ---------- 오늘 안내 (자동) ---------- */
+(function(){
+  var t=new Date(), ymd=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
+  var days=["2026-10-30","2026-10-31","2026-11-01"], i=days.indexOf(ymd), box=$("#todayBox");
+  if(i>=0) box.innerHTML='<div class="today"><b>오늘은 여행 '+(i+1)+'일차야.</b> <a href="travel_schedule.html">오늘 시간표 보기 →</a></div>';
+  else if(ymd<days[0]){ var d=Math.round((new Date(2026,9,30)-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/86400000);
+    box.innerHTML='<div class="today"><b>출발까지 '+d+'일.</b> 체크리스트에서 예약·반려견 준비부터 확인해줘.</div>'; }
+})();
 
 /* ---------- 시작 ---------- */
 renderRecs("all"); renderFood("all"); renderSpot("all"); renderDog("all"); renderMapDays();
