@@ -316,7 +316,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 장보기·빵 -->
 <section class="panel" id="shop">
   <h2>장보기 · 빵</h2>
-  <p class="lead">트레이더스 먹거리 TOP 20과 성심당 베이커리·케익부띠끄 TOP 10이야(2026-10-11 검색 기준). 숙소 규정에 안 맞는 상품(숯·장작·가스)과 지금 안 파는 시즌 케이크는 자동으로 뺐어. <b>사진 보기</b>를 누르면 네이버 이미지 검색으로 열려(이 페이지에 사진을 직접 넣을 수는 없었어). 살 것에 체크하면 아래에 합계가 나와(가격이 범위·미상인 건 합계에서 빠져).</p>
+  <p class="lead">트레이더스 먹거리 TOP 20과 성심당 베이커리·케익부띠끄 TOP 10이야(2026-10-11 검색 기준). 숙소 규정에 안 맞는 상품(숯·장작·가스)과 지금 안 파는 시즌 케이크는 자동으로 뺐어. <b>사진 보기</b>(네이버 이미지)·<b>블로그 후기</b>(사진 많은 네이버 블로그 후기)·성심당은 <b>나무위키</b> 제품 문서로 연결돼. 사진을 이 페이지에 직접 넣을 수는 없었어(외부 이미지를 가져올 수 없는 환경이라). 버튼이 안 열리면 <b>상품명 복사</b> 후 네이버 앱에서 검색해줘. 살 것에 체크하면 아래에 합계가 나와(가격이 범위·미상인 건 합계에서 빠져).</p>
   <div class="filters" id="shopFilter">
     <button aria-pressed="true" data-f="traders">트레이더스</button>
     <button aria-pressed="false" data-f="bakery">성심당 베이커리</button>
@@ -363,12 +363,12 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 지도·길찾기 -->
 <section class="panel" id="map">
   <h2>지도 · 길찾기</h2>
-  <div class="notice">모든 지도 버튼은 <b>네이버 지도</b> 검색으로 열려(지도 API 키 없이 링크 방식). '지역명 + 상호'로 검색해서 네이버 리뷰·영업 정보를 바로 확인할 수 있어. 페이지 안에 지도가 뜨지는 않고, 누르면 새 창에서 지도 앱/사이트가 열려. 링크 동작은 이 파일을 만든 환경에서 실제로 눌러보지 못했으니 처음 한 번 눌러서 확인해줘.</div>
+  <div class="notice">지도 버튼은 <b>네이버</b>로 열려(휴대폰은 네이버 모바일 검색의 장소 카드, PC는 네이버 지도). 버튼이 안 열리는 환경이면 <b>이름 복사</b>를 눌러 네이버 지도 앱 검색창에 붙여넣어줘. '지역명 + 상호'로 검색해서 네이버 리뷰·영업 정보를 바로 확인할 수 있어. 페이지 안에 지도가 뜨지는 않고, 누르면 새 창에서 지도 앱/사이트가 열려. 링크 동작은 이 파일을 만든 환경에서 실제로 눌러보지 못했으니 처음 한 번 눌러서 확인해줘.</div>
   <div class="card" style="margin-bottom:16px">
     <h3>네이버 지도에서 찾기</h3>
     <div class="dir" style="grid-template-columns:1fr auto">
       <div><label for="dTo">장소 이름 또는 주소</label><input id="dTo" placeholder="예: 괴산 즐거운날" value="스테이소몽"></div>
-      <div class="btns" style="margin:0"><a class="btn primary" id="dGo" href="#" target="_blank" rel="noopener">네이버 지도 열기</a></div>
+      <div class="btns" style="margin:0"><a class="btn primary" id="dGo" href="#" target="_blank" rel="noopener">네이버에서 열기</a><button class="btn" id="dCopy" type="button" data-copy="" data-what="이름">이름 복사</button></div>
     </div>
     <p class="muted" style="margin:8px 0 0">네이버 지도는 장소 이름만으로 경로를 미리 채워서 열 수가 없어. 장소를 연 다음 '길찾기'를 누르고 출발지에 각자 출발지나 '스테이소몽'을 넣으면 돼.</p>
   </div>
@@ -412,7 +412,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 출처 -->
 <section class="panel" id="source">
   <h2>출처 · 확인 날짜</h2>
-  <div class="notice">모든 정보는 <b>2026-10-11에 웹 검색 결과</b>로 확인했어. 이 파일을 만든 환경은 외부 웹페이지에 직접 접속이 막혀 있어서, 원문 페이지를 열어 대조하진 못했어. 그래서 가격·영업시간·동반 조건은 방문 전에 한 번 더 확인하는 걸 전제로 봐줘. 이 페이지는 열 때 인터넷 검색을 하지 않아.</div>
+  <div class="notice">출처 사이트 중 일부는 페이지가 바뀌었거나 앱 전용이라 바로 안 열릴 수 있어서, 누르는 링크 대신 <b>링크 복사</b>로 바꿨어. 복사해서 브라우저 주소창에 붙여넣으면 돼. 모든 정보는 <b>2026-10-11에 웹 검색 결과</b>로 확인했어. 이 파일을 만든 환경은 외부 웹페이지에 직접 접속이 막혀 있어서, 원문 페이지를 열어 대조하진 못했어. 그래서 가격·영업시간·동반 조건은 방문 전에 한 번 더 확인하는 걸 전제로 봐줘. 이 페이지는 열 때 인터넷 검색을 하지 않아.</div>
   <div style="overflow-x:auto"><table class="srctable" id="srcTable"><thead><tr><th>번호</th><th>내용</th><th>출처</th><th>확인일</th></tr></thead><tbody></tbody></table></div>
 </section>
 
@@ -433,7 +433,6 @@ var CHECKED = "2026-10-11";
 var SRC = {
   s1:{t:"스테이소몽 객실·반려견·바비큐 규정 (야놀자)", u:"https://nol.yanolja.com/stay/domestic/10064853"},
   s2:{t:"스테이소몽 주소·전화 (맘맘)", u:"https://mom-mom.net/travel/properties/68752b3566fa9f7ed41a104c"},
-  s3:{t:"스테이소몽 공식 홈페이지 (검색 결과에 노출된 주소)", u:"http://stay-somong.com/"},
   s4:{t:"산막이옛길 (괴산군 문화관광)", u:"https://www.goesan.go.kr/tour/selectTourInfo.do?key=858&tourNo=580"},
   s5:{t:"산막이옛길 (대한민국 구석구석)", u:"https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=f28a4a6d-481e-4895-bb4c-b03e3ecc7664"},
   s6:{t:"산막이옛길 유람선 운항 중단 기사 (2026-08-20)", u:"https://www.news-wa.com/article/travel/tour-korea/2026/08/20/20260820500061"},
@@ -532,7 +531,7 @@ var P = {
     menu:"-", hours:"체크인 15:00 · 체크아웃 11:00", parking:N,
     dog:2, dogText:"네이버 객실 정보에 '소몽(애견동반가능/수영장이용불가)'로 표기. 숙소 공통 반려견 규정은 15kg 미만, 1마리당 1박 30,000원(현장 결제), 최대 3마리, 맹견 불가, 사전 문의 필수 (예약 사이트 기준).",
     inout:"독채 · 침실 2 · 욕실 2 · 소몽은 수영장 이용 불가", reserve:"기준 2인 · 최대 8인 (네이버). 숯·가스버너·장작 반입 사용 불가, 전기그릴 1회 30,000원(입실 후 22시 전). 문의 010-4668-7424(공식 홈페이지 기재).",
-    price:"소몽 객실 네이버 표기 119,000 ~ 499,000원 (날짜·인원별 상이, 이번 일정 금액은 예약 내역 확인)", src:["s41","s1","s2","s3"]},
+    price:"소몽 객실 네이버 표기 119,000 ~ 499,000원 (날짜·인원별 상이, 이번 일정 금액은 예약 내역 확인)", src:["s41","s1","s2"]},
   forest:{name:"숲, Camp&Cafe", cat:"카페", area:"청천면 (숙소와 같은 면)", phone:"0507-1344-8029 / 043-834-5556", open:["o","o","o"], openNote:"화요일 정기휴무 → 금·토·일 영업 (출처 기준)", addr:"충북 괴산군 청천면 금평로 18",
     menu:"아메리카노 3,500원 · 숲 라떼 5,000원 · 천사 자몽에이드 6,000원", hours:"수~일 10:00–19:00 · 화요일 정기휴무 (월요일 영업 여부는 확인 필요)",
     parking:"주차장 넓다는 후기 있음", dog:2, dogText:"반려동물 동반 가능·대형견 가능·목줄 착용·실내 이용 가능으로 소개. 두 마리 동시 입장 조건은 명시 없음.",
@@ -955,7 +954,11 @@ function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");
 
 // 지도 검색어: 주소의 괄호 설명은 빼고 사용
 function q(p){ if(p.mapq) return p.mapq; return p.addr.replace(/\s*\(.*?\)\s*/g," ").replace(/ 일대$/,"").trim() }
-function naverUrl(s){return "https://map.naver.com/p/search/"+enc(s)}
+// 휴대폰은 네이버 모바일 통합검색(장소·지도·리뷰 카드), PC는 네이버 지도 검색
+var IS_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||"");
+function naverUrl(s){return IS_MOBILE ? "https://m.search.naver.com/search.naver?query="+enc(s) : "https://map.naver.com/p/search/"+enc(s)}
+function naverBlog(s){return IS_MOBILE ? "https://m.search.naver.com/search.naver?where=m_blog&query="+enc(s) : "https://search.naver.com/search.naver?where=blog&query="+enc(s)}
+function naverImg(s){return IS_MOBILE ? "https://m.search.naver.com/search.naver?where=m_image&query="+enc(s) : "https://search.naver.com/search.naver?where=image&query="+enc(s)}
 // 네이버 지도 검색어: 지역명 + 상호 (괄호 설명 제거). 관광지는 mapq 우선.
 function nq(p){
   if(p.nq) return p.nq; if(p.mapq) return p.mapq;
@@ -963,7 +966,7 @@ function nq(p){
   var m=(p.area||"").match(/^(괴산|문경|청주|충주)/);
   return (m?m[1]:"괴산")+" "+nm;
 }
-var ROUTE_TIP="네이버 지도에서 '길찾기' → 출발지에 '스테이소몽' 입력하면 차로 몇 분인지 나와";
+var ROUTE_TIP="네이버 지도에서 이 장소 → '길찾기' → 출발지에 '스테이소몽' 입력하면 차로 몇 분인지 나와 (버튼이 안 열리면 '이름 복사' 후 네이버 지도 앱에 붙여넣기)";
 
 function dogBadge(n){
   if(n===1) return '<span class="badge b-ok">두 마리 확인 완료</span>';
@@ -971,10 +974,11 @@ function dogBadge(n){
   return '<span class="badge b-warn">추가 확인 필요</span>';
 }
 function srcHtml(ids){
-  return '<div class="src">출처 (확인일 '+CHECKED+'): '+ids.map(function(id){var s=SRC[id];return '<a href="'+s.u+'" target="_blank" rel="noopener">'+esc(s.t)+'</a>'}).join(" · ")+'</div>';
+  return '<div class="src">출처 (확인일 '+CHECKED+'): '+ids.filter(function(id){return SRC[id]}).map(function(id){return esc(SRC[id].t)}).join(" · ")+' <span class="muted">· 주소는 출처 메뉴에서 복사</span></div>';
 }
 function mapBtns(p){
-  return '<a class="btn primary" href="'+naverUrl(nq(p))+'" target="_blank" rel="noopener">네이버 지도</a>'+
+  return '<a class="btn primary" href="'+naverUrl(nq(p))+'" target="_blank" rel="noopener">네이버에서 보기</a>'+
+         '<button class="btn" type="button" data-copy="'+esc(nq(p))+'" data-what="이름">이름 복사</button>'+
          '<button class="btn" type="button" data-copy="'+esc(p.addr)+'">주소 복사</button>';
 }
 
@@ -1151,6 +1155,7 @@ function renderMapDays(){
 function syncRoute(){var b=$("#dTo").value.trim(); $("#dGo").href = b ? naverUrl(b) : "#";}
 $("#dTo").addEventListener("input",syncRoute);
 $("#dGo").addEventListener("click",function(e){ if($("#dGo").getAttribute("href")==="#"){ e.preventDefault(); toast("장소 이름을 입력해줘"); } });
+$("#dCopy").addEventListener("click",function(){ $("#dCopy").setAttribute("data-copy",$("#dTo").value.trim()); });
 syncRoute();
 
 /* ---------- 주소 복사 ---------- */
@@ -1160,9 +1165,10 @@ document.addEventListener("click",function(e){
   function fallback(){
     var ta=document.createElement("textarea");ta.value=text;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";
     document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(err){}
-    document.body.removeChild(ta);toast(ok?what+"를 복사했어":"복사 실패 — 길게 눌러 복사해줘");
+    document.body.removeChild(ta);toast(ok?(what==="이름"?"이름을 복사했어 · 네이버 지도 앱 검색창에 붙여넣어":what==="링크"?"링크를 복사했어 · 브라우저 주소창에 붙여넣어":what+"를 복사했어"):"복사 실패 — 길게 눌러 복사해줘");
   }
-  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast(what+"를 복사했어")},fallback)}
+  var msg = what==="이름" ? "이름을 복사했어 · 네이버 지도 앱 검색창에 붙여넣어" : what==="링크" ? "링크를 복사했어 · 브라우저 주소창에 붙여넣어" : what+"를 복사했어";
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast(msg)},fallback)}
   else fallback();
 });
 
@@ -1275,7 +1281,7 @@ $("#shareCopy").addEventListener("click",function(){
 /* ---------- 출처 표 ---------- */
 $("#srcTable tbody").innerHTML=Object.keys(SRC).map(function(k,i){
   var s=SRC[k];
-  return '<tr><td>'+(i+1)+'</td><td>'+esc(s.t)+'</td><td><a href="'+s.u+'" target="_blank" rel="noopener">'+esc(s.u)+'</a></td><td>'+CHECKED+'</td></tr>';
+  return '<tr><td>'+(i+1)+'</td><td>'+esc(s.t)+'</td><td><button class="btn" type="button" data-copy="'+esc(s.u)+'" data-what="링크" style="padding:3px 9px;font-size:13px">링크 복사</button><div class="muted" style="word-break:break-all;margin-top:4px">'+esc(s.u)+'</div></td><td>'+CHECKED+'</td></tr>';
 }).join("");
 
 /* ---------- 테마 ---------- */
@@ -1297,13 +1303,18 @@ function renderShop(g){
   var keepI=S.items.filter(function(it){return !shopOut(it)}).slice(0,S.limit||10), outI=S.items.filter(function(it){return shopOut(it)});
   var siru=S.items.filter(function(it){return it.siru && !shopOut(it)});
   $("#shopList").innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">'+esc(S.title)+'</h3>'+
-    '<a class="btn primary" href="'+naverUrl(S.store.nq)+'" target="_blank" rel="noopener">네이버 지도: '+esc(S.store.name)+'</a></div>'+
+    '<span class="btns" style="margin:0"><a class="btn primary" href="'+naverUrl(S.store.nq)+'" target="_blank" rel="noopener">네이버에서 보기: '+esc(S.store.name)+'</a><button class="btn" type="button" data-copy="'+esc(S.store.nq)+'" data-what="이름">이름 복사</button></span></div>'+
     '<p class="muted" style="margin:6px 0 8px">'+esc(S.lead)+'</p>'+
     (siru.length?'<div class="today"><b>지금 파는 시루</b><ul style="margin:4px 0 0;padding-left:20px">'+siru.map(function(it){return '<li><b>'+esc(it.name)+'</b> '+esc(it.price)+' — '+esc(it.siru)+'</li>'}).join("")+'</ul></div>':'')+
     keepI.map(function(it,i){
       var id=curShop+":"+it.name;
       return '<div class="rank"><span class="no">'+(i+1)+'</span><label><input type="checkbox" data-shop="'+esc(id)+'"'+(shopSel[id]?' checked':'')+'> '+esc(it.name)+'</label><span class="pr">'+esc(it.price)+'</span>'+
-        '<span class="nt"><a class="btn" style="padding:3px 9px;font-size:13px;margin-right:6px" href="https://search.naver.com/search.naver?where=image&query='+enc(S.img+it.name.replace(/\s*\(.*?\)\s*/g," ").trim())+'" target="_blank" rel="noopener">사진 보기</a>'+esc(it.note)+(it.src?' · <span class="muted">출처: '+it.src.map(function(k){return '<a href="'+SRC[k].u+'" target="_blank" rel="noopener">'+esc(SRC[k].t)+'</a>'}).join(", ")+'</span>':'')+'</span></div>';
+        '<span class="nt">'+(function(){var qn=S.img+it.name.replace(/\s*\(.*?\)\s*/g," ").trim();
+          var sb='padding:3px 9px;font-size:13px;margin-right:4px';
+          return '<a class="btn" style="'+sb+'" href="'+naverImg(qn)+'" target="_blank" rel="noopener">사진 보기</a>'+
+            '<a class="btn" style="'+sb+'" href="'+naverBlog(qn+" 후기")+'" target="_blank" rel="noopener">블로그 후기</a>'+
+            (curShop!=="traders"?'<a class="btn" style="'+sb+'" href="https://namu.wiki/w/%EC%84%B1%EC%8B%AC%EB%8B%B9/%EC%A0%9C%ED%92%88" target="_blank" rel="noopener">나무위키</a>':'')+'<button class="btn" type="button" data-copy="'+esc(qn)+'" data-what="상품명" style="padding:3px 9px;font-size:13px;margin-right:6px">상품명 복사</button>';})()+
+          esc(it.note)+(it.src?' · <span class="muted">출처: '+it.src.filter(function(k){return SRC[k]}).map(function(k){return esc(SRC[k].t)}).join(", ")+'</span>':'')+'</span></div>';
     }).join("")+
     (outI.length?'<details class="outlist"><summary>자동으로 뺀 상품 '+outI.length+'개 (이유 보기)</summary><ul>'+outI.map(function(it){return '<li><b>'+esc(it.name)+'</b> ('+esc(it.price)+') — '+esc(shopOut(it))+'</li>'}).join("")+'</ul></details>':'')+
   '</div>';
