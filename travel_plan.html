@@ -225,7 +225,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
       <ol style="margin:6px 0 0;padding-left:20px">
         <li>두 마리 모두 <b>15kg 미만</b>인지 (숙소 규정)</li>
         <li>숙소에 <b>반려견 2마리 동반 사전 문의</b> (규정상 필수)</li>
-        <li>식당은 반려견 동반 정보가 <b>대부분 확인 안 됨</b> → 전화 확인 또는 포장</li>
+        <li>식당은 반려견 조건이 확인된 곳이 <b>산막이 세자매 한 곳</b>(소형견·캐리어)뿐 → 나머지는 전화 확인 또는 포장</li>
       </ol>
     </div>
     <div class="card">
@@ -250,7 +250,7 @@ footer{color:var(--sub);font-size:13px;padding:20px 0 40px;border-top:1px solid 
 <!-- 맛집·카페 -->
 <section class="panel" id="food">
   <h2>맛집 · 카페</h2>
-  <p class="lead">2026년 3월 1일부터 식품위생법 시행규칙 개정으로 음식점·카페의 반려동물 동반 출입이 조건부로 허용됐어. 그래도 업소마다 다르니, 아래에서 '추가 확인 필요'인 곳은 방문 전에 전화로 꼭 확인해.</p>
+  <p class="lead">2026년 3월 1일부터 식품위생법 시행규칙 개정으로 음식점·카페의 반려동물 동반 출입이 조건부로 허용됐어. 그래도 시설 기준을 갖추고 희망한 업소만 해당돼서 업소마다 달라. 괴산군 공식 동반 음식점 목록은 찾지 못했고, 반려견 조건이 명시된 식당은 <b>산막이 세자매</b> 한 곳뿐이야(소형견·캐리어 조건). 나머지는 방문 전에 전화로 꼭 확인해.</p>
   <div class="filters" id="foodFilter">
     <button aria-pressed="true" data-f="all">전체</button>
     <button aria-pressed="false" data-f="카페">카페</button>
@@ -378,7 +378,14 @@ var SRC = {
   s17:{t:"국립공원 반려견 시범사업 현황 (한국일보 2026-10-01)", u:"https://www.hankookilbo.com/news/article/A2026100114440002911"},
   s18:{t:"2026 괴산김장축제 11/5~8 (국제뉴스)", u:"https://www.gukjenews.com/news/articleView.html?idxno=3705317"},
   s19:{t:"반려동물 동반 가능 음식점 현황 (식품안전나라)", u:"https://www.foodsafetykorea.go.kr/portal/petKorea.do"},
-  s20:{t:"쉼터청천 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=JTfNFW4qhyLq"}
+  s20:{t:"쉼터청천 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=JTfNFW4qhyLq"},
+  s21:{t:"산막이 세자매 애견동반 정보 (펫온, 2026-02 갱신)", u:"https://peton.me/bbs/board.php?bo_table=addPlace&wr_id=249306"},
+  s22:{t:"산막이 세자매 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=8ElSFPFQEEq3"},
+  s23:{t:"주차장식당 (다이닝코드)", u:"https://www.diningcode.com/profile.php?rid=3qGa3kCbewV7"},
+  s24:{t:"괴산 읍내 밥집 추천 (식신)", u:"https://www.siksinhot.com/theme/magazine/14020"},
+  s25:{t:"괴산 맛집 소개 (식신)", u:"https://www.siksinhot.com/theme/magazine/18926"},
+  s26:{t:"괴산 맛집 소개 · 기사식당 (식신)", u:"https://www.siksinhot.com/theme/magazine/18184"},
+  s27:{t:"괴산군 반려동물 동반 음식점 지원 (더퍼블릭)", u:"https://www.thepublic.kr/news/articleView.html?idxno=320791"}
 };
 
 /* ---------- 장소 ----------
@@ -410,18 +417,25 @@ var P = {
     inout:"야외 (호숫가 숲길·데크길, 편도 약 2.3~4km)", reserve:"예약 없음. 주말 방문객 많음. 유람선(5,000~8,000원)은 2026년 8월 기사 기준 9/20까지 운항 중단이었고 재개 여부 미확인.",
     price:"입장 무료 · 주차 3,000원", src:["s4","s5","s6"]},
   jucha:{name:"주차장식당 (괴산읍 올갱이국)", cat:"식당", addr:"충북 괴산군 괴산읍 읍내로 282",
-    menu:"올갱이국 (가격 확인 필요)", hours:"07:00–20:00 (정보 기준일 2026-08-16) · 휴무일 확인 필요", parking:"<span class='need'>확인 필요</span>",
+    menu:"올갱이국 단일 메뉴", hours:"07:00–20:00 (정보 기준일 2026-08-16) · 휴무일 확인 필요", parking:"전용 주차장 없음 → 인근 도로변·공영주차장 (후기 기준)",
     dog:2, dogText:"반려견 동반 정보 없음. 043-832-2673으로 문의, 안 되면 포장.", inout:"실내",
-    reserve:"6명 단체라 전화로 자리 확인 추천.", price:"<span class='need'>확인 필요</span>", src:["s15"]},
-  seoul:{name:"서울식당 (괴산읍 올갱이국)", cat:"식당", addr:"충북 괴산군 괴산읍 읍내로2길 26-1",
-    menu:"올갱이국 (가격 확인 필요)", hours:"점심 11:00–14:00 · 저녁 17:00–20:00 · 토·일은 점심만", parking:"<span class='need'>확인 필요</span>",
-    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"전화번호 미확인 → 지도 앱에서 확인.", price:"<span class='need'>확인 필요</span>", src:["s15"]},
+    reserve:"6명 단체라 전화로 자리 확인 추천.", price:"올갱이국 12,000원 (후기 기준, 작성 시점 확인 필요) → 6명 약 72,000원", src:["s23","s15"]},
+  seoul:{name:"서울식당 (괴산읍 올갱이해장국)", cat:"식당", addr:"충북 괴산군 괴산읍 읍내로2길 26-1",
+    menu:"올갱이해장국 단일 메뉴", hours:"<span class='need'>출처마다 다름</span>: ① 점심 11–14시·저녁 17–20시, 토·일 점심만 ② 06:30–19:00 ③ 매일 06:00–20:00", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"주소도 출처마다 다름(읍내로2길 26-1 / 읍내로15길 26-1 반석빌딩 1층). 지도 앱에서 상호로 검색해 확인. 전화번호 미확인.", price:"올갱이해장국 1인 12,000원 (2026년 기사 기준)", src:["s15","s24","s25"]},
+  sejamae:{name:"산막이 세자매", cat:"식당", addr:"충북 괴산군 칠성면 산막이옛길 80-10",
+    menu:"자연산 버섯전골 (올갱이해장국도 있다는 후기)", hours:"09:00 또는 10:00 – 18:00, 라스트오더 17:00 (출처마다 시작 시간 다름)", parking:"산막이옛길 주차장 바로 뒤쪽 (주차장 중소형 3,000원)",
+    dog:2, dogText:"펫온 등록 정보상 소형견(10kg 미만)만, 가방 또는 캐리어에 넣어서 실내 입장 가능. 두 마리 모두 10kg 미만이고 캐리어가 있으면 조건상 맞지만, 이용자 등록 정보(2026-02 갱신)라 전화 확인 필요.",
+    inout:"실내 (반려견은 가방·캐리어 안에서)", reserve:"0507-1349-5714. 6명 + 반려견 2마리라고 미리 말하고 자리 확인.", price:"자연버섯전골(중) 50,000원 (후기 기준, 작성 시점 미상)", src:["s21","s22"]},
+  gisa:{name:"기사식당 (괴산읍)", cat:"식당", addr:"충북 괴산군 괴산읍 괴강로 8",
+    menu:"토종올갱이국 12,000원 · 청국장 9,000원 (후기 기준)", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"한 매체에 '명문본가바베큐괴산점'으로 함께 표기돼 상호가 바뀌었을 수 있음. 방문 전 영업 여부 확인.", price:"1인 약 9,000~12,000원 (후기 기준)", src:["s26","s15"]},
   mat:{name:"맛식당 (괴산읍 올갱이국)", cat:"식당", addr:"충북 괴산군 괴산읍 괴강로 12",
     menu:"올갱이국 (허영만 『식객』 소개 식당)", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
     dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"영업시간 미확인 → 방문 전 확인.", price:"<span class='need'>확인 필요</span>", src:["s15"]},
   cheongol:{name:"청천올갱이해장국", cat:"식당", addr:"충북 괴산군 청천면 괴산로 1583 (피노키오 펜션 입구 쪽)",
     menu:"올갱이해장국", hours:"<span class='need'>확인 필요</span> (월요일 영업 여부 포함)", parking:"<span class='need'>확인 필요</span>",
-    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"인천 서구에 같은 이름 식당이 있으니 지도 검색 시 '괴산' 꼭 붙이기.", price:"<span class='need'>확인 필요</span>", src:["s14"]},
+    dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"서울 강서·인천 서구에 같은 이름 식당이 있어 검색하면 그쪽 정보가 섞여 나옴. 지도 검색 시 '괴산 청천' 꼭 붙이기.", price:"<span class='need'>확인 필요</span> (검색되는 10,000~12,000원은 인천 매장 가격)", src:["s14"]},
   jungang:{name:"중앙불고기", cat:"식당", addr:"충북 괴산군 청천면 괴산로 1334",
     menu:"<span class='need'>확인 필요</span> (상호상 불고기)", hours:"<span class='need'>확인 필요</span>", parking:"<span class='need'>확인 필요</span>",
     dog:2, dogText:"반려견 동반 정보 없음.", inout:"실내", reserve:"청천면 소재지라 숙소에서 가까운 대안.", price:"<span class='need'>확인 필요</span>", src:["s14"]},
@@ -458,8 +472,8 @@ var DAYS = [
   ]},
   {d:"10/31", w:"토", title:"2일차 · 은행나무길과 산막이옛길", stops:[
     {t:"10:00", p:"mungwang", stay:"1시간 30분", why:"여러 매체가 10월 하순~11월 초를 은행나무 절정으로 꼽는 곳. 평지 2km 호숫가 길이라 반려견 산책에도 무리 없는 지형.", cost:"입장·주차 무료", note:"토요일이라 혼잡 예상 → 10시 전 도착. 반려견 출입 규정은 공식 확인 안 됨(괴산군청 043-830-2522). 2026년 단풍 상황은 출발 직전 확인."},
-    {t:"12:00", p:"jucha", stay:"1시간", why:"괴산 대표 음식 올갱이국. 문광저수지에서 산막이옛길 가는 길에 있는 괴산읍.", cost:"<span class='need'>확인 필요</span>", note:"반려견 동반 정보 없음 → 전화(043-832-2673) 확인, 안 되면 포장해서 차에서/다음 장소에서. 대안: 서울식당(토요일 점심 11~14시), 맛식당."},
-    {t:"13:30", p:"sanmak", stay:"2시간~2시간 30분", why:"호숫가 숲길·데크길 산책 코스. 입장 무료.", cost:"주차 3,000원(중소형 1대) · 유람선 5,000~8,000원(운항·반려견 탑승 미확인)", note:"반려견 동반 규정 미확인 → 관리사무소(043-832-3527)에 미리 전화. 주말 인파 많으니 목줄 짧게. 유람선은 운항 재개 여부부터 확인."},
+    {t:"12:00", p:"sejamae", stay:"1시간", why:"이번 조사에서 반려견 동반 조건이 명시된 유일한 식당. 산막이옛길 주차장 바로 뒤라 점심 먹고 그대로 산책 시작.", cost:"버섯전골(중) 50,000원 기준, 6명이면 2~3개 주문 예상 (후기 가격·인분 미확인)", note:"소형견(10kg 미만)·가방/캐리어 필수 조건. 캐리어 챙겨 가기. 조건이 안 맞으면 대안: 괴산읍 주차장식당(올갱이국 12,000원, 043-832-2673) 포장."},
+    {t:"13:00", p:"sanmak", stay:"2시간~2시간 30분", why:"호숫가 숲길·데크길 산책 코스. 입장 무료.", cost:"주차 3,000원(중소형 1대, 점심 때 이미 주차했으면 추가 없음) · 유람선 5,000~8,000원(운항·반려견 탑승 미확인)", note:"반려견 동반 규정 미확인 → 관리사무소(043-832-3527)에 미리 전화. 주말 인파 많으니 목줄 짧게. 유람선은 운항 재개 여부부터 확인."},
     {t:"17:00", p:"somong", stay:"저녁", why:"이틀째 저녁은 숙소에서 편하게.", cost:"<span class='need'>확인 필요</span>", note:"괴산읍에서 돌아오는 길에 포장 음식이나 장보기. 바비큐를 또 할지는 당일 결정(전기그릴 30,000원)."}
   ]},
   {d:"11/1", w:"일", title:"3일차 · 여유로운 카페 데이", stops:[
@@ -470,7 +484,7 @@ var DAYS = [
   ]},
   {d:"11/2", w:"월", title:"4일차 · 체크아웃 후 해산", stops:[
     {t:"10:00", p:"somong", stay:"1시간", why:"짐 정리와 반려견 용품 챙기기.", cost:"-", note:"체크아웃 11:00. 반려견 털 정리(테이프 클리너) 해두면 좋음."},
-    {t:"11:30", p:"cheongol", stay:"1시간", why:"해산 전 마지막 식사. 숙소와 같은 청천면.", cost:"<span class='need'>확인 필요</span>", note:"월요일 영업 여부 미확인 → 전날 확인. 쉬면 우리한식(괴산로 1331)·중앙불고기(괴산로 1334)로. 반려견 동반 정보 없음."},
+    {t:"11:30", p:"cheongol", stay:"1시간", why:"해산 전 마지막 식사. 숙소와 같은 청천면.", cost:"<span class='need'>확인 필요</span>", note:"월요일 영업 여부·가격 미확인 → 전날 전화 확인. 쉬면 우리한식(괴산로 1331)·중앙불고기(괴산로 1334)로. 반려견 동반 정보 없음 → 1~2명이 포장해 오는 방식도 고려."},
     {t:"12:30", p:null, place:"해산 · 각자 귀가", addr:"천안 · 인천 · 진해 방향", stay:"-", why:"출발지가 달라 여기서 해산.", cost:"유류비·통행료는 차량별", note:"장거리(인천·진해)는 반려견 휴게소 산책 시간 넉넉히."}
   ]}
 ];
@@ -478,7 +492,7 @@ var DAYS = [
 /* ---------- 예산 ---------- */
 var BUDGET = [
   {id:"stay",  name:"숙박비", amt:0, st:"미정", note:"몽몽 객실 플랫폼 표기 139,000원~ (1박, 날짜별 상이). 실제 예약 금액을 넣어줘."},
-  {id:"food",  name:"식비", amt:0, st:"미정", note:"식당 메뉴 가격 미확인. 장보기·외식 영수증 기준으로 입력."},
+  {id:"food",  name:"식비", amt:0, st:"미정", note:"참고: 올갱이국 1인 12,000원(괴산읍, 후기 기준), 산막이 세자매 버섯전골(중) 50,000원(후기 기준). 장보기·외식 영수증 기준으로 입력."},
   {id:"cafe",  name:"카페 및 디저트", amt:0, st:"미정", note:"참고: 숲, Camp&Cafe 아메리카노 3,500원 · 숲 라떼 5,000원."},
   {id:"ticket",name:"관광지 입장료", amt:0, st:"확인됨", note:"산막이옛길·문광저수지 입장 무료(검색 확인). 유람선 탈 경우 1인 5,000~8,000원 별도."},
   {id:"fuel",  name:"유류비", amt:0, st:"미정", note:"출발지(천안·인천·진해)와 차량 대수에 따라 다름."},
@@ -496,6 +510,7 @@ var CHECK = [
     ["c4","전기그릴 이용 신청 (1회 30,000원, 22시 전)"],
     ["c5","식당 예약 확인 · 6명 자리 / 반려견 동반 가능 여부 전화"],
     ["c6","숲, Camp&Cafe 두 마리 입장·테라스 대여 문의"],
+    ["c10","산막이 세자매(0507-1349-5714) 반려견 2마리·6명 자리 확인"],
     ["c7","산막이옛길 반려견 동반 가능 여부 · 유람선 운항 확인 (043-832-3527)"],
     ["c8","출발 직전 문광저수지 단풍 상황 확인"],
     ["c9","집결 시간(13:30 숲 Camp&Cafe)·차량 배정 단톡 공유"]
@@ -505,7 +520,7 @@ var CHECK = [
     ["d2","예방접종(광견병 등) 및 동물등록 상태 확인"],
     ["d3","목줄과 배변 봉투 넉넉히"],
     ["d4","사료와 간식 (3박 4일 + 여유분)"],
-    ["d5","이동장 또는 차량용 안전장치(카시트·안전벨트)"],
+    ["d5","이동장 또는 차량용 안전장치(카시트·안전벨트) · 식당용 가방/캐리어"],
     ["d6","강아지 물통과 휴대용 식기"],
     ["d7","반려견 담요·매트 (숙소 침구 보호)"],
     ["d8","털 정리용 테이프 클리너·물티슈"]
@@ -634,7 +649,7 @@ function placeCard(p){
     '</dl><div class="btns">'+mapBtns(p)+'</div>'+srcHtml(p.src)+'</div>';
 }
 function renderFood(f){
-  var keys=["forest","mwohanong","cheongan","shimteo","jucha","seoul","mat","cheongol","urihansik","jungang"];
+  var keys=["sejamae","forest","mwohanong","cheongan","shimteo","jucha","seoul","gisa","mat","cheongol","urihansik","jungang"];
   $("#foodGrid").innerHTML=keys.map(function(k){return P[k]}).filter(function(p){
     if(f==="all") return true; if(f==="warn") return p.dog===2; return p.cat===f;
   }).map(placeCard).join("");
