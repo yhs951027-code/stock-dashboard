@@ -138,7 +138,8 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .track span{display:block;width:100%;height:8px;border-radius:4px;background:var(--pline);overflow:hidden}
 .track i{display:block;height:100%;width:0;background:var(--brand)}
 .atime{flex:none;font-family:var(--f-num);font-variant-numeric:tabular-nums;font-size:15px;color:var(--psub);min-width:84px;text-align:right}
-.tail{flex:1;min-height:120px;cursor:text}
+.tail{flex:1;min-height:120px;cursor:text;display:flex;align-items:flex-start;justify-content:center;padding-top:14px}
+.tail span{font-size:16px;color:var(--psub);border:1.5px dashed var(--pline);border-radius:12px;padding:8px 16px;opacity:.85}
 .ed-meta{font-size:14.5px;color:var(--psub);font-family:var(--f-num);padding:10px 0 14px;text-align:right}
 .tools{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg)}
 .tool{min-height:58px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:14.5px;font-weight:700;line-height:1.2;padding:4px 2px;white-space:nowrap;letter-spacing:-.02em;min-width:0}
@@ -345,9 +346,13 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
       <div class="sheet paper" id="sheet">
         <input class="title" id="title" placeholder="제목" aria-label="제목" autocomplete="off" enterkeyhint="next">
         <div id="blocks"></div>
-        <div class="tail" id="tail" aria-hidden="true"></div>
+        <div class="tail" id="tail"></div>
         <div class="ed-meta" id="meta"></div>
       </div>
+    </div>
+    <div class="litools" id="todoTools" hidden role="toolbar" aria-label="체크리스트 편집">
+      <button type="button" data-td="add">＋ 항목 추가</button>
+      <button type="button" data-td="end">✎ 체크리스트 끝내고 글 쓰기</button>
     </div>
     <div class="litools" id="liTools" hidden role="toolbar" aria-label="목록 편집">
       <button type="button" data-li="out">⇤ 내어쓰기</button>
@@ -734,6 +739,8 @@ function renderEditor(){
   box.innerHTML='';
   for(const b of n.blocks) box.append(blockEl(b,n));
   box.querySelectorAll('textarea').forEach(autosize);
+  const last=n.blocks[n.blocks.length-1];
+  $('#tail').innerHTML= last && last.type!=='text'? '<span>＋ 여기를 눌러 이어서 쓰기</span>' : '';
   updateMeta();
 }
 /* ---------- 목록 (번호·글머리표) ---------- */
@@ -900,6 +907,10 @@ $('#blocks').addEventListener('input',e=>{
     focusBlock(added[added.length-1].id,added.length===1);
     return;
   }
+  if(b.type==='todo' && ta.value==='\n' && !b.text){ // 빈 항목에서 엔터 → 체크리스트 끝내고 글 쓰기
+    b.type='text'; b.text=''; delete b.done;
+    touch(n); renderEditor(); caretTo(b.id,0); return;
+  }
   if(b.type==='todo' && ta.value.includes('\n')){
     // 엔터 = 다음 항목. 붙여넣은 여러 줄은 줄마다 항목으로.
     const parts=ta.value.split('\n');
@@ -1035,8 +1046,24 @@ $('#lsts').addEventListener('click',e=>{
 $('#listDlg').addEventListener('click',e=>{ if(e.target===e.currentTarget || e.target.matches('[data-close]')) closeOverlay(); });
 // 목록 칸에 있을 때만 보이는 편집 줄 (누를 때 키보드가 내려가지 않게 포커스 유지)
 const liTools=$('#liTools');
-$('#blocks').addEventListener('focusin',e=>{ liTools.hidden=!e.target.classList?.contains('b-li-t'); });
-$('#blocks').addEventListener('focusout',()=>{ setTimeout(()=>{ if(!document.activeElement?.classList?.contains('b-li-t')) liTools.hidden=true; },120); });
+const todoTools=$('#todoTools');
+$('#blocks').addEventListener('focusin',e=>{ liTools.hidden=!e.target.classList?.contains('b-li-t'); todoTools.hidden=!e.target.classList?.contains('b-todo-t'); });
+$('#blocks').addEventListener('focusout',()=>{ setTimeout(()=>{ const a=document.activeElement?.classList; if(!a?.contains('b-li-t')) liTools.hidden=true; if(!a?.contains('b-todo-t')) todoTools.hidden=true; },120); });
+todoTools.addEventListener('pointerdown',e=>e.preventDefault()); // 눌러도 키보드 유지
+todoTools.addEventListener('click',e=>{
+  const act=e.target.closest('[data-td]')?.dataset.td, ta=document.activeElement;
+  const n=cur(); const b=n && ta?.classList?.contains('b-todo-t') && blk(n,ta.dataset.id); if(!act||!b) return;
+  if(act==='add'){
+    const t={id:uid(),type:'todo',text:'',done:false};
+    n.blocks.splice(n.blocks.indexOf(b)+1,0,t); touch(n); renderEditor(); caretTo(t.id,0); return;
+  }
+  // 체크리스트 끝내고 글 쓰기: 지금 항목이 비었으면 그 줄을 글 줄로, 아니면 체크리스트 바로 아래에 글 줄
+  if(!b.text.trim()){ b.type='text'; b.text=''; delete b.done; touch(n); renderEditor(); caretTo(b.id,0); return; }
+  let i=n.blocks.indexOf(b); while(n.blocks[i+1]?.type==='todo') i++;
+  const next=n.blocks[i+1];
+  if(next?.type==='text'){ caretTo(next.id,0); return; }
+  const t={id:uid(),type:'text',text:''}; n.blocks.splice(i+1,0,t); touch(n); renderEditor(); caretTo(t.id,0);
+});
 liTools.addEventListener('pointerdown',e=>e.preventDefault());
 liTools.addEventListener('click',e=>{
   const act=e.target.closest('[data-li]')?.dataset.li; const ta=document.activeElement;
