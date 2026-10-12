@@ -115,6 +115,9 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .b-li .mk.small{font-size:13px}
 .b-li-t{flex:1;min-width:0;display:block;resize:none;overflow:hidden;border:0;background:transparent;color:var(--pink);font:inherit;font-size:19px;line-height:32px;padding:0;margin:0;min-height:32px}
 .paper-lined .b-li-t{background-image:repeating-linear-gradient(to bottom,transparent 0 31px,var(--pline) 31px 32px)}
+.b-text.under{width:calc(100% - 34px);margin-left:34px;padding-left:12px;border-left:2px solid var(--pline)}
+.b-li.under{margin-left:34px;padding-left:calc(12px + var(--lv,0) * 28px);border-left:2px solid var(--pline)}
+.under.faded{opacity:.5}
 .litools{flex:none;display:flex;gap:6px;padding:6px 12px 0;background:var(--bg);border-top:1px solid var(--line);overflow-x:auto}
 .litools button{flex:1 0 auto;min-height:46px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-size:15.5px;font-weight:700;white-space:nowrap;padding:4px 10px}
 .lsts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -351,8 +354,14 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
       </div>
     </div>
     <div class="litools" id="todoTools" hidden role="toolbar" aria-label="체크리스트 편집">
-      <button type="button" data-td="add">＋ 항목 추가</button>
-      <button type="button" data-td="end">✎ 체크리스트 끝내고 글 쓰기</button>
+      <button type="button" data-td="memo">↳ 아래에 메모</button>
+      <button type="button" data-td="list">↳ 아래에 목록</button>
+      <button type="button" data-td="end">✎ 체크리스트 끝</button>
+    </div>
+    <div class="litools" id="childTools" hidden role="toolbar" aria-label="항목 메모 편집">
+      <button type="button" data-cd="list">≡ 목록으로</button>
+      <button type="button" data-cd="next">☑ 다음 체크 항목</button>
+      <button type="button" data-cd="end">✎ 체크리스트 끝</button>
     </div>
     <div class="litools" id="liTools" hidden role="toolbar" aria-label="목록 편집">
       <button type="button" data-li="out">⇤ 내어쓰기</button>
@@ -595,9 +604,24 @@ async function saveNow(){
   toast(ok? new Date().toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'})+'에 저장했습니다.' : '저장하지 못했습니다. 저장 공간을 확인해 주세요.');
 }
 // 편집을 마칠 때 비어 있는 줄·체크 항목 정리
+// 체크 항목에 딸린 블록: b.under = 체크 항목 id. 항목 바로 뒤에 이어서 놓인다.
+function childrenOf(n,t){ const out=[]; for(let j=n.blocks.indexOf(t)+1;j<n.blocks.length && n.blocks[j].under===t.id;j++) out.push(n.blocks[j]); return out; }
+function lastOfItem(n,t){ const c=childrenOf(n,t); return c.length? c[c.length-1] : t; }
+function ownerOf(n,b){ return b?.under? blk(n,b.under) : null; }
+function inherit(src,obj){ if(src?.under) obj.under=src.under; return obj; }
+function fixUnder(n){ // 딸린 블록은 자기 체크 항목 바로 뒤에 이어져 있을 때만 인정
+  let owner=null;
+  for(const b of n.blocks){
+    if(b.type==='todo'){ owner=b.id; delete b.under; continue; }
+    if(b.under && b.under!==owner){ delete b.under; owner=null; }
+    else if(!b.under) owner=null;
+  }
+}
 function tidy(n){
   const before=n.blocks.length;
-  n.blocks=n.blocks.filter(b=>!(isWriting(b) && !b.text.trim()));
+  const hasKids=new Set(n.blocks.filter(b=>b.under && (!isWriting(b) || b.text.trim())).map(b=>b.under));
+  n.blocks=n.blocks.filter(b=>!(isWriting(b) && !b.text.trim() && !(b.type==='todo' && hasKids.has(b.id))));
+  fixUnder(n);
   if(n.blocks.length!==before) dirty.add(n.id);
 }
 function normalize(m){
@@ -737,10 +761,18 @@ function renderEditor(){
   $('#title').value=n.title;
   const box=$('#blocks');
   box.innerHTML='';
-  for(const b of n.blocks) box.append(blockEl(b,n));
+  fixUnder(n);
+  for(const b of n.blocks){
+    const e=blockEl(b,n);
+    if(b.under){
+      e.classList.add('under'); if(blk(n,b.under)?.done) e.classList.add('faded');
+      if(b.type==='text') e.placeholder='이 항목에 대한 메모';
+    }
+    box.append(e);
+  }
   box.querySelectorAll('textarea').forEach(autosize);
   const last=n.blocks[n.blocks.length-1];
-  $('#tail').innerHTML= last && last.type!=='text'? '<span>＋ 여기를 눌러 이어서 쓰기</span>' : '';
+  $('#tail').innerHTML= last && (last.type!=='text' || last.under)? '<span>＋ 여기를 눌러 이어서 쓰기</span>' : '';
   updateMeta();
 }
 /* ---------- 목록 (번호·글머리표) ---------- */
@@ -832,7 +864,10 @@ function insertBlock(b){
   let i=n.blocks.findIndex(x=>x.id===lastFocus);
   if(i<0) i=n.blocks.length-1;
   // 체크리스트 중간에 그림·녹음이 끼지 않도록 목록 끝으로 보낸다
-  for(const run of ['todo','li']) if(b.type!==run) while(n.blocks[i]?.type===run && n.blocks[i+1]?.type===run) i++;
+  const inTodo=x=>x?.type==='todo' || !!x?.under;
+  if(b.type==='todo'){ const o=n.blocks[i]?.type==='todo'? n.blocks[i] : ownerOf(n,n.blocks[i]); if(o) i=n.blocks.indexOf(lastOfItem(n,o)); }
+  else if(!b.under) while(inTodo(n.blocks[i]) && inTodo(n.blocks[i+1])) i++;
+  if(b.type!=='li') while(n.blocks[i]?.type==='li' && n.blocks[i+1]?.type==='li' && n.blocks[i+1].under===n.blocks[i].under) i++;
   const at=n.blocks[i];
   if(at && at.type==='text' && !at.text.trim()) n.blocks.splice(i,1,b);
   else n.blocks.splice(i+1,0,b);
@@ -874,8 +909,8 @@ function autoList(n,b,ta,e){
   if(!m) return false;
   const style=styleFromMark(m[2]), level=Math.min(2,Math.floor(m[1].replace(/\t/g,'    ').length/2));
   const before=v.slice(0,ls).replace(/\n$/,''), after=v.slice(c);
-  const item={id:uid(),type:'li',style,level,text:m[3]}, next={id:uid(),type:'li',style,level,text:after};
-  const rep=[]; if(before.trim()) rep.push({id:uid(),type:'text',text:before});
+  const item=inherit(b,{id:uid(),type:'li',style,level,text:m[3]}), next=inherit(b,{id:uid(),type:'li',style,level,text:after});
+  const rep=[]; if(before.trim()) rep.push(inherit(b,{id:uid(),type:'text',text:before}));
   rep.push(item,next);
   n.blocks.splice(n.blocks.indexOf(b),1,...rep);
   touch(n); renderEditor(); focusBlock(next.id,true);
@@ -901,7 +936,7 @@ $('#blocks').addEventListener('input',e=>{
     }
     b.text=parts[0];
     const idx=n.blocks.indexOf(b);
-    const added=parts.slice(1).map(t=>({id:uid(),type:'li',style:b.style,level:b.level||0,text:t}));
+    const added=parts.slice(1).map(t=>inherit(b,{id:uid(),type:'li',style:b.style,level:b.level||0,text:t}));
     n.blocks.splice(idx+1,0,...added);
     touch(n); renderEditor();
     focusBlock(added[added.length-1].id,added.length===1);
@@ -917,7 +952,7 @@ $('#blocks').addEventListener('input',e=>{
     b.text=parts[0];
     const idx=n.blocks.indexOf(b);
     const added=parts.slice(1).map(t=>({id:uid(),type:'todo',text:t,done:false}));
-    n.blocks.splice(idx+1,0,...added);
+    n.blocks.splice(n.blocks.indexOf(lastOfItem(n,b))+1,0,...added);
     touch(n); renderEditor();
     const last=added[added.length-1];
     focusBlock(last.id,added.length===1);
@@ -941,6 +976,7 @@ $('#blocks').addEventListener('keydown',e=>{
   if(e.key==='Backspace' && ta.value==='' ){
     e.preventDefault();
     const n=cur(), b=blk(n,ta.dataset.id), i=n.blocks.indexOf(b);
+    if(childrenOf(n,b).length) return; // 아래에 메모·목록이 있으면 ✕로 지우게
     n.blocks.splice(i,1);
     const prev=n.blocks[i-1];
     touch(n); renderEditor();
@@ -956,16 +992,22 @@ $('#blocks').addEventListener('click',e=>{
     b.done=!b.done;
     row.classList.toggle('done',b.done);
     ck.setAttribute('aria-checked',String(b.done)); ck.querySelector('i').textContent=b.done?'✓':'';
+    for(const c of childrenOf(n,b)) document.querySelector(`#blocks > [data-id="${c.id}"]`)?.classList.toggle('faded',b.done);
     touch(n);
   }else if(x){
-    n.blocks=n.blocks.filter(y=>y!==b); touch(n); renderEditor();
+    // 항목을 지우면 아래에 딸린 메모·목록도 같이 (되돌리기 가능)
+    const at=n.blocks.indexOf(b), gone=[b,...childrenOf(n,b)];
+    n.blocks.splice(at,gone.length); touch(n); renderEditor();
+    if(gone.length>1 || b.text.trim()) toast(gone.length>1? `항목과 아래 내용 ${gone.length-1}줄을 지웠습니다.` : '항목을 지웠습니다.','되돌리기',()=>{
+      if(cur()!==n) return; n.blocks.splice(Math.min(at,n.blocks.length),0,...gone); touch(n); renderEditor();
+    });
   }
 });
 // 빈 아래쪽을 누르면 이어서 쓰기
 $('#tail').addEventListener('click',()=>{
   const n=cur(); if(!n) return;
   const last=n.blocks[n.blocks.length-1];
-  if(last && last.type==='text') return focusBlock(last.id);
+  if(last && last.type==='text' && !last.under) return focusBlock(last.id);
   const b={id:uid(),type:'text',text:''};
   n.blocks.push(b); renderEditor(); focusBlock(b.id);
 });
@@ -1031,9 +1073,9 @@ $('#lsts').addEventListener('click',e=>{
     if(t.s>0 && v[t.s-1]==='\n') {} // 줄 맨 앞
     const lines=v.slice(ls,le).split('\n');
     const before=v.slice(0,ls).replace(/\n$/,''), after=v.slice(le+1);
-    const items=lines.map(l=>{ const m=l.match(LIST_START); return {id:uid(),type:'li',style,level:m? Math.min(2,Math.floor(m[1].length/2)) : 0,text:(m? m[3] : l).trim()}; });
-    const rep=[]; if(before.trim()) rep.push({id:uid(),type:'text',text:before});
-    rep.push(...items); if(after.trim()) rep.push({id:uid(),type:'text',text:after});
+    const items=lines.map(l=>{ const m=l.match(LIST_START); return inherit(b,{id:uid(),type:'li',style,level:m? Math.min(2,Math.floor(m[1].length/2)) : 0,text:(m? m[3] : l).trim()}); });
+    const rep=[]; if(before.trim()) rep.push(inherit(b,{id:uid(),type:'text',text:before}));
+    rep.push(...items); if(after.trim()) rep.push(inherit(b,{id:uid(),type:'text',text:after}));
     n.blocks.splice(n.blocks.indexOf(b),1,...rep);
     focusId=items[items.length-1].id;
   }else{
@@ -1047,22 +1089,47 @@ $('#listDlg').addEventListener('click',e=>{ if(e.target===e.currentTarget || e.t
 // 목록 칸에 있을 때만 보이는 편집 줄 (누를 때 키보드가 내려가지 않게 포커스 유지)
 const liTools=$('#liTools');
 const todoTools=$('#todoTools');
-$('#blocks').addEventListener('focusin',e=>{ liTools.hidden=!e.target.classList?.contains('b-li-t'); todoTools.hidden=!e.target.classList?.contains('b-todo-t'); });
-$('#blocks').addEventListener('focusout',()=>{ setTimeout(()=>{ const a=document.activeElement?.classList; if(!a?.contains('b-li-t')) liTools.hidden=true; if(!a?.contains('b-todo-t')) todoTools.hidden=true; },120); });
+const childTools=$('#childTools');
+function syncEditTools(t){
+  const c=t?.classList, n=cur(), b=n && t?.dataset?.id && blk(n,t.dataset.id);
+  liTools.hidden=!c?.contains('b-li-t');
+  todoTools.hidden=!c?.contains('b-todo-t');
+  childTools.hidden=!(c?.contains('b-text') && b?.under);
+}
+$('#blocks').addEventListener('focusin',e=>syncEditTools(e.target));
+$('#blocks').addEventListener('focusout',()=>{ setTimeout(()=>{ const a=document.activeElement; syncEditTools(a && $('#blocks').contains(a)? a : null); },120); });
+function endChecklist(n,owner){ // 체크리스트(와 딸린 내용) 바로 아래에 일반 글 줄
+  let i=n.blocks.indexOf(owner); while(n.blocks[i+1]?.type==='todo' || n.blocks[i+1]?.under) i++;
+  const next=n.blocks[i+1];
+  if(next?.type==='text'){ caretTo(next.id,0); return; }
+  const t={id:uid(),type:'text',text:''}; n.blocks.splice(i+1,0,t); touch(n); renderEditor(); caretTo(t.id,0);
+}
+function addUnder(n,owner,kind){ // 체크 항목 아래(딸린 내용 맨 끝)에 메모나 목록
+  const last=lastOfItem(n,owner);
+  if(last!==owner && isWriting(last) && !last.text.trim() && (kind==='memo'? last.type==='text' : last.type==='li')){ caretTo(last.id,0); return; }
+  const t= kind==='memo'? {id:uid(),type:'text',text:'',under:owner.id} : {id:uid(),type:'li',style:'dash',level:0,text:'',under:owner.id};
+  n.blocks.splice(n.blocks.indexOf(last)+1,0,t); touch(n); renderEditor(); caretTo(t.id,0);
+}
+childTools.addEventListener('pointerdown',e=>e.preventDefault());
+childTools.addEventListener('click',e=>{
+  const act=e.target.closest('[data-cd]')?.dataset.cd, ta=document.activeElement;
+  const n=cur(); const b=n && ta?.dataset?.id && blk(n,ta.dataset.id); const o=ownerOf(n,b); if(!act||!o) return;
+  if(act==='list'){
+    if(!b.text.trim()){ b.type='li'; b.style='dash'; b.level=0; touch(n); renderEditor(); caretTo(b.id,0); }
+    else addUnder(n,o,'list');
+  }else if(act==='next'){
+    const t={id:uid(),type:'todo',text:'',done:false};
+    n.blocks.splice(n.blocks.indexOf(lastOfItem(n,o))+1,0,t); touch(n); renderEditor(); caretTo(t.id,0);
+  }else endChecklist(n,o);
+});
 todoTools.addEventListener('pointerdown',e=>e.preventDefault()); // 눌러도 키보드 유지
 todoTools.addEventListener('click',e=>{
   const act=e.target.closest('[data-td]')?.dataset.td, ta=document.activeElement;
   const n=cur(); const b=n && ta?.classList?.contains('b-todo-t') && blk(n,ta.dataset.id); if(!act||!b) return;
-  if(act==='add'){
-    const t={id:uid(),type:'todo',text:'',done:false};
-    n.blocks.splice(n.blocks.indexOf(b)+1,0,t); touch(n); renderEditor(); caretTo(t.id,0); return;
-  }
-  // 체크리스트 끝내고 글 쓰기: 지금 항목이 비었으면 그 줄을 글 줄로, 아니면 체크리스트 바로 아래에 글 줄
-  if(!b.text.trim()){ b.type='text'; b.text=''; delete b.done; touch(n); renderEditor(); caretTo(b.id,0); return; }
-  let i=n.blocks.indexOf(b); while(n.blocks[i+1]?.type==='todo') i++;
-  const next=n.blocks[i+1];
-  if(next?.type==='text'){ caretTo(next.id,0); return; }
-  const t={id:uid(),type:'text',text:''}; n.blocks.splice(i+1,0,t); touch(n); renderEditor(); caretTo(t.id,0);
+  if(act==='memo'||act==='list') return addUnder(n,b,act);
+  // 체크리스트 끝: 지금 항목이 비었고 딸린 것도 없으면 그 줄을 글 줄로, 아니면 체크리스트 바로 아래에 글 줄
+  if(!b.text.trim() && !childrenOf(n,b).length){ b.type='text'; b.text=''; delete b.done; touch(n); renderEditor(); caretTo(b.id,0); return; }
+  endChecklist(n,b);
 });
 liTools.addEventListener('pointerdown',e=>e.preventDefault());
 liTools.addEventListener('click',e=>{
@@ -1074,7 +1141,7 @@ liTools.addEventListener('click',e=>{
   else if(act==='end'){
     if(!b.text.trim()){ liToText(n,b); touch(n); renderEditor(); caretTo(b.id,0); return; }
     const run=listRun(n,b), last=run[run.length-1];
-    const t={id:uid(),type:'text',text:''}; n.blocks.splice(n.blocks.indexOf(last)+1,0,t);
+    const t=inherit(b,{id:uid(),type:'text',text:''}); n.blocks.splice(n.blocks.indexOf(last)+1,0,t);
     touch(n); renderEditor(); caretTo(t.id,0);
   }
 });
@@ -1342,8 +1409,9 @@ addEventListener('popstate',()=>{
 function noteAsText(n){
   const out=[]; if(n.title.trim()) out.push(n.title.trim(),'');
   n.blocks.forEach((b,i)=>{
-    if(b.type==='li' && b.text.trim()) out.push('    '.repeat(Math.min(2,b.level||0))+markerFor(n,i)+' '+b.text);
-    if(b.type==='text' && b.text.trim()) out.push(b.text);
+    const pad=b.under? '      ' : '';
+    if(b.type==='li' && b.text.trim()) out.push(pad+'    '.repeat(Math.min(2,b.level||0))+markerFor(n,i)+' '+b.text);
+    if(b.type==='text' && b.text.trim()) out.push(b.under? b.text.split('\n').map(l=>pad+l).join('\n') : b.text);
     if(b.type==='todo' && b.text.trim()) out.push((b.done?'☑ ':'☐ ')+b.text);
     if(b.type==='draw') out.push('[그림]');
     if(b.type==='audio') out.push('[음성 '+mmss(b.dur||0)+']');
