@@ -1,5 +1,5 @@
 // 오프라인에서도 열리도록 앱 파일을 저장해 둔다. 앱 화면은 네트워크 우선(업데이트 바로 반영), 글꼴은 저장본 우선.
-const CACHE='memo-v10';
+const CACHE='memo-v11';
 const SHELL=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-maskable.png'];
 
 self.addEventListener('install',e=>{

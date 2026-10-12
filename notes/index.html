@@ -94,13 +94,14 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .editor{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column}
 .ed-bar{flex:none;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;border-bottom:1px solid var(--line)}
 .ed-bar .gap{display:flex;gap:8px}
-.ed-bar .btn{padding-inline:12px;white-space:nowrap}
-.save{min-width:104px;white-space:nowrap}
+.ed-bar .btn{min-height:44px;font-size:16px;padding-inline:11px;white-space:nowrap}
+.ed-bar .btn.icon{min-width:44px;padding-inline:8px}
+.save{min-width:96px;white-space:nowrap}
 .save[data-st="dirty"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
 .save[data-st="saving"]{opacity:.7}
 .save[data-st="saved"]{border-color:var(--line);color:var(--sub);font-weight:500}
 .save[data-st="error"]{border-color:var(--warn);color:var(--warn)}
-@media (max-width:380px){ .ed-bar{gap:6px;padding-inline:8px} .ed-bar .btn{font-size:16.5px;padding-inline:9px} .ed-bar .gap{gap:6px} .ed-bar .btn.icon{min-width:46px;padding-inline:8px} .save{min-width:92px} }
+@media (max-width:380px){ .ed-bar{gap:6px;padding-inline:8px} .ed-bar .btn{font-size:15px;padding-inline:8px} .ed-bar .gap{gap:6px} .ed-bar .btn.icon{min-width:42px;padding-inline:6px} .save{min-width:86px} }
 .ed-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px}
 .sheet{max-width:760px;margin:0 auto;min-height:100%;border-radius:16px;box-shadow:var(--shadow);padding:14px 16px 0;display:flex;flex-direction:column}
 .title{width:100%;border:0;border-bottom:1px solid var(--pline);background:transparent;color:var(--pink);font:inherit;font-family:var(--f-num);font-size:24px;font-weight:700;line-height:1.4;padding:4px 0 10px;margin-bottom:8px}
@@ -118,8 +119,9 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .b-text.under{width:calc(100% - 34px);margin-left:34px;padding-left:12px;border-left:2px solid var(--pline)}
 .b-li.under{margin-left:34px;padding-left:calc(12px + var(--lv,0) * 28px);border-left:2px solid var(--pline)}
 .under.faded{opacity:.5}
-.litools{flex:none;display:flex;gap:6px;padding:6px 12px 0;background:var(--bg);border-top:1px solid var(--line);overflow-x:auto}
-.litools button{flex:1 0 auto;min-height:46px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-size:15.5px;font-weight:700;white-space:nowrap;padding:4px 10px}
+.litools{flex:none;display:flex;gap:5px;padding:5px 10px 0;background:var(--bg);border-top:1px solid var(--line);overflow-x:auto}
+.litools button{flex:1 0 auto;min-height:38px;border-radius:9px;border:1.5px solid var(--line);background:var(--card);font-size:14px;font-weight:700;white-space:nowrap;padding:3px 9px}
+.litools button.del{flex:0 0 auto;color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
 .lsts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .lst{border-radius:12px;border:2.5px solid var(--line);background:var(--card);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:120px}
 .lst[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
@@ -144,10 +146,11 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
 .tail{flex:1;min-height:120px;cursor:text;display:flex;align-items:flex-start;justify-content:center;padding-top:14px}
 .tail span{font-size:16px;color:var(--psub);border:1.5px dashed var(--pline);border-radius:12px;padding:8px 16px;opacity:.85}
 .ed-meta{font-size:14.5px;color:var(--psub);font-family:var(--f-num);padding:10px 0 14px;text-align:right}
-.tools{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg)}
-.tool{min-height:58px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:14.5px;font-weight:700;line-height:1.2;padding:4px 2px;white-space:nowrap;letter-spacing:-.02em;min-width:0}
-@media (max-width:380px){ .tool{font-size:13px} }
-.tool b{font-size:22px;line-height:1.1}
+.tools{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg)}
+.tool{min-height:46px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:12.5px;font-weight:700;line-height:1.15;padding:3px 2px;white-space:nowrap;letter-spacing:-.02em;min-width:0}
+@media (max-width:380px){ .tool{font-size:11.5px} }
+@media (max-width:400px){ .litools{gap:4px;padding-inline:8px} .litools button{font-size:12.5px;padding:3px 6px;letter-spacing:-.03em} }
+.tool b{font-size:17px;line-height:1.1}
 .blank-msg{display:none}
 
 /* ---------- 바텀시트 / 그림판 / 녹음 ---------- */
@@ -356,18 +359,21 @@ mark{background:var(--hl);color:inherit;border-radius:3px}
     <div class="litools" id="todoTools" hidden role="toolbar" aria-label="체크리스트 편집">
       <button type="button" data-td="memo">↳ 아래에 메모</button>
       <button type="button" data-td="list">↳ 아래에 목록</button>
-      <button type="button" data-td="end">✎ 체크리스트 끝</button>
+      <button type="button" data-td="end">✎ 체크 끝</button>
+      <button type="button" class="del" data-td="del" aria-label="이 항목 지우기">🗑 지우기</button>
     </div>
     <div class="litools" id="childTools" hidden role="toolbar" aria-label="항목 메모 편집">
       <button type="button" data-cd="list">≡ 목록으로</button>
-      <button type="button" data-cd="next">☑ 다음 체크 항목</button>
-      <button type="button" data-cd="end">✎ 체크리스트 끝</button>
+      <button type="button" data-cd="next">☑ 다음 항목</button>
+      <button type="button" data-cd="end">✎ 체크 끝</button>
+      <button type="button" class="del" data-cd="del" aria-label="이 메모 지우기">🗑 지우기</button>
     </div>
     <div class="litools" id="liTools" hidden role="toolbar" aria-label="목록 편집">
       <button type="button" data-li="out">⇤ 내어쓰기</button>
       <button type="button" data-li="in">들여쓰기 ⇥</button>
       <button type="button" data-li="style">모양</button>
       <button type="button" data-li="end">목록 끝</button>
+      <button type="button" class="del" data-li="del" aria-label="이 항목 지우기">🗑</button>
     </div>
     <div class="tools" role="toolbar" aria-label="추가하기">
       <button class="tool" id="tCheck" type="button"><b>☑</b>체크리스트</button>
@@ -994,15 +1000,21 @@ $('#blocks').addEventListener('click',e=>{
     ck.setAttribute('aria-checked',String(b.done)); ck.querySelector('i').textContent=b.done?'✓':'';
     for(const c of childrenOf(n,b)) document.querySelector(`#blocks > [data-id="${c.id}"]`)?.classList.toggle('faded',b.done);
     touch(n);
-  }else if(x){
-    // 항목을 지우면 아래에 딸린 메모·목록도 같이 (되돌리기 가능)
-    const at=n.blocks.indexOf(b), gone=[b,...childrenOf(n,b)];
-    n.blocks.splice(at,gone.length); touch(n); renderEditor();
-    if(gone.length>1 || b.text.trim()) toast(gone.length>1? `항목과 아래 내용 ${gone.length-1}줄을 지웠습니다.` : '항목을 지웠습니다.','되돌리기',()=>{
-      if(cur()!==n) return; n.blocks.splice(Math.min(at,n.blocks.length),0,...gone); touch(n); renderEditor();
-    });
-  }
+  }else if(x) removeItem(n,b,false);
 });
+// 줄 하나 지우기 (체크 항목이면 딸린 메모·목록도 같이). 내용이 있었으면 되돌리기 가능.
+function removeItem(n,b,keepTyping){
+  const at=n.blocks.indexOf(b); if(at<0) return;
+  const gone= b.type==='todo'? [b,...childrenOf(n,b)] : [b];
+  n.blocks.splice(at,gone.length); touch(n); renderEditor();
+  if(keepTyping){ // 바로 위 글 칸으로 커서
+    for(let i=at-1;i>=0;i--) if(isWriting(n.blocks[i])){ caretTo(n.blocks[i].id); break; }
+  }
+  const filled=gone.some(g=>!isWriting(g) || g.text.trim());
+  if(filled) toast(gone.length>1? `항목과 아래 내용 ${gone.length-1}줄을 지웠습니다.` : '지웠습니다.','되돌리기',()=>{
+    if(cur()!==n) return; n.blocks.splice(Math.min(at,n.blocks.length),0,...gone); touch(n); renderEditor();
+  });
+}
 // 빈 아래쪽을 누르면 이어서 쓰기
 $('#tail').addEventListener('click',()=>{
   const n=cur(); if(!n) return;
@@ -1114,6 +1126,7 @@ childTools.addEventListener('pointerdown',e=>e.preventDefault());
 childTools.addEventListener('click',e=>{
   const act=e.target.closest('[data-cd]')?.dataset.cd, ta=document.activeElement;
   const n=cur(); const b=n && ta?.dataset?.id && blk(n,ta.dataset.id); const o=ownerOf(n,b); if(!act||!o) return;
+  if(act==='del') return removeItem(n,b,true);
   if(act==='list'){
     if(!b.text.trim()){ b.type='li'; b.style='dash'; b.level=0; touch(n); renderEditor(); caretTo(b.id,0); }
     else addUnder(n,o,'list');
@@ -1126,6 +1139,7 @@ todoTools.addEventListener('pointerdown',e=>e.preventDefault()); // 눌러도 �
 todoTools.addEventListener('click',e=>{
   const act=e.target.closest('[data-td]')?.dataset.td, ta=document.activeElement;
   const n=cur(); const b=n && ta?.classList?.contains('b-todo-t') && blk(n,ta.dataset.id); if(!act||!b) return;
+  if(act==='del') return removeItem(n,b,true);
   if(act==='memo'||act==='list') return addUnder(n,b,act);
   // 체크리스트 끝: 지금 항목이 비었고 딸린 것도 없으면 그 줄을 글 줄로, 아니면 체크리스트 바로 아래에 글 줄
   if(!b.text.trim() && !childrenOf(n,b).length){ b.type='text'; b.text=''; delete b.done; touch(n); renderEditor(); caretTo(b.id,0); return; }
@@ -1136,6 +1150,7 @@ liTools.addEventListener('click',e=>{
   const act=e.target.closest('[data-li]')?.dataset.li; const ta=document.activeElement;
   const n=cur(); const b=n && ta?.classList?.contains('b-li-t') && blk(n,ta.dataset.id); if(!act||!b) return;
   const p=ta.selectionStart;
+  if(act==='del') return removeItem(n,b,true);
   if(act==='in'||act==='out'){ liIndent(b,act==='in'?1:-1); touch(n); renderEditor(); caretTo(b.id,p); }
   else if(act==='style'){ openListStyles({kind:'list',id:b.id}); }
   else if(act==='end'){
