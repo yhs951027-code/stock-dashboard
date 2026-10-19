@@ -12,6 +12,9 @@ OUT = 'result.json'
 MODEL = os.environ.get('WHISPER_MODEL', 'small')
 # 무음·음악 구간에서 Whisper가 지어내는 대표 문구
 BOGUS = ('MBC 뉴스', '자막 제공', 'Amara.org', '한글자막 by', '자막 by')
+# 영상 끝 무음·음악에서 Whisper가 자주 지어내는 마무리 인사 (맨 끝 줄일 때만 지움)
+OUTRO = ('시청해주셔서감사합니다', '시청해주셔서고맙습니다', '구독과좋아요부탁드립니다', '구독좋아요부탁드립니다',
+         '다음영상에서만나요', '감사합니다')
 
 
 def save(d):
@@ -60,6 +63,8 @@ def to_lines(words, maxlen=14, gap=0.6):
     if cur:
         flush()
 
+    while lines and lines[-1]['text'].replace(' ', '').rstrip('.!~') in OUTRO:
+        lines.pop()
     # 너무 짧게 스치는 자막은 조금 늘리되 다음 줄과 겹치지 않게
     for i, ln in enumerate(lines):
         end = max(ln['end'] + 0.25, ln['start'] + 0.8)

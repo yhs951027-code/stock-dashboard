@@ -229,7 +229,7 @@ a{color:var(--brand)}
 'use strict';
 const $=s=>document.querySelector(s);
 const W=1080,H=1920;
-const STUDIO_VER=4;  // process.py·워크플로를 고치면 올림 → 앱이 저장소 파일을 자동으로 새로 설치
+const STUDIO_VER=5;  // process.py·워크플로를 고치면 올림 → 앱이 저장소 파일을 자동으로 새로 설치
 const STUDIO_FILES=[['requirements.txt','studio/requirements.txt'],['process.py','studio/process.py'],['.github/workflows/shorts.yml','studio/shorts.yml']];
 const TITLE_FONT='"Black Han Sans","Noto Sans KR",sans-serif';
 const SUB_FONT='"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
@@ -488,7 +488,7 @@ function openEditor(){
     S.titles.forEach(t=>{const b=document.createElement('button');b.className='chip';b.innerHTML=esc(t.line1)+'<br><span>'+esc(t.line2)+'</span>';
       b.onclick=()=>{$('#l1').value=t.line1;$('#l2').value=t.line2;redraw()};box.appendChild(b)});
   }
-  renderSubs(); syncToggles();
+  renderSubs(); syncToggles(); fontsThenRedraw();
   $('#scrub').max=S.dur; $('#scrub').value=Math.min(S.dur*0.3,S.dur);
   seekTo(+$('#scrub').value);
   $('#step2').scrollIntoView({behavior:'smooth'});
@@ -501,7 +501,7 @@ function renderSubs(){
     const row=document.createElement('div'); row.className='sl';
     row.innerHTML=`<button class="tm">${fmt(l.start)}</button><input class="t" value="${esc(l.text)}"><button class="x" aria-label="삭제">✕</button>`;
     row.querySelector('.tm').onclick=()=>{$('#scrub').value=l.start+0.05;seekTo(l.start+0.05)};
-    row.querySelector('input').oninput=e=>{l.text=e.target.value;redraw()};
+    row.querySelector('input').oninput=e=>{l.text=e.target.value;redraw();fontsThenRedraw()};
     row.querySelector('input').onfocus=()=>{$('#scrub').value=l.start+0.05;seekTo(l.start+0.05)};
     row.querySelector('.x').onclick=()=>{S.lines.splice(i,1);renderSubs();redraw()};
     box.appendChild(row);
@@ -520,7 +520,7 @@ $('#tgBars').onclick=()=>{S.bars=!S.bars;syncToggles();redraw()};
 $('#tgSubs').onclick=()=>{S.subs=!S.subs;syncToggles();redraw()};
 $('#tgIntro').onclick=()=>{S.use.intro=!S.use.intro;syncToggles()};
 $('#tgOutro').onclick=()=>{S.use.outro=!S.use.outro;syncToggles()};
-$('#l1').oninput=redraw; $('#l2').oninput=redraw;
+$('#l1').oninput=()=>{redraw();fontsThenRedraw()}; $('#l2').oninput=()=>{redraw();fontsThenRedraw()};
 $('#scrub').addEventListener('input',e=>seekTo(+e.target.value));
 let seeking=false,pendingSeek=null;
 async function seekTo(t){
@@ -634,12 +634,26 @@ let player=null;
 function pickMime(){
   if(!window.MediaRecorder) return null;
   // H.264를 먼저: 폰 하드웨어 인코더를 써서 프레임이 안 빠짐 (VP8/VP9는 대부분 소프트웨어라 느림)
-  return ['video/mp4;codecs=avc1.42E01F,mp4a.40.2','video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/webm;codecs=h264,opus','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']
+  return ['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1.4D0028,mp4a.40.2','video/mp4;codecs=avc1.42E01F,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/webm;codecs=h264,opus','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']
     .find(m=>MediaRecorder.isTypeSupported(m))||'';
 }
-async function fontsReady(){
-  try{await Promise.all([document.fonts.load(`80px "Black Han Sans"`,'가나다'),document.fonts.load(`900 80px "Noto Sans KR"`,'가나다')])}catch(e){}
+/* 한글 웹폰트는 글자 범위별로 88조각으로 나뉘어 받아짐. 그릴 글자가 든 조각을 다 받아야
+   중간 글자만 기본 글꼴로 나오는(글씨 깨짐) 일이 없음 → 실제로 그릴 글자로 미리 받음 */
+function screenText(){
+  const c=getChannel();
+  return [$('#l1').value,$('#l2').value,c.name,c.sub,...S.lines.map(l=>l.text),'가나다0123?!'].join('');
 }
+async function fontsReady(){
+  const text=screenText();
+  try{
+    await Promise.all([`80px "Black Han Sans"`,`900 80px "Noto Sans KR"`,`700 80px "Noto Sans KR"`,`500 80px "Noto Sans KR"`]
+      .map(f=>document.fonts.load(f,text)));
+    await document.fonts.ready;
+  }catch(e){}
+}
+let fontWait=null;
+function fontsThenRedraw(){ clearTimeout(fontWait); fontWait=setTimeout(()=>fontsReady().then(redraw),150) }
+document.fonts.addEventListener&&document.fonts.addEventListener('loadingdone',()=>redraw());
 async function play(record){
   await fontsReady();
   const segs=[];
@@ -668,7 +682,7 @@ async function play(record){
       stream=rc.captureStream(0); vtrack=stream.getVideoTracks()[0];
       if(!vtrack||!vtrack.requestFrame){stream=rc.captureStream(30);vtrack=null}
       dest.stream.getAudioTracks().forEach(tr=>stream.addTrack(tr));
-      rec=new MediaRecorder(stream,{...(mime?{mimeType:mime}:{}),videoBitsPerSecond:6e6,audioBitsPerSecond:128e3});
+      rec=new MediaRecorder(stream,{...(mime?{mimeType:mime}:{}),videoBitsPerSecond:12e6,audioBitsPerSecond:128e3});
       rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
       try{lock=await navigator.wakeLock?.request('screen')}catch(e){}
     }
@@ -770,7 +784,7 @@ $('#save').addEventListener('click',()=>{
 /* ---------- 내 채널 (이름·소개·프로필 사진) ---------- */
 const chImg=new Image();
 function getChannel(){const c=lsGet('shorts-channel')||{};return {name:String(c.name||''),sub:String(c.sub||''),img:c.img||'',pos:['top','corner','off'].includes(c.pos)?c.pos:'top'}}
-function setChannel(patch){const c={...getChannel(),...patch};lsSet('shorts-channel',c);loadChannel();redraw()}
+function setChannel(patch){const c={...getChannel(),...patch};lsSet('shorts-channel',c);loadChannel();redraw();fontsThenRedraw()}
 function loadChannel(){
   const c=getChannel();
   if(c.img&&chImg.src!==c.img){chImg.src=c.img;chImg.onload=()=>redraw()}
