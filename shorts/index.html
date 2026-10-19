@@ -235,7 +235,12 @@ async function setup(){
     cfg.ready=true; saveCfg();
     status('#setSt','준비 끝! 첫 AI 작업은 모델을 받느라 3~5분 걸릴 수 있어요.','done');
     refreshStart();
-  }catch(e){cfg.ready=false;saveCfg();status('#setSt',e.message,'err')}
+  }catch(e){
+    cfg.ready=false;saveCfg();
+    const msg=e.status===403?'토큰 권한이 부족해요. 토큰 설정에서 Repository permissions의 Contents와 Workflows를 둘 다 "Read and write"로 바꿔 주세요.'
+      :e.status===401?'토큰이 틀렸거나 만료됐어요. 새로 만들어 붙여넣어 주세요.':e.message;
+    status('#setSt',msg,'err');
+  }
 }
 
 /* 앱을 중간에 닫아 남은 작업 브랜치 정리 (30분 지난 것) */
