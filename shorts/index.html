@@ -80,6 +80,7 @@ a{color:var(--brand)}
 <main>
   <header>
     <h1>🎬 쇼츠 메이커</h1>
+    <button class="icon-btn" id="openEx" aria-label="예시 영상">🎨</button>
     <button class="icon-btn" id="openSet" aria-label="설정">⚙️</button>
   </header>
 
@@ -109,7 +110,10 @@ a{color:var(--brand)}
     <div class="toggles">
       <button class="tg" id="tgBars" aria-pressed="true">위아래 검은 띠 + 제목</button>
       <button class="tg" id="tgSubs" aria-pressed="true">자막</button>
+      <button class="tg hide" id="tgIntro" aria-pressed="true">인트로</button>
+      <button class="tg hide" id="tgOutro" aria-pressed="true">아웃트로</button>
     </div>
+    <div class="meta" id="styleNote"></div>
 
     <div id="titleBox">
       <label class="f">제목 (첫 줄 흰색 · 둘째 줄 노란색)</label>
@@ -138,6 +142,35 @@ a{color:var(--brand)}
 </main>
 
 <div class="hidden-media" id="media"></div>
+
+<dialog id="exDlg">
+  <h3>🎨 예시 영상</h3>
+  <div class="hint">필요한 것만 골라서 쓰면 돼요. 넣어둔 건 이 휴대폰에 저장돼요.</div>
+
+  <label class="f">① 스타일 따라 하기</label>
+  <div class="hint">마음에 드는 쇼츠를 넣으면 AI가 제목 말투, 글자 색·굵기, 자막 위치를 보고 내 영상도 그 느낌으로 만들어요.</div>
+  <label class="btn" for="refFile">예시 쇼츠 고르기</label>
+  <input type="file" id="refFile" accept="video/*">
+  <div class="status" id="refSt"><div class="spin"></div><div id="refTxt"></div></div>
+  <div class="meta" id="styleNow"></div>
+  <button class="btn hide" id="styleReset">기본 스타일로 되돌리기</button>
+
+  <label class="f">② 인트로 · 아웃트로</label>
+  <div class="hint">넣어두면 영상 만들 때마다 앞(인트로)·뒤(아웃트로)에 자동으로 붙어요. 편집 화면에서 끌 수도 있어요.</div>
+  <div class="row">
+    <label class="btn" for="introFile" id="introLbl">인트로 넣기</label>
+    <label class="btn" for="outroFile" id="outroLbl">아웃트로 넣기</label>
+  </div>
+  <input type="file" id="introFile" accept="video/*"><input type="file" id="outroFile" accept="video/*">
+  <div class="row">
+    <button class="btn hide" id="introDel">인트로 빼기</button>
+    <button class="btn hide" id="outroDel">아웃트로 빼기</button>
+  </div>
+
+  <label class="f">③ Claude한테 보여주기</label>
+  <div class="hint">원하는 느낌의 영상이나 캡처를 Claude 채팅에 올리면 앱 디자인 자체를 그 느낌으로 고쳐 드려요.</div>
+  <button class="btn" id="closeEx">닫기</button>
+</dialog>
 
 <dialog id="setDlg">
   <h3>⚙️ 처음 한 번만 설정</h3>
@@ -168,12 +201,13 @@ a{color:var(--brand)}
 'use strict';
 const $=s=>document.querySelector(s);
 const W=1080,H=1920;
+const STUDIO_VER=2;  // process.py·워크플로를 고치면 올림 → 앱이 저장소 파일을 자동으로 새로 설치
 const STUDIO_FILES=[['requirements.txt','studio/requirements.txt'],['process.py','studio/process.py'],['.github/workflows/shorts.yml','studio/shorts.yml']];
 const TITLE_FONT='"Black Han Sans","Noto Sans KR",sans-serif';
 const SUB_FONT='"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
 
 /* ---------- 상태 ---------- */
-const S={file:null,url:null,w:0,h:0,dur:0,lines:[],titles:[],bars:true,subs:true,busy:false};
+const S={file:null,url:null,w:0,h:0,dur:0,lines:[],titles:[],bars:true,subs:true,busy:false,use:{intro:true,outro:true}};
 const cfg=(()=>{try{return JSON.parse(localStorage.getItem('shorts-cfg'))||{}}catch(e){return {}}})();
 function saveCfg(){try{localStorage.setItem('shorts-cfg',JSON.stringify(cfg))}catch(e){}}
 
@@ -216,8 +250,23 @@ async function setup(){
     }
     if(!repo.private) throw new Error('저장소가 공개(Public)로 되어 있어요. 소리가 남에게 보일 수 있으니 Private 저장소로 만들어 주세요.');
     cfg.branch=repo.default_branch||'main';
+    await installStudio(dst=>status('#setSt','처리 파일 설치 중… '+dst));
+    cfg.ready=true; saveCfg();
+    status('#setSt','준비 끝! 이제 영상을 골라 주세요.','done');
+    refreshStart();
+    setTimeout(()=>$('#setDlg').close(),1500);  // 끝났다는 걸 보여 주고 창 닫기
+  }catch(e){
+    cfg.ready=false;saveCfg();
+    status('#setSt',ghMsg(e),'err');
+  }
+}
+function ghMsg(e){
+  return e.status===403?'토큰 권한이 부족해요. 토큰 설정에서 Repository permissions의 Contents와 Workflows를 둘 다 "Read and write"로 바꿔 주세요.'
+    :e.status===401?'토큰이 틀렸거나 만료됐어요. 새로 만들어 ⚙️ 설정에 붙여넣어 주세요.':e.message;
+}
+async function installStudio(say){
     for(const [dst,src] of STUDIO_FILES){
-      status('#setSt','처리 파일 설치 중… '+dst);
+      say&&say(dst);
       const text=await (await fetch(src,{cache:'no-store'})).text();
       let sha=null,same=false;
       try{
@@ -232,16 +281,12 @@ async function setup(){
         throw e;
       }
     }
-    cfg.ready=true; saveCfg();
-    status('#setSt','준비 끝! 이제 영상을 골라 주세요.','done');
-    refreshStart();
-    setTimeout(()=>$('#setDlg').close(),1500);  // 끝났다는 걸 보여 주고 창 닫기
-  }catch(e){
-    cfg.ready=false;saveCfg();
-    const msg=e.status===403?'토큰 권한이 부족해요. 토큰 설정에서 Repository permissions의 Contents와 Workflows를 둘 다 "Read and write"로 바꿔 주세요.'
-      :e.status===401?'토큰이 틀렸거나 만료됐어요. 새로 만들어 붙여넣어 주세요.':e.message;
-    status('#setSt',msg,'err');
-  }
+    cfg.studioVer=STUDIO_VER; saveCfg();
+}
+/* 앱이 새 버전이면 저장소의 처리 파일도 조용히 새로 설치 */
+async function updateStudio(){
+  if(!cfg.ready||cfg.studioVer===STUDIO_VER) return;
+  try{await installStudio()}catch(e){}
 }
 
 /* 앱을 중간에 닫아 남은 작업 브랜치 정리 (30분 지난 것) */
@@ -314,15 +359,16 @@ function wav(f32,rate){
   for(let i=0;i<n;i++){const s=Math.max(-1,Math.min(1,f32[i]));d.setInt16(44+i*2,s<0?s*0x8000:s*0x7FFF,true)}
   return new Blob([b],{type:'audio/wav'});
 }
-async function grabFrames(){
-  const out=[],c=document.createElement('canvas'),k=480/Math.max(S.w,S.h);
-  c.width=Math.round(S.w*k); c.height=Math.round(S.h*k);
+async function grabFrames(v=scrubV,at=[0.15,0.5,0.85],size=480){
+  const vw=v.videoWidth||S.w, vh=v.videoHeight||S.h, dur=v.duration||S.dur;
+  const out=[],c=document.createElement('canvas'),k=size/Math.max(vw,vh);
+  c.width=Math.round(vw*k); c.height=Math.round(vh*k);
   const x=c.getContext('2d');
-  for(const p of [0.15,0.5,0.85]){
+  for(const p of at){
     try{
-      scrubV.currentTime=Math.min(S.dur*p,Math.max(0,S.dur-0.1));
-      await once(scrubV,'seeked',8000);
-      x.drawImage(scrubV,0,0,c.width,c.height); out.push(c.toDataURL('image/jpeg',0.7));
+      v.currentTime=Math.min(dur*p,Math.max(0,dur-0.1));
+      await once(v,'seeked',8000);
+      x.drawImage(v,0,0,c.width,c.height); out.push(c.toDataURL('image/jpeg',0.75));
     }catch(e){}
   }
   return out;
@@ -334,38 +380,15 @@ $('#goManual').addEventListener('click',()=>{ S.lines=[];S.titles=[];S.bars=true
 
 async function runAI(){
   if(S.busy) return; S.busy=true; setBtns(true);
-  let branch=null; const t0=Date.now();
   try{
     status('#st','영상에서 소리 뽑는 중…');
     const audio=await extractWav(S.file);
     status('#st','장면 사진 찍는 중…');
     const frames=await grabFrames();
-    status('#st','비공개 저장소로 보내는 중…');
-    const head=await gh(`${R()}/git/ref/heads/${cfg.branch||'main'}`);
-    const base=head.object.sha;
-    const baseCommit=await gh(`${R()}/git/commits/${base}`);
-    const tree=[];
-    if(audio){
-      const b=await gh(`${R()}/git/blobs`,{method:'POST',body:{content:await blobB64(audio),encoding:'base64'}});
-      tree.push({path:'audio.wav',mode:'100644',type:'blob',sha:b.sha});
-    }
-    const inp=await gh(`${R()}/git/blobs`,{method:'POST',body:{content:JSON.stringify({version:1,duration:S.dur,hasAudio:!!audio,frames}),encoding:'utf-8'}});
-    tree.push({path:'input.json',mode:'100644',type:'blob',sha:inp.sha});
-    const t=await gh(`${R()}/git/trees`,{method:'POST',body:{base_tree:baseCommit.tree.sha,tree}});
-    const c=await gh(`${R()}/git/commits`,{method:'POST',body:{message:'job',tree:t.sha,parents:[base]}});
-    branch='job-'+Date.now();
-    await gh(`${R()}/git/refs`,{method:'POST',body:{ref:'refs/heads/'+branch,sha:c.sha}});
-
-    let res=null;
-    while(Date.now()-t0<20*60e3){
-      const sec=Math.round((Date.now()-t0)/1000);
-      status('#st',`AI가 ${audio?'자막과 ':''}제목 만드는 중… ${Math.floor(sec/60)}분 ${sec%60}초 (보통 1~2분, 처음엔 3~5분)`);
-      try{res=JSON.parse(await gh(`${R()}/contents/result.json?ref=${branch}`,{accept:'application/vnd.github.raw+json'}));break}
-      catch(e){if(e.status!==404) throw e}
-      await sleep(5000);
-    }
-    if(!res) throw new Error('20분이 지나도 결과가 안 와요. 저장소의 Actions 탭을 확인해 주세요.');
-    if(res.error) throw new Error('AI 처리 오류: '+res.error);
+    const st=getStyle();
+    const res=await runJob(audio,{mode:'shorts',duration:S.dur,frames,tone:st.tone||'',examples:st.examples||[]},
+      sec=>status('#st',`AI가 ${audio?'자막과 ':''}제목 만드는 중… ${Math.floor(sec/60)}분 ${sec%60}초 (보통 1~2분)`),
+      ()=>status('#st','비공개 저장소로 보내는 중…'));
     S.lines=res.lines||[]; S.titles=res.titles||[];
     S.subs=S.lines.length>0;
     S.bars=!res.speech || S.w>S.h;  // 말이 없거나 가로 영상이면 검은 띠 + 제목
@@ -374,13 +397,45 @@ async function runAI(){
     status('#st',msg,'done');
     openEditor();
   }catch(e){
-    status('#st',e.message,'err');
+    status('#st',ghMsg(e),'err');
   }finally{
-    if(branch) gh(`${R()}/git/refs/heads/${branch}`,{method:'DELETE'}).catch(()=>{});
     S.busy=false; setBtns(false);
   }
 }
-function setBtns(dis){document.querySelectorAll('.btn,#file').forEach(b=>{if(b.id!=='closeSet'&&b.id!=='doSetup')b.disabled=dis})}
+/* 비공개 저장소에 job-* 브랜치로 올리고 result.json을 기다림. 끝나면 브랜치째 지움 */
+async function runJob(audio,input,onWait,onSend){
+  let branch=null; const t0=Date.now();
+  try{
+    onSend&&onSend();
+    const head=await gh(`${R()}/git/ref/heads/${cfg.branch||'main'}`);
+    const base=head.object.sha;
+    const baseCommit=await gh(`${R()}/git/commits/${base}`);
+    const tree=[];
+    if(audio){
+      const b=await gh(`${R()}/git/blobs`,{method:'POST',body:{content:await blobB64(audio),encoding:'base64'}});
+      tree.push({path:'audio.wav',mode:'100644',type:'blob',sha:b.sha});
+    }
+    const inp=await gh(`${R()}/git/blobs`,{method:'POST',body:{content:JSON.stringify({version:1,hasAudio:!!audio,...input}),encoding:'utf-8'}});
+    tree.push({path:'input.json',mode:'100644',type:'blob',sha:inp.sha});
+    const t=await gh(`${R()}/git/trees`,{method:'POST',body:{base_tree:baseCommit.tree.sha,tree}});
+    const c=await gh(`${R()}/git/commits`,{method:'POST',body:{message:'job',tree:t.sha,parents:[base]}});
+    branch='job-'+Date.now();
+    await gh(`${R()}/git/refs`,{method:'POST',body:{ref:'refs/heads/'+branch,sha:c.sha}});
+    while(Date.now()-t0<20*60e3){
+      onWait&&onWait(Math.round((Date.now()-t0)/1000));
+      try{
+        const res=JSON.parse(await gh(`${R()}/contents/result.json?ref=${branch}`,{accept:'application/vnd.github.raw+json'}));
+        if(res.error) throw new Error('AI 처리 오류: '+res.error);
+        return res;
+      }catch(e){if(e.status!==404) throw e}
+      await sleep(5000);
+    }
+    throw new Error('20분이 지나도 결과가 안 와요. 저장소의 Actions 탭을 확인해 주세요.');
+  }finally{
+    if(branch) gh(`${R()}/git/refs/heads/${branch}`,{method:'DELETE'}).catch(()=>{});
+  }
+}
+function setBtns(dis){document.querySelectorAll('main .btn,#file').forEach(b=>b.disabled=dis)}
 
 /* ---------- 편집 화면 ---------- */
 function openEditor(){
@@ -415,10 +470,17 @@ function renderSubs(){
 }
 function syncToggles(){
   $('#tgBars').setAttribute('aria-pressed',S.bars); $('#tgSubs').setAttribute('aria-pressed',S.subs);
+  for(const k of ['intro','outro']){
+    const b=$(k==='intro'?'#tgIntro':'#tgOutro');
+    b.classList.toggle('hide',!clips[k]); b.setAttribute('aria-pressed',!!(clips[k]&&S.use[k]));
+  }
+  const st=getStyle(); $('#styleNote').textContent=st.custom?'🎨 예시 영상 스타일 적용 중 (🎨 버튼에서 바꿀 수 있어요)':'';
   $('#titleBox').classList.toggle('hide',!S.bars); $('#subBox').classList.toggle('hide',!S.subs);
 }
 $('#tgBars').onclick=()=>{S.bars=!S.bars;syncToggles();redraw()};
 $('#tgSubs').onclick=()=>{S.subs=!S.subs;syncToggles();redraw()};
+$('#tgIntro').onclick=()=>{S.use.intro=!S.use.intro;syncToggles()};
+$('#tgOutro').onclick=()=>{S.use.outro=!S.use.outro;syncToggles()};
 $('#l1').oninput=redraw; $('#l2').oninput=redraw;
 $('#scrub').addEventListener('input',e=>seekTo(+e.target.value));
 let seeking=false,pendingSeek=null;
@@ -435,8 +497,8 @@ function redraw(){ if(!player) draw(scrubV,scrubV.currentTime) }
 const cv=$('#cv'), ctx=cv.getContext('2d');
 let g=ctx;  // 지금 그리는 대상 (녹화 땐 녹화 전용 캔버스)
 function layout(){
-  const a=S.w/S.h;
-  if(!S.bars && a<=0.8) return {x:0,y:0,w:W,h:H,cover:true,top:0,subY:H*0.72};
+  const a=S.w/S.h, pos={high:0.3,middle:0.55,low:0.72}[getStyle().sub.position]||0.72;
+  if(!S.bars && a<=0.8) return {x:0,y:0,w:W,h:H,cover:true,top:0,subY:H*pos};
   // 검은 띠: 세로 영상은 4:5로 잘라 가운데, 가로 영상은 폭 맞춤
   const h=a>=0.8?Math.round(W/a):1350, y=Math.round((H-h)/2), bottom=H-y-h;
   return {x:0,y,w:W,h,cover:a<0.8,top:y,subY:bottom>=200?y+h+bottom/2:y+h-140};
@@ -455,14 +517,18 @@ function fitSize(lines,font,max,min,maxW){
 function drawTitle(L){
   const l1=$('#l1').value.trim(), l2=$('#l2').value.trim();
   const lines=[l1,l2].filter(Boolean); if(!lines.length||L.top<120) return;
-  const font=s=>`${s}px ${TITLE_FONT}`;
-  let s=fitSize(lines,font,112,40,W-90);
+  const st=getStyle().title;
+  const font=st.weight==='bold'?(s=>`900 ${s}px ${SUB_FONT}`):(s=>`${s}px ${TITLE_FONT}`);
+  const max={S:88,M:112,L:128}[st.size]||112;
+  let s=fitSize(lines,font,max,40,W-90);
   s=Math.min(s,(L.top-70)/(lines.length*1.22));
-  g.font=font(s); g.textAlign='center'; g.textBaseline='middle';
+  g.font=font(s); g.textAlign='center'; g.textBaseline='middle'; g.lineJoin='round';
   const lh=s*1.22, cy=L.top/2+12, y0=cy-(lines.length-1)*lh/2;
   lines.forEach((t,i)=>{
-    g.fillStyle=(lines.length===2&&i===1)?'#FFD84D':'#FFFFFF';
-    g.fillText(t,W/2,y0+i*lh);
+    const y=y0+i*lh;
+    if(st.stroke){g.lineWidth=s*0.16;g.strokeStyle='#000';g.strokeText(t,W/2,y)}
+    g.fillStyle=(lines.length===2&&i===1)?st.color2:st.color1;
+    g.fillText(t,W/2,y);
   });
 }
 function wrap(text,maxW){
@@ -475,13 +541,27 @@ function drawSub(L,t){
   let s=74; g.font=`900 ${s}px ${SUB_FONT}`;
   let rows=wrap(ln.text.trim(),W-120);
   while((rows.length>2||rows.some(r=>g.measureText(r).width>W-120))&&s>44){s-=4;g.font=`900 ${s}px ${SUB_FONT}`;rows=wrap(ln.text.trim(),W-120)}
+  const st=getStyle().sub;
   g.textAlign='center'; g.textBaseline='middle'; g.lineJoin='round';
   const lh=s*1.25, y0=L.subY-(rows.length-1)*lh/2;
+  if(st.box){
+    const bw=Math.max(...rows.map(r=>g.measureText(r).width))+s*0.8, bh=rows.length*lh+s*0.4;
+    g.fillStyle=st.boxColor; roundRect(W/2-bw/2,L.subY-bh/2,bw,bh,s*0.25);
+  }
   rows.forEach((r,i)=>{
     const y=y0+i*lh;
-    g.lineWidth=s*0.2; g.strokeStyle='#000'; g.strokeText(r,W/2,y);
-    g.fillStyle='#FFFFFF'; g.fillText(r,W/2,y);
+    if(st.stroke!=='none'){g.lineWidth=s*0.2; g.strokeStyle=st.stroke; g.strokeText(r,W/2,y)}
+    g.fillStyle=st.color; g.fillText(r,W/2,y);
   });
+}
+function roundRect(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill()}
+/* 인트로·아웃트로: 세로면 꽉 채우고 가로면 가운데 */
+function drawClip(v){
+  const vw=v.videoWidth,vh=v.videoHeight,a=vw/vh;
+  g.fillStyle='#000'; g.fillRect(0,0,W,H);
+  if(!vw) return;
+  if(a<=0.8) drawVideo(v,{x:0,y:0,w:W,h:H,cover:true});
+  else{const h=Math.round(W/a);drawVideo(v,{x:0,y:Math.round((H-h)/2),w:W,h,cover:false})}
 }
 function draw(v,t){
   const L=layout();
@@ -504,17 +584,26 @@ async function fontsReady(){
 }
 async function play(record){
   await fontsReady();
-  const v=document.createElement('video'); v.src=S.url; v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto';
-  $('#media').appendChild(v);
-  const me=player={v,stop:false};
+  const segs=[];
+  if(clips.intro&&S.use.intro) segs.push({url:clips.intro.url,main:false});
+  segs.push({url:S.url,main:true});
+  if(clips.outro&&S.use.outro) segs.push({url:clips.outro.url,main:false});
+  for(const sg of segs){
+    const v=document.createElement('video'); v.src=sg.url; v.playsInline=true; v.setAttribute('playsinline',''); v.preload='auto';
+    $('#media').appendChild(v); sg.v=v;
+  }
+  const me=player={stop:false};
   let rec=null,chunks=[],actx=null,lock=null,vtrack=null,stream=null,rc=null;
+  const paint=(sg,t)=>{ sg.main?draw(sg.v,t):drawClip(sg.v); vtrack&&vtrack.requestFrame(); if(rc) ctx.drawImage(rc,0,0) };
   try{
-    await once(v,'loadedmetadata',15000);
+    for(const sg of segs) if(sg.v.readyState<1) await once(sg.v,'loadedmetadata',15000);  // 이미 읽혔으면 이벤트가 안 옴
+    const total=segs.reduce((n,sg)=>n+(sg.v.duration||0),0)||1;
     if(record){
       const mime=pickMime();
       if(mime===null||!HTMLCanvasElement.prototype.captureStream) throw new Error('이 브라우저는 영상 저장을 지원하지 않아요. 크롬(안드로이드)이나 사파리(아이폰) 최신 버전으로 열어 주세요.');
       const AC=window.AudioContext||window.webkitAudioContext; actx=new AC(); await actx.resume();
-      const dest=actx.createMediaStreamDestination(); actx.createMediaElementSource(v).connect(dest);
+      const dest=actx.createMediaStreamDestination();
+      for(const sg of segs) actx.createMediaElementSource(sg.v).connect(dest);
       // 프레임을 그릴 때마다 직접 넘겨 줌 (자동 30fps 캡처는 가끔 멈춤)
       // 녹화할 때마다 새 캔버스를 씀 (같은 캔버스를 다시 캡처하면 프레임이 빠지는 경우가 있음)
       rc=document.createElement('canvas'); rc.width=W; rc.height=H; g=rc.getContext('2d');
@@ -525,24 +614,34 @@ async function play(record){
       rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
       try{lock=await navigator.wakeLock?.request('screen')}catch(e){}
     }
-    v.currentTime=0;
-    await v.play(); v.pause(); v.currentTime=0; await once(v,'seeked',5000).catch(()=>{});
-    draw(v,0);
-    if(rec){rec.start(1000);vtrack&&vtrack.requestFrame()}
-    await v.play();
+    // 이어 붙일 때 멈칫하지 않게 전부 미리 첫 프레임까지 준비
+    for(const sg of segs){
+      sg.v.muted=true;
+      try{await sg.v.play()}catch(e){}
+      sg.v.pause(); sg.v.currentTime=0; await once(sg.v,'seeked',5000).catch(()=>{});
+      sg.v.muted=false;
+    }
+    paint(segs[0],0);
+    if(rec) rec.start(1000);
     $('#prog').classList.add('on');
-    await new Promise(res=>{
-      const tick=()=>{
-        if(me.stop||v.ended){res();return}
-        draw(v,v.currentTime); vtrack&&vtrack.requestFrame();
-        if(rc) ctx.drawImage(rc,0,0);
-        $('#prog i').style.width=(v.currentTime/S.dur*100)+'%';
+    let done=0;
+    for(const sg of segs){
+      if(me.stop) break;
+      const v=sg.v;
+      await v.play();
+      await new Promise(res=>{
+        const tick=()=>{
+          if(me.stop||v.ended){res();return}
+          paint(sg,v.currentTime);
+          $('#prog i').style.width=((done+v.currentTime)/total*100)+'%';
+          requestAnimationFrame(tick);
+        };
+        v.addEventListener('ended',()=>res(),{once:true});
         requestAnimationFrame(tick);
-      };
-      v.addEventListener('ended',()=>res(),{once:true});
-      requestAnimationFrame(tick);
-    });
-    draw(v,v.duration||S.dur); vtrack&&vtrack.requestFrame();
+      });
+      paint(sg,v.duration||0);
+      done+=v.duration||0;
+    }
     if(rec){
       await sleep(200); rec.stop(); await once(rec,'stop');
       if(me.stop) return null;
@@ -551,7 +650,7 @@ async function play(record){
     }
     return null;
   }finally{
-    v.pause(); v.removeAttribute('src'); v.load(); v.remove();
+    for(const sg of segs){const v=sg.v; v.pause(); v.removeAttribute('src'); v.load(); v.remove()}
     if(stream) stream.getTracks().forEach(tr=>tr.stop());
     g=ctx;
     if(actx) actx.close().catch(()=>{});
@@ -595,6 +694,75 @@ $('#save').addEventListener('click',()=>{
   const a=document.createElement('a'); a.href=$('#out').src; a.download=outFile.name; document.body.appendChild(a); a.click(); a.remove();
 });
 
+/* ---------- 예시 영상: 스타일 ---------- */
+const BASE_STYLE={title:{color1:'#FFFFFF',color2:'#FFD84D',weight:'heavy',size:'M',stroke:false},
+  sub:{color:'#FFFFFF',stroke:'#000000',box:false,boxColor:'rgba(0,0,0,.6)',position:'low'},tone:'',examples:[]};
+const hex=(c,d)=>/^#[0-9a-f]{6}$/i.test(c||'')?c:d;
+function getStyle(){
+  let st=null; try{st=JSON.parse(localStorage.getItem('shorts-style'))}catch(e){}
+  if(!st) return BASE_STYLE;
+  const t=st.title||{},u=st.sub||{};
+  return {custom:true,tone:String(st.tone||''),examples:(st.examples||[]).slice(0,3).map(String),
+    title:{color1:hex(t.color1,'#FFFFFF'),color2:hex(t.color2,'#FFD84D'),weight:t.weight==='bold'?'bold':'heavy',size:['S','M','L'].includes(t.size)?t.size:'M',stroke:!!t.stroke},
+    sub:{color:hex(u.color,'#FFFFFF'),stroke:u.stroke==='none'?'none':hex(u.stroke,'#000000'),box:!!u.box,boxColor:hex(u.boxColor,'')||'rgba(0,0,0,.6)',
+      position:['high','middle','low'].includes(u.position)?u.position:'low'}};
+}
+function showStyle(){
+  const st=getStyle();
+  $('#styleReset').classList.toggle('hide',!st.custom);
+  if(!st.custom){$('#styleNow').textContent='지금: 기본 스타일 (흰색·노란색 제목, 흰 자막)';return}
+  const pos={high:'위쪽',middle:'가운데',low:'아래쪽'}[st.sub.position];
+  $('#styleNow').innerHTML=`지금: 예시 스타일 · 제목 <b style="color:${st.title.color1}">■</b><b style="color:${st.title.color2}">■</b> · 자막 <b style="color:${st.sub.color}">■</b> ${pos}${st.sub.box?' · 배경 상자':''}`+(st.tone?`<br>말투: ${esc(st.tone)}`:'');
+}
+$('#refFile').addEventListener('change',async e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  if(!cfg.ready){status('#refSt','먼저 ⚙️ 설정에서 저장소를 연결해 주세요.','err');return}
+  const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=URL.createObjectURL(f);
+  $('#media').appendChild(v);
+  try{
+    status('#refSt','예시 영상 장면 찍는 중…');
+    await once(v,'loadedmetadata',15000); await primeVideo(v);
+    const frames=await grabFrames(v,[0.1,0.3,0.5,0.7,0.9],640);
+    if(!frames.length) throw new Error('예시 영상을 읽을 수 없어요.');
+    const res=await runJob(null,{mode:'style',frames},
+      sec=>status('#refSt',`AI가 스타일 보는 중… ${sec}초`),()=>status('#refSt','비공개 저장소로 보내는 중…'));
+    if(!res.style) throw new Error('스타일을 못 읽었어요'+(res.styleError?': '+res.styleError:'.'));
+    localStorage.setItem('shorts-style',JSON.stringify(res.style));
+    status('#refSt','적용했어요! 다음 영상부터 이 스타일로 만들어요.','done');
+    showStyle(); syncToggles(); redraw();
+  }catch(err){status('#refSt',ghMsg(err),'err')}
+  finally{URL.revokeObjectURL(v.src); v.remove()}
+});
+$('#styleReset').onclick=()=>{try{localStorage.removeItem('shorts-style')}catch(e){} showStyle(); syncToggles(); redraw(); unstatus('#refSt')};
+
+/* ---------- 예시 영상: 인트로·아웃트로 (IndexedDB에 파일째 저장) ---------- */
+const clips={intro:null,outro:null};
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('shorts',1);r.onupgradeneeded=()=>r.result.createObjectStore('clips');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbDo(mode,fn){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction('clips',mode);const r=fn(tx.objectStore('clips'));tx.oncomplete=()=>res(r&&r.result);tx.onerror=()=>rej(tx.error)})}
+async function loadClips(){
+  for(const k of ['intro','outro']){
+    try{const f=await idbDo('readonly',s=>s.get(k)); setClip(k,f||null)}catch(e){}
+  }
+}
+function setClip(k,f){
+  if(clips[k]) URL.revokeObjectURL(clips[k].url);
+  clips[k]=f?{file:f,url:URL.createObjectURL(f)}:null;
+  const name=k==='intro'?'인트로':'아웃트로';
+  $('#'+k+'Lbl').textContent=f?`${name} 바꾸기`:`${name} 넣기`;
+  $('#'+k+'Del').classList.toggle('hide',!f);
+  syncToggles();
+}
+for(const k of ['intro','outro']){
+  $('#'+k+'File').addEventListener('change',async e=>{
+    const f=e.target.files[0]; e.target.value=''; if(!f) return;
+    try{await idbDo('readwrite',s=>s.put(f,k)); setClip(k,f); S.use[k]=true; syncToggles()}
+    catch(err){alert('저장 공간이 부족해서 못 넣었어요. 더 짧은 영상으로 해 주세요.')}
+  });
+  $('#'+k+'Del').onclick=async()=>{try{await idbDo('readwrite',s=>s.delete(k))}catch(e){} setClip(k,null)};
+}
+$('#openEx').onclick=()=>{showStyle(); unstatus('#refSt'); $('#exDlg').showModal()};
+$('#closeEx').onclick=()=>$('#exDlg').close();
+
 /* ---------- 설정 ---------- */
 function openSettings(){ $('#tok').value=cfg.token||''; $('#repoName').value=cfg.repo||'shorts-studio'; unstatus('#setSt'); $('#setDlg').showModal() }
 $('#openSet').onclick=openSettings;
@@ -603,7 +771,7 @@ $('#doSetup').onclick=setup;
 
 fontsReady().then(redraw);  // 글꼴이 늦게 오면 미리보기를 다시 그림
 if(!cfg.ready) setTimeout(()=>{ if(!S.file) openSettings() },400);
-cleanupJobs();
+cleanupJobs(); updateStudio(); loadClips();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
