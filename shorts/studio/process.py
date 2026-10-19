@@ -110,8 +110,10 @@ def ai_titles(frames, transcript, tone='', examples=()):
     prompt = (
         '유튜브 쇼츠 위쪽 검은 띠에 크게 들어갈 제목을 지어줘.\n'
         '장면 사진' + (' 과 영상 속 말' if transcript else '') + '을 보고 영상 내용에 딱 맞게.\n'
-        '- 2줄. 각 줄은 공백 포함 12자 이내\n'
-        '- 첫 줄은 상황, 둘째 줄은 궁금증을 만들거나 핵심을 찍는 말\n'
+        '- 2줄. 각 줄은 공백 포함 13자 이내\n'
+        '- 첫 줄은 상황, 둘째 줄은 궁금증을 만들거나 핵심을 찍는 말 (둘째 줄은 색을 바꿔 강조됨)\n'
+        '- 이런 느낌: "강아지 두마리 키우는 / 견주의 흔한 일상", "○○과 힘대결하면 / 벌어지는 일", '
+        '"○○한테 찐으로 / 반해버린 순간 ㅋㅋ", "사람 대우도 못 하면서 / 이게 왜 제 탓이죠?"\n'
         '- 실제 사람이 쓴 것처럼 자연스러운 한국어 구어체\n'
         '- 이모지, 해시태그, 따옴표, 과장된 낚시 금지\n'
         '- 서로 느낌이 다른 후보 3개\n'
@@ -138,7 +140,9 @@ def ai_style(frames):
     """예시 쇼츠 장면을 보고 제목·자막 글자 스타일과 제목 말투를 뽑는다."""
     prompt = (
         '이 사진들은 어떤 유튜브 쇼츠의 장면이야. 화면에 들어간 글자 스타일을 똑같이 따라 하려고 해.\n'
-        '- title: 위쪽(보통 검은 띠)에 크게 고정된 제목 글자. 없으면 비슷하게 어울리는 값으로\n'
+        '- band: 영상 바깥(위쪽 제목 띠) 배경색\n'
+        '- title: 위쪽 띠에 크게 고정된 제목 글자. 없으면 비슷하게 어울리는 값으로\n'
+        'title.box2: 둘째 줄 글자 뒤에 색 상자가 있으면 그 색, 없으면 ""\n'
         '- sub: 말하는 내용이 바뀌며 나오는 자막 글자. 없으면 기본값\n'
         '색은 실제 보이는 색을 #RRGGBB로. 두 줄 제목이면 color1은 첫 줄, color2는 둘째 줄(강조) 색.\n'
         'weight: 아주 두껍고 각진 제목용 글꼴이면 "heavy", 일반 굵은 고딕이면 "bold"\n'
@@ -146,10 +150,11 @@ def ai_style(frames):
         'stroke(제목): 글자에 검은 테두리가 있으면 true\n'
         'sub.stroke: 자막 테두리 색 #RRGGBB, 없으면 "none". sub.box: 자막 뒤에 배경 상자가 있으면 true, boxColor는 그 색\n'
         'sub.position: 자막 세로 위치 "high"/"middle"/"low"\n'
+        'sub.font: 자막이 각진 굵은 글꼴이면 "heavy", 일반 고딕이면 "bold"\n'
         'tone: 제목 말투를 한 문장으로 설명 (예: 반말로 짧게 놀라움을 강조)\n'
         'examples: 화면에 보이는 제목 글자를 그대로 최대 2개 (안 보이면 빈 배열)\n'
-        '답은 JSON만: {"style":{"title":{"color1":"","color2":"","weight":"","size":"","stroke":false},'
-        '"sub":{"color":"","stroke":"","box":false,"boxColor":"","position":""},"tone":"","examples":[]}}'
+        '답은 JSON만: {"style":{"band":"","title":{"color1":"","color2":"","box2":"","weight":"","size":"","stroke":false},'
+        '"sub":{"color":"","stroke":"","box":false,"boxColor":"","position":"","font":""},"tone":"","examples":[]}}'
     )
     data, err = ask_json(prompt, frames, 0.2)
     if data is None:

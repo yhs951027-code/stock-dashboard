@@ -56,6 +56,10 @@ input[type=range]{width:100%;margin:10px 0 0;accent-color:var(--brand)}
 label.f{display:block;font-size:13px;color:var(--sub);margin:12px 0 6px}
 input.t{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--line);background:#0E1114;color:var(--ink);font:inherit;font-size:16px;padding:0 12px}
 input.t.y{color:var(--brand)}
+.tpls{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.tpl{flex:none;border:2px solid var(--line);border-radius:12px;padding:8px 10px;min-width:92px;font-size:13px;font-weight:700;text-align:center}
+.tpl[aria-pressed=true]{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
+.tpl i{display:block;font-style:normal;font-size:15px;line-height:1.3;font-family:'Black Han Sans',sans-serif;font-weight:400;margin-bottom:4px}
 .chips{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .chip{text-align:left;border:1px solid var(--line);background:#0E1114;color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.4}
 .chip span{color:var(--brand)}
@@ -108,12 +112,13 @@ a{color:var(--brand)}
 
     <label class="f">꾸미기</label>
     <div class="toggles">
-      <button class="tg" id="tgBars" aria-pressed="true">위아래 검은 띠 + 제목</button>
+      <button class="tg" id="tgBars" aria-pressed="true">위 띠 + 제목</button>
       <button class="tg" id="tgSubs" aria-pressed="true">자막</button>
       <button class="tg hide" id="tgIntro" aria-pressed="true">인트로</button>
       <button class="tg hide" id="tgOutro" aria-pressed="true">아웃트로</button>
     </div>
-    <div class="meta" id="styleNote"></div>
+    <label class="f">스타일</label>
+    <div class="tpls" id="tplRow"></div>
 
     <div id="titleBox">
       <label class="f">제목 (첫 줄 흰색 · 둘째 줄 노란색)</label>
@@ -153,7 +158,7 @@ a{color:var(--brand)}
   <input type="file" id="refFile" accept="video/*">
   <div class="status" id="refSt"><div class="spin"></div><div id="refTxt"></div></div>
   <div class="meta" id="styleNow"></div>
-  <button class="btn hide" id="styleReset">기본 스타일로 되돌리기</button>
+  <button class="btn hide" id="styleReset">예시 스타일 지우기</button>
 
   <label class="f">② 인트로 · 아웃트로</label>
   <div class="hint">넣어두면 영상 만들 때마다 앞(인트로)·뒤(아웃트로)에 자동으로 붙어요. 편집 화면에서 끌 수도 있어요.</div>
@@ -201,7 +206,7 @@ a{color:var(--brand)}
 'use strict';
 const $=s=>document.querySelector(s);
 const W=1080,H=1920;
-const STUDIO_VER=2;  // process.py·워크플로를 고치면 올림 → 앱이 저장소 파일을 자동으로 새로 설치
+const STUDIO_VER=3;  // process.py·워크플로를 고치면 올림 → 앱이 저장소 파일을 자동으로 새로 설치
 const STUDIO_FILES=[['requirements.txt','studio/requirements.txt'],['process.py','studio/process.py'],['.github/workflows/shorts.yml','studio/shorts.yml']];
 const TITLE_FONT='"Black Han Sans","Noto Sans KR",sans-serif';
 const SUB_FONT='"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
@@ -474,7 +479,7 @@ function syncToggles(){
     const b=$(k==='intro'?'#tgIntro':'#tgOutro');
     b.classList.toggle('hide',!clips[k]); b.setAttribute('aria-pressed',!!(clips[k]&&S.use[k]));
   }
-  const st=getStyle(); $('#styleNote').textContent=st.custom?'🎨 예시 영상 스타일 적용 중 (🎨 버튼에서 바꿀 수 있어요)':'';
+  renderTpls();
   $('#titleBox').classList.toggle('hide',!S.bars); $('#subBox').classList.toggle('hide',!S.subs);
 }
 $('#tgBars').onclick=()=>{S.bars=!S.bars;syncToggles();redraw()};
@@ -496,12 +501,27 @@ function redraw(){ if(!player) draw(scrubV,scrubV.currentTime) }
 /* ---------- 그리기 ---------- */
 const cv=$('#cv'), ctx=cv.getContext('2d');
 let g=ctx;  // 지금 그리는 대상 (녹화 땐 녹화 전용 캔버스)
+/* 제목 띠: 화면 위 1/5쯤, 제목은 폭을 꽉 채우는 굵은 글씨. 영상은 띠 바로 아래부터 */
+function titleLines(){return [$('#l1').value.trim(),$('#l2').value.trim()].filter(Boolean)}
+function titleFont(st,s){return st.title.weight==='bold'?`900 ${s}px ${SUB_FONT}`:`${s}px ${TITLE_FONT}`}
+function titleMetrics(){
+  const st=getStyle(), lines=titleLines();
+  const max={S:120,M:150,L:170}[st.title.size];
+  const s=lines.length?fitSize(lines,x=>titleFont(st,x),max,56,W-80):0;
+  const pad=110;  // 위쪽은 유튜브 앱 아이콘이 덮으니 비움
+  const band=lines.length?Math.round(pad+lines.length*s*1.18+60):300;
+  return {st,lines,s,band:Math.max(300,Math.min(band,640)),pad};
+}
 function layout(){
-  const a=S.w/S.h, pos={high:0.3,middle:0.55,low:0.72}[getStyle().sub.position]||0.72;
-  if(!S.bars && a<=0.8) return {x:0,y:0,w:W,h:H,cover:true,top:0,subY:H*pos};
-  // 검은 띠: 세로 영상은 4:5로 잘라 가운데, 가로 영상은 폭 맞춤
-  const h=a>=0.8?Math.round(W/a):1350, y=Math.round((H-h)/2), bottom=H-y-h;
-  return {x:0,y,w:W,h,cover:a<0.8,top:y,subY:bottom>=200?y+h+bottom/2:y+h-140};
+  const a=S.w/S.h, pos={high:0.3,middle:0.55,low:0.75}[getStyle().sub.position];
+  if(!S.bars){
+    if(a<=0.8) return {x:0,y:0,w:W,h:H,cover:true,subY:H*pos};
+    const h=Math.round(W/a); return {x:0,y:Math.round((H-h)/2),w:W,h,cover:false,subY:Math.round((H+h)/2)+170};
+  }
+  const top=titleMetrics().band, rest=H-top;
+  if(a<=0.8) return {x:0,y:top,w:W,h:rest,cover:true,top,subY:top+rest*(pos===0.75?0.78:pos)};  // 세로 영상: 띠 아래를 꽉 채움
+  const h=Math.min(Math.round(W/a),rest), bottom=rest-h;                                     // 가로·정사각: 폭 맞춤
+  return {x:0,y:top,w:W,h,cover:h<Math.round(W/a),top,subY:bottom>=240?top+h+Math.min(bottom/2,190):top+h-130};
 }
 function drawVideo(v,L){
   const vw=v.videoWidth||S.w, vh=v.videoHeight||S.h;
@@ -514,21 +534,28 @@ function fitSize(lines,font,max,min,maxW){
   for(;s>min;s-=4){g.font=font(s);if(lines.every(l=>g.measureText(l).width<=maxW))break}
   return s;
 }
-function drawTitle(L){
-  const l1=$('#l1').value.trim(), l2=$('#l2').value.trim();
-  const lines=[l1,l2].filter(Boolean); if(!lines.length||L.top<120) return;
-  const st=getStyle().title;
-  const font=st.weight==='bold'?(s=>`900 ${s}px ${SUB_FONT}`):(s=>`${s}px ${TITLE_FONT}`);
-  const max={S:88,M:112,L:128}[st.size]||112;
-  let s=fitSize(lines,font,max,40,W-90);
-  s=Math.min(s,(L.top-70)/(lines.length*1.22));
-  g.font=font(s); g.textAlign='center'; g.textBaseline='middle'; g.lineJoin='round';
-  const lh=s*1.22, cy=L.top/2+12, y0=cy-(lines.length-1)*lh/2;
+function outlined(text,x,y,size,fill,stroke,box){
+  if(box){
+    const w=g.measureText(text).width+size*0.4;
+    g.fillStyle=box; g.fillRect(x-w/2,y-size*0.62,w,size*1.2);
+  }
+  if(stroke&&stroke!=='none'){
+    g.lineJoin='round'; g.lineWidth=size*0.2; g.strokeStyle=stroke; g.strokeText(text,x,y);
+  }
+  g.fillStyle=fill; g.fillText(text,x,y);
+}
+function drawTitle(){
+  const {st,lines,s,band,pad}=titleMetrics(); if(!lines.length) return;
+  g.font=titleFont(st,s); g.textAlign='center'; g.textBaseline='middle';
+  const lh=s*1.18, y0=pad+(band-pad-30-lines.length*lh)/2+lh/2;
   lines.forEach((t,i)=>{
-    const y=y0+i*lh;
-    if(st.stroke){g.lineWidth=s*0.16;g.strokeStyle='#000';g.strokeText(t,W/2,y)}
-    g.fillStyle=(lines.length===2&&i===1)?st.color2:st.color1;
-    g.fillText(t,W/2,y);
+    const second=lines.length===2&&i===1, y=y0+i*lh;
+    const fill=second?st.title.color2:st.title.color1;
+    // 진한 배경엔 검은 테두리 + 그림자, 밝은 배경엔 테두리 없이
+    if(st.title.stroke){g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowOffsetY=s*0.06;g.shadowBlur=s*0.05;
+      g.lineJoin='round';g.lineWidth=s*0.14;g.strokeStyle='#000';g.strokeText(t,W/2,y);g.restore()}
+    if(second&&st.title.box2){const w=g.measureText(t).width+s*0.36;g.fillStyle=st.title.box2;g.fillRect(W/2-w/2,y-s*0.6,w,s*1.16)}
+    g.fillStyle=fill; g.fillText(t,W/2,y);
   });
 }
 function wrap(text,maxW){
@@ -538,21 +565,13 @@ function wrap(text,maxW){
 }
 function drawSub(L,t){
   const ln=S.lines.find(l=>t>=l.start&&t<l.end); if(!ln||!ln.text.trim()) return;
-  let s=74; g.font=`900 ${s}px ${SUB_FONT}`;
-  let rows=wrap(ln.text.trim(),W-120);
-  while((rows.length>2||rows.some(r=>g.measureText(r).width>W-120))&&s>44){s-=4;g.font=`900 ${s}px ${SUB_FONT}`;rows=wrap(ln.text.trim(),W-120)}
-  const st=getStyle().sub;
-  g.textAlign='center'; g.textBaseline='middle'; g.lineJoin='round';
-  const lh=s*1.25, y0=L.subY-(rows.length-1)*lh/2;
-  if(st.box){
-    const bw=Math.max(...rows.map(r=>g.measureText(r).width))+s*0.8, bh=rows.length*lh+s*0.4;
-    g.fillStyle=st.boxColor; roundRect(W/2-bw/2,L.subY-bh/2,bw,bh,s*0.25);
-  }
-  rows.forEach((r,i)=>{
-    const y=y0+i*lh;
-    if(st.stroke!=='none'){g.lineWidth=s*0.2; g.strokeStyle=st.stroke; g.strokeText(r,W/2,y)}
-    g.fillStyle=st.color; g.fillText(r,W/2,y);
-  });
+  const st=getStyle().sub, font=x=>st.font==='bold'?`900 ${x}px ${SUB_FONT}`:`${x}px ${TITLE_FONT}`;
+  let s=100; g.font=font(s);
+  let rows=wrap(ln.text.trim(),W-110);
+  while((rows.length>2||rows.some(r=>g.measureText(r).width>W-110))&&s>48){s-=4;g.font=font(s);rows=wrap(ln.text.trim(),W-110)}
+  g.textAlign='center'; g.textBaseline='middle';
+  const lh=s*1.3, y0=L.subY-(rows.length-1)*lh/2;
+  rows.forEach((r,i)=>outlined(r,W/2,y0+i*lh,s,st.color,st.box?'none':st.stroke,st.box?st.boxColor:''));
 }
 function roundRect(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill()}
 /* 인트로·아웃트로: 세로면 꽉 채우고 가로면 가운데 */
@@ -565,9 +584,9 @@ function drawClip(v){
 }
 function draw(v,t){
   const L=layout();
-  g.fillStyle='#000'; g.fillRect(0,0,W,H);
+  g.fillStyle=S.bars?getStyle().band:'#000'; g.fillRect(0,0,W,H);
   drawVideo(v,L);
-  if(S.bars) drawTitle(L);
+  if(S.bars) drawTitle();
   if(S.subs) drawSub(L,t);
 }
 
@@ -694,25 +713,54 @@ $('#save').addEventListener('click',()=>{
   const a=document.createElement('a'); a.href=$('#out').src; a.download=outFile.name; document.body.appendChild(a); a.click(); a.remove();
 });
 
-/* ---------- 예시 영상: 스타일 ---------- */
-const BASE_STYLE={title:{color1:'#FFFFFF',color2:'#FFD84D',weight:'heavy',size:'M',stroke:false},
-  sub:{color:'#FFFFFF',stroke:'#000000',box:false,boxColor:'rgba(0,0,0,.6)',position:'low'},tone:'',examples:[]};
+/* ---------- 스타일 (템플릿 + 예시 영상에서 읽은 스타일) ---------- */
+// band: 영상 밖 배경색 / title.box2: 둘째 줄 뒤 색 상자 / sub.font: heavy(각진 굵은 글꼴)·bold
+const TEMPLATES=[
+  {id:'black-sky',name:'블랙·하늘',band:'#000000',title:{color1:'#FFFFFF',color2:'#4FC3F7',stroke:true},sub:{color:'#FFE14D',stroke:'none',box:true,boxColor:'#111111'}},
+  {id:'black-yellow',name:'블랙·노랑',band:'#000000',title:{color1:'#FFFFFF',color2:'#FFE14D',stroke:true},sub:{color:'#FFFFFF',stroke:'#000000'}},
+  {id:'brown',name:'브라운',band:'#6E3A1E',title:{color1:'#FFE14D',color2:'#FFFFFF',stroke:true},sub:{color:'#FFFFFF',stroke:'#000000'}},
+  {id:'white',name:'화이트',band:'#F2F2F2',title:{color1:'#111111',color2:'#111111',stroke:false},sub:{color:'#111111',stroke:'#FFFFFF'}},
+  {id:'navy-box',name:'네이비·박스',band:'#0A2463',title:{color1:'#FFFFFF',color2:'#FFFFFF',box2:'#1E5BFF',stroke:false},sub:{color:'#FFFFFF',stroke:'#000000'}},
+];
 const hex=(c,d)=>/^#[0-9a-f]{6}$/i.test(c||'')?c:d;
-function getStyle(){
-  let st=null; try{st=JSON.parse(localStorage.getItem('shorts-style'))}catch(e){}
-  if(!st) return BASE_STYLE;
+function cleanStyle(st,name){
   const t=st.title||{},u=st.sub||{};
-  return {custom:true,tone:String(st.tone||''),examples:(st.examples||[]).slice(0,3).map(String),
-    title:{color1:hex(t.color1,'#FFFFFF'),color2:hex(t.color2,'#FFD84D'),weight:t.weight==='bold'?'bold':'heavy',size:['S','M','L'].includes(t.size)?t.size:'M',stroke:!!t.stroke},
-    sub:{color:hex(u.color,'#FFFFFF'),stroke:u.stroke==='none'?'none':hex(u.stroke,'#000000'),box:!!u.box,boxColor:hex(u.boxColor,'')||'rgba(0,0,0,.6)',
-      position:['high','middle','low'].includes(u.position)?u.position:'low'}};
+  return {name,band:hex(st.band,'#000000'),tone:String(st.tone||''),examples:(st.examples||[]).slice(0,3).map(String),
+    title:{color1:hex(t.color1,'#FFFFFF'),color2:hex(t.color2,'#FFE14D'),box2:hex(t.box2,''),stroke:t.stroke!==false,
+      weight:t.weight==='bold'?'bold':'heavy',size:['S','M','L'].includes(t.size)?t.size:'M'},
+    sub:{color:hex(u.color,'#FFFFFF'),stroke:u.stroke==='none'?'none':hex(u.stroke,'#000000'),box:!!u.box,boxColor:hex(u.boxColor,'#111111'),
+      font:u.font==='bold'?'bold':'heavy',position:['high','middle','low'].includes(u.position)?u.position:'low'}};
+}
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+function styleList(){
+  const list=TEMPLATES.map(t=>({id:t.id,st:cleanStyle(t,t.name)}));
+  const ai=lsGet('shorts-style-ai'); if(ai) list.push({id:'ai',st:cleanStyle(ai,'예시 영상')});
+  return list;
+}
+function getStyle(){
+  const list=styleList(), pick=lsGet('shorts-style-pick');
+  return (list.find(x=>x.id===pick)||list[0]).st;
+}
+function renderTpls(){
+  const row=$('#tplRow'); if(!row) return;
+  const pick=lsGet('shorts-style-pick'), list=styleList(), cur=(list.find(x=>x.id===pick)||list[0]).id;
+  row.innerHTML='';
+  for(const {id,st} of list){
+    const b=document.createElement('button'); b.className='tpl'; b.setAttribute('aria-pressed',id===cur);
+    b.style.background=st.band; b.style.color=st.title.color1;
+    const l2=st.title.box2?`<span style="background:${st.title.box2};color:${st.title.color2};padding:0 3px">둘째줄</span>`:`<span style="color:${st.title.color2}">둘째줄</span>`;
+    b.innerHTML=`<i>첫줄<br>${l2}</i>${esc(st.name)}`;
+    b.onclick=()=>{lsSet('shorts-style-pick',id);renderTpls();redraw()};
+    row.appendChild(b);
+  }
 }
 function showStyle(){
-  const st=getStyle();
-  $('#styleReset').classList.toggle('hide',!st.custom);
-  if(!st.custom){$('#styleNow').textContent='지금: 기본 스타일 (흰색·노란색 제목, 흰 자막)';return}
-  const pos={high:'위쪽',middle:'가운데',low:'아래쪽'}[st.sub.position];
-  $('#styleNow').innerHTML=`지금: 예시 스타일 · 제목 <b style="color:${st.title.color1}">■</b><b style="color:${st.title.color2}">■</b> · 자막 <b style="color:${st.sub.color}">■</b> ${pos}${st.sub.box?' · 배경 상자':''}`+(st.tone?`<br>말투: ${esc(st.tone)}`:'');
+  const ai=lsGet('shorts-style-ai');
+  $('#styleReset').classList.toggle('hide',!ai);
+  if(!ai){$('#styleNow').textContent='아직 넣은 예시가 없어요. 편집 화면의 스타일 목록에서 기본 템플릿을 고를 수 있어요.';return}
+  const st=cleanStyle(ai,'예시 영상'), pos={high:'위쪽',middle:'가운데',low:'아래쪽'}[st.sub.position];
+  $('#styleNow').innerHTML=`예시 스타일: 배경 <b style="color:${st.band}">■</b> · 제목 <b style="color:${st.title.color1}">■</b><b style="color:${st.title.color2}">■</b> · 자막 <b style="color:${st.sub.color}">■</b> ${pos}${st.sub.box?' · 배경 상자':''}`+(st.tone?`<br>말투: ${esc(st.tone)}`:'');
 }
 $('#refFile').addEventListener('change',async e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f) return;
@@ -727,13 +775,13 @@ $('#refFile').addEventListener('change',async e=>{
     const res=await runJob(null,{mode:'style',frames},
       sec=>status('#refSt',`AI가 스타일 보는 중… ${sec}초`),()=>status('#refSt','비공개 저장소로 보내는 중…'));
     if(!res.style) throw new Error('스타일을 못 읽었어요'+(res.styleError?': '+res.styleError:'.'));
-    localStorage.setItem('shorts-style',JSON.stringify(res.style));
-    status('#refSt','적용했어요! 다음 영상부터 이 스타일로 만들어요.','done');
+    lsSet('shorts-style-ai',res.style); lsSet('shorts-style-pick','ai');
+    status('#refSt','적용했어요! 편집 화면 스타일 목록에 "예시 영상"으로 들어갔어요.','done');
     showStyle(); syncToggles(); redraw();
   }catch(err){status('#refSt',ghMsg(err),'err')}
   finally{URL.revokeObjectURL(v.src); v.remove()}
 });
-$('#styleReset').onclick=()=>{try{localStorage.removeItem('shorts-style')}catch(e){} showStyle(); syncToggles(); redraw(); unstatus('#refSt')};
+$('#styleReset').onclick=()=>{lsSet('shorts-style-ai',null); if(lsGet('shorts-style-pick')==='ai') lsSet('shorts-style-pick',null); showStyle(); syncToggles(); redraw(); unstatus('#refSt')};
 
 /* ---------- 예시 영상: 인트로·아웃트로 (IndexedDB에 파일째 저장) ---------- */
 const clips={intro:null,outro:null};
