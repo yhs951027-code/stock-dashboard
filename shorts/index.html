@@ -233,8 +233,9 @@ async function setup(){
       }
     }
     cfg.ready=true; saveCfg();
-    status('#setSt','준비 끝! 첫 AI 작업은 모델을 받느라 3~5분 걸릴 수 있어요.','done');
+    status('#setSt','준비 끝! 이제 영상을 골라 주세요.','done');
     refreshStart();
+    setTimeout(()=>$('#setDlg').close(),1500);  // 끝났다는 걸 보여 주고 창 닫기
   }catch(e){
     cfg.ready=false;saveCfg();
     const msg=e.status===403?'토큰 권한이 부족해요. 토큰 설정에서 Repository permissions의 Contents와 Workflows를 둘 다 "Read and write"로 바꿔 주세요.'
