@@ -105,8 +105,8 @@ def ask_json(prompt, frames, temperature):
     return None, last
 
 
-def ai_titles(frames, transcript, tone='', examples=()):
-    """상단 제목 후보 3개. 예시 쇼츠 말투가 있으면 그 말투를 따라 함."""
+def ai_titles(frames, transcript, tone='', examples=(), channel=''):
+    """상단 제목 후보 3개 + 유튜브 업로드 제목·해시태그. 예시 쇼츠 말투가 있으면 그 말투를 따라 함."""
     prompt = (
         '유튜브 쇼츠 위쪽 검은 띠에 크게 들어갈 제목을 지어줘.\n'
         '장면 사진' + (' 과 영상 속 말' if transcript else '') + '을 보고 영상 내용에 딱 맞게.\n'
@@ -117,23 +117,33 @@ def ai_titles(frames, transcript, tone='', examples=()):
         '- 실제 사람이 쓴 것처럼 자연스러운 한국어 구어체\n'
         '- 이모지, 해시태그, 따옴표, 과장된 낚시 금지\n'
         '- 서로 느낌이 다른 후보 3개\n'
-        '답은 JSON만: {"titles":[{"line1":"","line2":""},...]}'
+        '그리고 유튜브에 올릴 때 쓸 upload 도 만들어줘:\n'
+        '- upload.title: 검색에 잘 걸리는 업로드 제목 (40자 이내, 첫 번째 후보와 같은 내용)\n'
+        '- upload.tags: 영상 내용에 맞는 해시태그 4~6개 (#shorts 포함)\n'
+        '답은 JSON만: {"titles":[{"line1":"","line2":""},...],"upload":{"title":"","tags":["#..."]}}'
     )
     if tone:
         prompt += '\n\n이 말투를 따라 해: ' + tone[:300]
     if examples:
         prompt += '\n참고할 예시 제목(그대로 베끼지는 말 것): ' + ' / '.join(e[:40] for e in examples[:3])
+    if channel:
+        prompt += '\n채널 이름: ' + channel[:40]
     if transcript:
         prompt += '\n\n영상 속 말: ' + transcript[:1500]
     data, err = ask_json(prompt, frames[:4], 0.8)
     if data is None:
-        return None, err
+        return None, None, err
     out = []
     for t in data.get('titles', []) if isinstance(data, dict) else []:
         l1, l2 = str(t.get('line1', '')).strip(), str(t.get('line2', '')).strip()
         if l1 or l2:
             out.append({'line1': l1, 'line2': l2})
-    return (out[:3], None) if out else (None, '빈 응답')
+    upload = None
+    u = data.get('upload') if isinstance(data, dict) else None
+    if isinstance(u, dict) and u.get('title'):
+        tags = [str(t).strip() for t in (u.get('tags') or []) if str(t).strip()][:8]
+        upload = {'title': str(u['title']).strip()[:100], 'tags': tags}
+    return (out[:3], upload, None) if out else (None, None, '빈 응답')
 
 
 def ai_style(frames):
@@ -178,9 +188,11 @@ def main():
     if not speech:
         lines = []
     transcript = ' '.join(l['text'] for l in lines)
-    titles, err = ai_titles(inp.get('frames', []), transcript,
-                            inp.get('tone', ''), inp.get('examples', []))
+    titles, upload, err = ai_titles(inp.get('frames', []), transcript,
+                                    inp.get('tone', ''), inp.get('examples', []), inp.get('channel', ''))
     res = {'version': 1, 'speech': speech, 'lines': lines, 'titles': titles or []}
+    if upload:
+        res['upload'] = upload
     if err and not titles:
         res['titleError'] = err
     save(res)
