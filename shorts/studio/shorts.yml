@@ -1,0 +1,68 @@
+# 쇼츠 메이커: 폰 앱이 job-* 브랜치로 소리·장면 사진을 올리면 자막·제목을 만들어 result.json으로 돌려준다.
+# main에 푸시되면 Whisper 모델만 미리 받아 캐시해 둔다 (작업 브랜치는 main 캐시를 가져다 씀).
+name: shorts
+
+on:
+  push:
+    branches: ['main', 'master', 'job-*']
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: ${{ github.ref }}
+
+env:
+  WHISPER_MODEL: small
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 할 일 확인
+        id: chk
+        run: |
+          if [[ "$GITHUB_REF_NAME" != job-* ]]; then echo "mode=warm" >> "$GITHUB_OUTPUT";
+          elif [ -f input.json ] && [ ! -f result.json ]; then echo "mode=job" >> "$GITHUB_OUTPUT";
+          else echo "mode=skip" >> "$GITHUB_OUTPUT"; fi
+
+      - if: steps.chk.outputs.mode != 'skip'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - if: steps.chk.outputs.mode != 'skip'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: whisper-${{ env.WHISPER_MODEL }}-v1
+
+      - if: steps.chk.outputs.mode != 'skip'
+        run: pip install -r requirements.txt
+
+      - if: steps.chk.outputs.mode == 'warm'
+        run: python process.py warm
+
+      - if: steps.chk.outputs.mode == 'job'
+        run: python process.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 실패 기록
+        if: failure() && steps.chk.outputs.mode == 'job'
+        run: |
+          [ -f result.json ] || echo '{"error":"처리 중 오류가 났어요. 저장소의 Actions 기록을 확인해 주세요."}' > result.json
+
+      - name: 결과 올리기
+        if: always() && steps.chk.outputs.mode == 'job'
+        run: |
+          git config user.name "shorts-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add result.json
+          git commit -m "result"
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
