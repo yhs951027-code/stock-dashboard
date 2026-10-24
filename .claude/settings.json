@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:stockanalysis.com)",
+      "WebFetch(domain:tradingeconomics.com)"
+    ]
+  }
+}
