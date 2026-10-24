@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#B5482A">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>구매 리뷰</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 상품마다 블로그용·쿠팡용 리뷰를 칸별로 나눠 두고, 칸마다 복사해서 바로 붙여넣는 페이지.
+   리뷰는 이 기기(localStorage)에 저장. PRESET에 넣은 리뷰는 처음 열 때 목록에 들어감. */
+:root{
+  --bg:#F3EFEA; --card:#FFFFFF; --ink:#1F1A17; --sub:#5E554E; --line:#DDD4CB;
+  --brand:#B5482A; --brand-ink:#FFFFFF; --soft:#F6E6E0;
+  --good:#1E6B45; --good-bg:#E3F2E9; --bad:#A33A2C; --bad-bg:#FBE7E3; --star:#D08A00;
+  --shadow:0 1px 2px rgba(31,26,23,.08),0 6px 18px rgba(31,26,23,.06);
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15120F; --card:#211C18; --ink:#F2ECE6; --sub:#B7ADA4; --line:#3B332C;
+  --brand:#F0957A; --brand-ink:#24120B; --soft:#33241E;
+  --good:#7FD3A2; --good-bg:#17301F; --bad:#FF9C8C; --bad-bg:#3A1C17; --star:#F5C25A;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#15120F; --card:#211C18; --ink:#F2ECE6; --sub:#B7ADA4; --line:#3B332C;
+  --brand:#F0957A; --brand-ink:#24120B; --soft:#33241E;
+  --good:#7FD3A2; --good-bg:#17301F; --bad:#FF9C8C; --bad-bg:#3A1C17; --star:#F5C25A;
+  --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+
+.wrap{max-width:720px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.top h1{font-family:var(--f-num);font-size:26px;font-weight:700}
+.top .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+.btn{min-height:48px;padding:8px 16px;border-radius:12px;border:2px solid var(--brand);background:var(--card);color:var(--brand);font-weight:700;font-size:17px}
+.btn.fill{background:var(--brand);color:var(--brand-ink)}
+.btn.ghost{border-color:var(--line);color:var(--ink);font-weight:500}
+.btn.sm{min-height:40px;padding:4px 12px;font-size:15px;border-radius:10px}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+
+.hint{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);color:var(--sub);font-size:16px}
+.hint b{color:var(--ink)}
+
+/* 상품 목록 칩 */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:none;max-width:220px;min-height:44px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--card);font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip[aria-current="true"]{border-color:var(--brand);background:var(--soft);color:var(--brand);font-weight:700}
+.chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--line);margin-right:6px;vertical-align:middle}
+.chip.done .dot{background:var(--good)}
+
+/* 상품 카드 */
+.prod{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px}
+.prod-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.prod-head .btn{flex:none;white-space:nowrap}
+.prod-head h2{font-family:var(--f-num);font-size:22px;font-weight:700;line-height:1.35}
+.meta{font-size:15px;color:var(--sub)}
+.stars{color:var(--star);letter-spacing:1px}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg);padding:5px;border-radius:12px}
+.tab{min-height:46px;border:0;border-radius:9px;background:transparent;font-weight:700;font-size:17px;color:var(--sub)}
+.tab[aria-selected="true"]{background:var(--card);color:var(--brand);box-shadow:var(--shadow)}
+
+/* 칸 */
+.sec{border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.sec-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 8px 8px 14px;background:var(--bg);border-bottom:1.5px solid var(--line)}
+.sec-h h3{font-size:16px;font-weight:700}
+.sec.good{border-color:var(--good)} .sec.good .sec-h{background:var(--good-bg);border-color:var(--good)} .sec.good h3{color:var(--good)}
+.sec.bad{border-color:var(--bad)} .sec.bad .sec-h{background:var(--bad-bg);border-color:var(--bad)} .sec.bad h3{color:var(--bad)}
+.sec textarea{display:block;width:100%;border:0;background:var(--card);padding:12px 14px;font-size:17px;line-height:1.7;resize:vertical;min-height:60px;field-sizing:content}
+.copy-all{display:flex;gap:8px;flex-wrap:wrap}
+.copy-all .btn{flex:1}
+
+/* 입력 폼 */
+dialog{border:0;border-radius:16px;padding:0;width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--card);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.dlg h2{font-family:var(--f-num);font-size:21px}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label{font-size:15px;font-weight:700;color:var(--sub)}
+.f small{font-size:14px;color:var(--sub)}
+.f input,.f select,.f textarea{width:100%;min-height:48px;border:2px solid var(--line);border-radius:10px;background:var(--card);padding:8px 12px;font-size:17px}
+.f textarea{min-height:84px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rate{display:flex;gap:4px}
+.rate button{flex:1;min-height:48px;border:2px solid var(--line);border-radius:10px;background:var(--card);font-size:22px;color:var(--line)}
+.rate button.on{color:var(--star);border-color:var(--star)}
+.dlg-acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+.toast{position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:50;max-width:480px;margin:0 auto;background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;font-weight:500;text-align:center}
+.empty{text-align:center;color:var(--sub);padding:30px 10px}
+@media (max-width:420px){ .row2{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>구매 리뷰</h1>
+    <div class="acts">
+      <button class="btn ghost sm" id="btnTheme">화면: 자동</button>
+      <button class="btn ghost sm" id="btnBulk">목록 붙여넣기</button>
+      <button class="btn fill sm" id="btnAdd">+ 상품 추가</button>
+    </div>
+  </div>
+
+  <p class="hint" id="hint"><b>쓰는 법</b> — 상품을 고르고 <b>블로그용 / 쿠팡용</b> 탭을 바꿔 가며 칸마다 <b>복사</b>를 눌러 붙여넣으면 돼요. 내용은 바로 고쳐 쓸 수 있고, 고친 건 이 기기에 저장돼요.</p>
+
+  <div class="chips" id="chips" role="tablist" aria-label="상품"></div>
+  <div id="view"></div>
+</div>
+
+<dialog id="dlg">
+  <form class="dlg" method="dialog" id="form">
+    <h2 id="dlgTitle">상품 추가</h2>
+    <div class="f"><label for="fName">상품명</label><input id="fName" required placeholder="예: 샤오미 무선 청소기 G10"></div>
+    <div class="row2">
+      <div class="f"><label for="fCat">종류</label>
+        <select id="fCat"><option>생활용품</option><option>주방용품</option><option>가전·디지털</option><option>식품</option><option>뷰티</option><option>패션</option><option>유아·반려</option><option>자동차용품</option><option>기타</option></select></div>
+      <div class="f"><label for="fPeriod">써본 기간</label><input id="fPeriod" placeholder="예: 2주, 한 달"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="fDate">구매일</label><input id="fDate" type="date"></div>
+      <div class="f"><label for="fPrice">가격 (선택)</label><input id="fPrice" inputmode="numeric" placeholder="예: 29900"></div>
+    </div>
+    <div class="f"><label>별점</label><div class="rate" id="fRate"></div></div>
+    <div class="f"><label for="fReason">산 이유</label><input id="fReason" placeholder="예: 쓰던 게 고장 나서, 후기가 좋아서"></div>
+    <div class="f"><label for="fPros">좋았던 점</label><textarea id="fPros" placeholder="한 줄에 하나씩&#10;예: 생각보다 흡입력이 셈&#10;무게가 가벼워서 손목이 덜 아픔"></textarea></div>
+    <div class="f"><label for="fCons">아쉬운 점</label><textarea id="fCons" placeholder="한 줄에 하나씩&#10;예: 먼지통이 작아서 자주 비워야 함"></textarea></div>
+    <div class="f"><label for="fFor">이런 분께 추천 (선택)</label><input id="fFor" placeholder="예: 원룸 사는 1인 가구"></div>
+    <div class="f"><label for="fMemo">하고 싶은 말 (선택)</label><textarea id="fMemo" placeholder="자유롭게. 배송, 포장, 실제 써보니 어땠는지 등"></textarea><small>적은 내용으로 초안을 만들어요. 만든 뒤에 칸마다 고칠 수 있어요.</small></div>
+    <div class="dlg-acts">
+      <button class="btn danger" type="button" id="fDel" hidden>삭제</button>
+      <button class="btn ghost" type="button" id="fCancel">닫기</button>
+      <button class="btn fill" type="submit" id="fOk">초안 만들기</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="bulk">
+  <form class="dlg" method="dialog" id="bulkForm">
+    <h2>구매 목록 붙여넣기</h2>
+    <div class="f"><label for="bulkText">상품명을 한 줄에 하나씩</label><textarea id="bulkText" style="min-height:200px" placeholder="쿠팡 주문목록에서 상품명만 복사해서 붙여넣으세요"></textarea><small>상품만 먼저 목록에 올라가요. 하나씩 눌러서 좋았던 점·아쉬운 점을 채우면 리뷰가 만들어져요.</small></div>
+    <div class="dlg-acts">
+      <button class="btn ghost" type="button" id="bulkCancel">닫기</button>
+      <button class="btn fill" type="submit">목록에 넣기</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const KEY='reviews.items', SEL='reviews.sel', TAB='reviews.tab', THEME_KEY='reviews.theme';
+
+/* 미리 써 둔 리뷰. id가 이미 저장돼 있으면 다시 넣지 않음(고친 내용 보존). */
+const PRESET=[];
+
+const BLOG_SECS=[['title','제목'],['intro','도입'],['reason','구매 이유'],['use','사용 후기'],['pros','장점','good'],['cons','단점','bad'],['who','이런 분께 추천'],['sum','총평'],['tags','해시태그']];
+const CP_SECS=[['line','한 줄 요약'],['body','본문'],['pros','좋은 점','good'],['cons','아쉬운 점','bad'],['again','재구매 의사']];
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||[]; }catch(e){ return []; } }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(items)); }catch(e){} }
+function getLS(k,d){ try{ return localStorage.getItem(k)||d; }catch(e){ return d; } }
+function setLS(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+let items=load();
+{ const have=new Set(items.map(i=>i.id)); let add=false;
+  for(const p of PRESET) if(!have.has(p.id)){ items.push(p); add=true; }
+  if(add) save(); }
+let sel=getLS(SEL,''), tab=getLS(TAB,'blog'), editId=null, rating=5;
+
+/* ---------- 초안 만들기 ---------- */
+const lines=s=>(s||'').split('\n').map(x=>x.trim().replace(/^[-•·*\d.)\s]+/,'').trim()).filter(Boolean);
+const pick=(a,seed)=>a[Math.abs(seed)%a.length];
+const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7);
+const won=p=>{ const n=+String(p).replace(/[^\d]/g,''); return n? n.toLocaleString('ko-KR')+'원' : ''; };
+const short=n=>n.replace(/\[[^\]]*\]|\([^)]*\)/g,'').replace(/\s+/g,' ').trim().split(' ').slice(0,4).join(' ');
+const endDot=s=>/[.!?~]$/.test(s)? s : s+'.';
+
+function draft(it){
+  const sd=hash(it.name), nm=short(it.name), pros=lines(it.pros), cons=lines(it.cons);
+  const period=it.period? it.period+' 정도' : '며칠';
+  const price=won(it.price);
+  const r=it.rating;
+  const verdict= r>=5? '돈 아깝지 않은 소비였어요' : r>=4? '아쉬운 점이 조금 있지만 전체적으로 만족해요' : r>=3? '장단점이 확실한 제품이에요' : '솔직히 기대보다는 아쉬웠어요';
+  const prosBl= pros.length? pros.map(p=>'✔ '+p).join('\n') : '✔ ';
+  const consBl= cons.length? cons.map(c=>'✖ '+c).join('\n') : '✖ 아직 크게 불편한 점은 없었어요.';
+  const who= it.for||'';
+  const cat=(it.cat||'').replace('·',' ').split(' ')[0];
+  const tagWords=[...new Set([nm.replace(/\s/g,''), ...nm.split(' ').filter(w=>w.length>1).slice(0,2), cat, '쿠팡추천','내돈내산','솔직후기'])];
+
+  const blog={
+    title: `${nm} ${it.period? it.period+' ':''}실사용 솔직 후기 (장단점 정리)`,
+    intro: `${pick(['안녕하세요!','오늘은','요즘 잘 쓰고 있는 물건 하나 소개해요.'],sd)} ${nm} ${period} 써본 후기 남겨볼게요.\n쿠팡에서 ${price? price+'에 ':''}직접 구매한 내돈내산 후기예요.`,
+    reason: it.reason? endDot(`${it.reason.replace(/[.]$/,'')} 구매하게 됐어요`) : '',
+    use: it.memo||'',
+    pros: prosBl, cons: consBl,
+    who: who? `${who}께 추천드려요.` : '',
+    sum: `${'★'.repeat(r)}${'☆'.repeat(5-r)} (${r}/5)\n${period} 써본 결과, ${verdict}.`,
+    tags: tagWords.filter(Boolean).map(w=>'#'+w).join(' ')
+  };
+  const cp={
+    line: r>=4? pick(['만족하면서 잘 쓰고 있어요.','생각보다 훨씬 괜찮아요.','가격 대비 만족스러워요.'],sd) : r>=3? '쓸 만한데 아쉬운 점도 있어요.' : '기대보다는 아쉬웠어요.',
+    body: [`${period} 써보고 남겨요.`, it.reason&&endDot(`${it.reason.replace(/[.]$/,'')} 샀어요`), it.memo&&endDot(it.memo)].filter(Boolean).join(' '),
+    pros: pros.length? pros.map(p=>'- '+p).join('\n') : '- ',
+    cons: cons.length? cons.map(c=>'- '+c).join('\n') : '- 딱히 없어요',
+    again: r>=4? '있어요. 떨어지면 또 살 것 같아요.' : r>=3? '고민돼요. 더 나은 게 없으면 다시 살 수도 있어요.' : '없어요.'
+  };
+  return {blog,cp};
+}
+
+/* ---------- 화면 ---------- */
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const filled=it=>it.blog && (lines(it.pros).length||lines(it.cons).length||it.memo);
+
+function render(){
+  if(!items.find(i=>i.id===sel)) sel=items[0]?.id||'';
+  $('#chips').innerHTML=items.map(i=>`<button class="chip${filled(i)?' done':''}" role="tab" data-id="${i.id}" aria-current="${i.id===sel}"><span class="dot"></span>${esc(short(i.name))}</button>`).join('');
+  const it=items.find(i=>i.id===sel);
+  if(!it){ $('#view').innerHTML=`<div class="prod empty">아직 상품이 없어요.<br><b>+ 상품 추가</b>나 <b>목록 붙여넣기</b>로 시작하세요.</div>`; return; }
+  if(!filled(it)){
+    $('#view').innerHTML=`<div class="prod"><div class="prod-head"><div><h2>${esc(it.name)}</h2><p class="meta">아직 리뷰 내용이 없어요</p></div></div>
+      <button class="btn fill" data-act="edit">좋았던 점·아쉬운 점 채우기</button></div>`;
+    return;
+  }
+  const secs= tab==='blog'? BLOG_SECS : CP_SECS, src= tab==='blog'? it.blog : it.cp;
+  const meta=[it.cat, it.date&&it.date.replaceAll('-','.')+' 구매', it.period&&it.period+' 사용', won(it.price)].filter(Boolean).join(' · ');
+  $('#view').innerHTML=`<article class="prod">
+    <div class="prod-head"><div><h2>${esc(it.name)}</h2><p class="meta"><span class="stars">${'★'.repeat(it.rating)}${'☆'.repeat(5-it.rating)}</span> ${esc(meta)}</p></div>
+      <button class="btn ghost sm" data-act="edit">수정</button></div>
+    <div class="tabs" role="tablist"><button class="tab" role="tab" data-tab="blog" aria-selected="${tab==='blog'}">블로그용</button><button class="tab" role="tab" data-tab="cp" aria-selected="${tab==='cp'}">쿠팡용</button></div>
+    ${secs.filter(([k])=>src[k]!==undefined).map(([k,label,cls])=>`<section class="sec ${cls||''}">
+      <div class="sec-h"><h3>${label}</h3><button class="btn ghost sm" data-copy="${k}">복사</button></div>
+      <textarea data-k="${k}" aria-label="${label}" rows="${Math.max(2,(src[k]||'').split('\n').length)}" placeholder="비어 있어요. 직접 써 넣거나 이 칸은 빼고 쓰세요.">${esc(src[k])}</textarea></section>`).join('')}
+    <div class="copy-all"><button class="btn fill" data-act="all">${tab==='blog'?'블로그 글':'쿠팡 리뷰'} 전체 복사</button><button class="btn ghost" data-act="regen">초안 다시 만들기</button></div>
+  </article>`;
+}
+
+function fullText(it){
+  if(tab==='blog'){ const b=it.blog;
+    return [b.title,'',b.intro,'',b.reason&&'📦 구매 이유\n'+b.reason,b.use&&'📝 사용 후기\n'+b.use,'👍 장점\n'+b.pros,'👎 단점\n'+b.cons,b.who&&'🙋 이런 분께 추천\n'+b.who,'⭐ 총평\n'+b.sum,'',b.tags].filter(x=>x!==''&&x).join('\n\n').replace(/\n{3,}/g,'\n\n');
+  }
+  const c=it.cp;
+  return [c.line,c.body,'[좋은 점]\n'+c.pros,'[아쉬운 점]\n'+c.cons,'[재구매 의사] '+c.again].filter(Boolean).join('\n\n');
+}
+
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){ const t=document.createElement('textarea'); t.value=text; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+  toast('복사했어요');
+}
+let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,1800); }
+
+$('#chips').onclick=e=>{ const b=e.target.closest('.chip'); if(!b) return; sel=b.dataset.id; setLS(SEL,sel); render(); };
+$('#view').addEventListener('click',e=>{
+  const it=items.find(i=>i.id===sel); if(!it) return;
+  const t=e.target.closest('[data-tab]'); if(t){ tab=t.dataset.tab; setLS(TAB,tab); render(); return; }
+  const c=e.target.closest('[data-copy]'); if(c){ copy((tab==='blog'?it.blog:it.cp)[c.dataset.copy]); return; }
+  const a=e.target.closest('[data-act]')?.dataset.act;
+  if(a==='edit') openForm(it);
+  if(a==='all') copy(fullText(it));
+  if(a==='regen' && confirm('칸에서 고친 내용이 지워지고 입력한 내용으로 다시 만들어요. 계속할까요?')){ Object.assign(it,draft(it)); save(); render(); toast('다시 만들었어요'); }
+});
+$('#view').addEventListener('input',e=>{
+  const ta=e.target.closest('textarea[data-k]'); if(!ta) return;
+  const it=items.find(i=>i.id===sel); (tab==='blog'?it.blog:it.cp)[ta.dataset.k]=ta.value; save();
+});
+
+/* ---------- 입력 폼 ---------- */
+$('#fRate').innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" aria-label="${n}점">★</button>`).join('');
+const paintRate=()=>$('#fRate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.n<=rating));
+$('#fRate').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; rating=+b.dataset.n; paintRate(); };
+const F={name:'#fName',cat:'#fCat',period:'#fPeriod',date:'#fDate',price:'#fPrice',reason:'#fReason',pros:'#fPros',cons:'#fCons',for:'#fFor',memo:'#fMemo'};
+function openForm(it){
+  editId=it?.id||null;
+  for(const [k,s] of Object.entries(F)) $(s).value=it?.[k]??(k==='cat'?'생활용품':'');
+  rating=it?.rating||5; paintRate();
+  $('#dlgTitle').textContent=it? '상품 정보 수정' : '상품 추가';
+  $('#fOk').textContent=it?.blog? '저장하고 초안 다시 만들기' : '초안 만들기';
+  $('#fDel').hidden=!it;
+  $('#dlg').showModal();
+}
+$('#btnAdd').onclick=()=>openForm(null);
+$('#fCancel').onclick=()=>$('#dlg').close();
+$('#fDel').onclick=()=>{ if(!confirm('이 상품을 지울까요?')) return; items=items.filter(i=>i.id!==editId); save(); $('#dlg').close(); render(); };
+$('#form').onsubmit=e=>{
+  const v={}; for(const [k,s] of Object.entries(F)) v[k]=$(s).value.trim();
+  if(!v.name){ e.preventDefault(); return; }
+  v.rating=rating;
+  let it=items.find(i=>i.id===editId);
+  if(it && it.blog && !confirm('입력한 내용으로 리뷰 칸을 다시 만들어요. 칸에서 고친 내용은 지워져요. 계속할까요?')){ e.preventDefault(); return; }
+  if(!it){ it={id:uid()}; items.unshift(it); }
+  Object.assign(it,v,draft(v));
+  sel=it.id; setLS(SEL,sel); save(); render();
+};
+
+/* ---------- 목록 붙여넣기 ---------- */
+$('#btnBulk').onclick=()=>{ $('#bulkText').value=''; $('#bulk').showModal(); };
+$('#bulkCancel').onclick=()=>$('#bulk').close();
+$('#bulkForm').onsubmit=()=>{
+  const names=$('#bulkText').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const have=new Set(items.map(i=>i.name));
+  const add=names.filter(n=>!have.has(n)).map(n=>({id:uid(),name:n,cat:'기타',rating:5}));
+  items=[...items,...add]; if(add[0]&&!sel) sel=add[0].id; save(); render();
+  toast(add.length? `${add.length}개 넣었어요` : '새로 넣을 상품이 없어요');
+};
+
+/* ---------- 화면 테마 ---------- */
+const THEMES=['auto','light','dark'], THEME_LABEL={auto:'자동',light:'밝게',dark:'어둡게'};
+function applyTheme(t){ if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); $('#btnTheme').textContent='화면: '+THEME_LABEL[t]; }
+$('#btnTheme').onclick=()=>{ const t=THEMES[(THEMES.indexOf(getLS(THEME_KEY,'auto'))+1)%3]; setLS(THEME_KEY,t); applyTheme(t); };
+applyTheme(getLS(THEME_KEY,'auto'));
+
+render();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "구매 리뷰",
+  "short_name": "구매 리뷰",
+  "description": "쿠팡에서 산 물건 리뷰를 블로그용·쿠팡용으로 나눠 쓰고 바로 복사",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3EFEA",
+  "theme_color": "#B5482A",
+  "lang": "ko",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
